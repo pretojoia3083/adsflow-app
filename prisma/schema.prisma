@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String         @id @default(cuid())
+  email             String         @unique
+  name              String?
+  passwordHash      String?
+  image             String?
+  plan              String         @default("FREE")
+  stripeCustomerId  String?        @unique
+  emailVerified     DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  accounts          Account[]
+  sessions          Session[]
+  campaigns         Campaign[]
+  presells          Presell[]
+  subscription      Subscription?
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Campaign {
+  id              String   @id @default(cuid())
+  userId          String
+  productName     String
+  description     String?
+  audience        String?
+  funnelStage     String   @default("meio")
+  budgetPref      String   @default("medio")
+  country         String
+  countryCode     String?
+  language        String?
+  estimatedCpm    String?
+  networkId       String?
+  networkName     String?
+  affLink         String?
+  trackingId      String?
+  templateId      String?
+  templateLabel   String?
+  presellSlug     String?
+  keywords        String   @default("[]")
+  interests       String   @default("[]")
+  placements      String   @default("[]")
+  budgetDaily     Float?
+  deviceSplit     String   @default("{}")
+  adCopy          String   @default("{}")
+  tone            String?
+  status          String   @default("DRAFT")
+  metaCampaignId  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Presell {
+  id          String   @id @default(cuid())
+  userId      String
+  slug        String   @unique
+  title       String
+  headline    String?
+  subheadline String?
+  bodyText    String?
+  ctaText     String?
+  ctaLink     String?
+  bgColor     String?
+  accentColor String?
+  textColor   String?
+  customHtml  String?
+  template    String   @default("advertorial")
+  language    String   @default("pt")
+  network     String?
+  affLink     String?
+  published   Boolean  @default(false)
+  views       Int      @default(0)
+  campaignId  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user     User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  stripeId      String   @unique
+  status        String
+  priceId       String?
+  currentPeriod DateTime?
+  cancelAt      DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
