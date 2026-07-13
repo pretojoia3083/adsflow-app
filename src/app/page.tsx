@@ -1,483 +1,933 @@
-"use client";
-
-import React, { useState } from "react";
-
-const C = {
-  bg: "#0B0F17",
-  panel: "#121826",
-  panelAlt: "#1A2333",
-  border: "#232D40",
-  accent: "#6366F1",
-  accentSoft: "rgba(99,102,241,0.15)",
-  green: "#22C55E",
-  amber: "#F59E0B",
-  red: "#F87171",
-  text: "#F1F5F9",
-  dim: "#8B96A8",
-};
-
-const SCORE_COLOR = (score: number) =>
-  score >= 75 ? C.green : score >= 50 ? C.amber : C.red;
-
-const FUNNEL_STAGES = [
-  { id: "topo", label: "Topo de funil", desc: "Descoberta" },
-  { id: "meio", label: "Meio de funil", desc: "Consideracao" },
-  { id: "fundo", label: "Fundo de funil", desc: "Decisao" },
-];
-
-const AFFILIATE_NETWORKS = [
-  { id: "hotmart", name: "Hotmart", tag: "Infoproduto" },
-  { id: "kiwify", name: "Kiwify", tag: "Infoproduto" },
-  { id: "eduzz", name: "Eduzz", tag: "Infoproduto" },
-  { id: "monetizze", name: "Monetizze", tag: "Infoproduto/Fisico" },
-  { id: "braip", name: "Braip", tag: "Recorrencia/Fisico" },
-  { id: "clickbank", name: "ClickBank", tag: "Global" },
-  { id: "amazon", name: "Amazon Associados", tag: "E-commerce" },
-  { id: "shopee", name: "Shopee Afiliados", tag: "E-commerce" },
-];
-
-const TEMPLATES: Record<string, Array<{ id: string; label: string; desc: string }>> = {
-  topo: [
-    { id: "advertorial", label: "Advertorial / Noticia", desc: "Formato de materia, alto engajamento" },
-    { id: "quiz", label: "Quiz interativo", desc: "Engaja e qualifica antes de mostrar a oferta" },
-  ],
-  meio: [
-    { id: "comparacao", label: "Comparacao", desc: "Produto vs concorrentes" },
-    { id: "depoimentos", label: "Depoimentos", desc: "Prova social pra vencer objecoes" },
-  ],
-  fundo: [
-    { id: "contagem", label: "Contagem regressiva", desc: "Urgencia/escassez pra fechar a venda" },
-    { id: "depoimentos", label: "Depoimentos", desc: "Reforco de confianca antes do checkout" },
-  ],
-};
-
-function Spinner({ label }: { label?: string }) {
+export default function Home() {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, color: C.dim, fontSize: 13 }}>
-      <div
+    <div style={{ fontFamily: "'Inter', sans-serif", background: "#080B14", minHeight: "100vh", color: "#E2E8F0", margin: 0, padding: 0 }}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { background: #080B14; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-6px); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+      ` }} />
+
+      {/* WhatsApp Floating Button */}
+      <a
+        href="https://wa.me/5500000000000"
+        target="_blank"
+        rel="noopener noreferrer"
         style={{
-          width: 16,
-          height: 16,
-          border: `2px solid ${C.border}`,
-          borderTopColor: C.accent,
+          position: "fixed",
+          bottom: 24,
+          right: 24,
+          width: 56,
+          height: 56,
           borderRadius: "50%",
-          animation: "spin 0.8s linear infinite",
-        }}
-      />
-      {label}
-    </div>
-  );
-}
-
-function ScoreRing({ score }: { score: number }) {
-  const size = 52;
-  const stroke = 5;
-  const r = (size - stroke) / 2;
-  const c = 2 * Math.PI * r;
-  const offset = c - (score / 100) * c;
-  const color = SCORE_COLOR(score);
-  return (
-    <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
-      <svg width={size} height={size}>
-        <circle cx={size / 2} cy={size / 2} r={r} stroke={C.border} strokeWidth={stroke} fill="none" />
-        <circle
-          cx={size / 2} cy={size / 2} r={r} stroke={color} strokeWidth={stroke} fill="none"
-          strokeDasharray={c} strokeDashoffset={offset} strokeLinecap="round"
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-          style={{ transition: "stroke-dashoffset 0.6s ease" }}
-        />
-      </svg>
-      <div
-        style={{
-          position: "absolute", inset: 0, display: "flex", alignItems: "center",
-          justifyContent: "center", fontWeight: 800, fontSize: 13, color,
+          background: "#25D366",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 4px 20px rgba(37,211,102,0.4)",
+          zIndex: 9999,
+          textDecoration: "none",
+          transition: "transform 0.2s",
         }}
       >
-        {score}
-      </div>
-    </div>
-  );
-}
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+      </a>
 
-function Stepper({ step }: { step: number }) {
-  const steps = ["Produto", "Mercado", "Presell", "Anuncios", "Campanha"];
-  return (
-    <div style={{ display: "flex", gap: 4, marginBottom: 22, flexWrap: "wrap" }}>
-      {steps.map((label, i) => {
-        const n = i + 1;
-        const active = n === step;
-        const done = n < step;
-        return (
-          <div key={label} style={{ display: "flex", alignItems: "center", gap: 6, flex: "1 1 auto", minWidth: 60 }}>
-            <div
+      {/* Sticky Header */}
+      <header
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 1000,
+          background: "rgba(8,11,20,0.85)",
+          backdropFilter: "blur(16px)",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 1200,
+            margin: "0 auto",
+            padding: "0 24px",
+            height: 64,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect width="32" height="32" rx="8" fill="#22B07D"/>
+              <path d="M8 16L13 21L24 10" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 22, color: "#FFFFFF" }}>
+              AdsFlow
+            </span>
+          </div>
+
+          <nav style={{ display: "flex", alignItems: "center", gap: 32 }}>
+            {[
+              { label: "Recursos", href: "#recursos" },
+              { label: "Como funciona", href: "#como-funciona" },
+              { label: "Preços", href: "#precos" },
+              { label: "Depoimentos", href: "#depoimentos" },
+            ].map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                style={{ color: "#94A3B8", fontSize: 14, fontWeight: 500, textDecoration: "none", transition: "color 0.2s" }}
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <a
+              href="/login"
               style={{
-                width: 24, height: 24, borderRadius: "50%", display: "flex",
-                alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800,
-                flexShrink: 0, background: done ? C.green : active ? C.accent : C.panelAlt,
-                color: done || active ? "#fff" : C.dim,
-                border: `1px solid ${done ? C.green : active ? C.accent : C.border}`,
+                color: "#E2E8F0",
+                fontSize: 14,
+                fontWeight: 500,
+                textDecoration: "none",
+                padding: "8px 16px",
+                borderRadius: 8,
+                transition: "background 0.2s",
               }}
             >
-              {done ? "✓" : n}
-            </div>
-            <span style={{ fontSize: 11, fontWeight: 700, color: active ? C.text : C.dim, whiteSpace: "nowrap" }}>
-              {label}
-            </span>
-            {n < steps.length && <div style={{ flex: 1, height: 1, background: C.border, minWidth: 8 }} />}
+              Entrar
+            </a>
+            <a
+              href="/register"
+              style={{
+                background: "#22B07D",
+                color: "#FFFFFF",
+                fontSize: 14,
+                fontWeight: 600,
+                textDecoration: "none",
+                padding: "8px 20px",
+                borderRadius: 8,
+                transition: "background 0.2s",
+              }}
+            >
+              Criar conta grátis
+            </a>
           </div>
-        );
-      })}
-    </div>
-  );
-}
-
-const MOCK_MARKETS = [
-  { country: "Brasil", countryCode: "BR", flag: "🇧🇷", demandScore: 92, competitionLevel: "media" as const, suggestedLanguage: "Portugues", estimatedCpm: "$2-5", reasoning: "Maior mercado de infoprodutos da America Latina. Publico altamente receptivo a ofertas digitais." },
-  { country: "Estados Unidos", countryCode: "US", flag: "🇺🇸", demandScore: 88, competitionLevel: "alta" as const, suggestedLanguage: "English", estimatedCpm: "$6-12", reasoning: "Maior mercado de afiliados do mundo. Alta competicao mas enorme potencial de conversao." },
-  { country: "Mexico", countryCode: "MX", flag: "🇲🇽", demandScore: 78, competitionLevel: "baixa" as const, suggestedLanguage: "Espanhol", estimatedCpm: "$1-3", reasoning: "Mercado em crescimento rapido com baixa concorrencia. Custo de midia muito acessivel." },
-  { country: "Portugal", countryCode: "PT", flag: "🇵🇹", demandScore: 72, competitionLevel: "baixa" as const, suggestedLanguage: "Portugues", estimatedCpm: "$2-4", reasoning: "Publico lusofono com poder de compra superior ao Brasil. Pouca competicao em nichos digitais." },
-  { country: "Colombia", countryCode: "CO", flag: "🇨🇴", demandScore: 68, competitionLevel: "baixa" as const, suggestedLanguage: "Espanhol", estimatedCpm: "$1-2", reasoning: "Crescimento acelerado de e-commerce. Custo de CPM muito baixo para alcance." },
-  { country: "Argentina", countryCode: "AR", flag: "🇦🇷", demandScore: 65, competitionLevel: "baixa" as const, suggestedLanguage: "Espanhol", estimatedCpm: "$1-3", reasoning: "Publico engajado com conteudo digital. Boa oportunidade para entrada antecipada." },
-];
-
-export default function Home() {
-  const [step, setStep] = useState(1);
-  const [product, setProduct] = useState("");
-  const [description, setDescription] = useState("");
-  const [audience, setAudience] = useState("");
-  const [budget, setBudget] = useState("medio");
-  const [funnelStage, setFunnelStage] = useState("meio");
-  const [marketLoading, setMarketLoading] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState<typeof MOCK_MARKETS[0] | null>(null);
-  const [networkId, setNetworkId] = useState("");
-  const [networkName, setNetworkName] = useState("");
-  const [affLink, setAffLink] = useState("");
-  const [domainSlug, setDomainSlug] = useState("");
-  const [presellLang, setPresellLang] = useState("");
-  const [templateId, setTemplateId] = useState("");
-  const [templateLabel, setTemplateLabel] = useState("");
-  const [tone, setTone] = useState("confiante");
-  const [copyLoading, setCopyLoading] = useState(false);
-  const [variations, setVariations] = useState<Array<{ label: string; headline: string; body: string; cta: string; imageStyle: string; colors: { background: string; accent: string; text: string } }> | null>(null);
-  const [campaignData, setCampaignData] = useState<{ keywords: string[]; interests: string[]; placements: string[] } | null>(null);
-  const [activated, setActivated] = useState(false);
-
-  const analyzeMarkets = () => {
-    if (!product.trim()) return;
-    setMarketLoading(true);
-    setTimeout(() => setMarketLoading(false), 2000);
-  };
-
-  const generateCopy = () => {
-    setCopyLoading(true);
-    setTimeout(() => {
-      setVariations([
-        { label: "Variacao A - Confiante", headline: `${product} - A solucao que voce precisava`, body: `Descubra como ${product} pode transformar seus resultados. Milhares de pessoas ja esta usando.`, cta: "Saiba Mais", imageStyle: "Foto de pessoa sorrindo com produto, fundo vibrante", colors: { background: "#1a1a2e", accent: "#6366F1", text: "#F1F5F9" } },
-        { label: "Variacao B - Urgente", headline: `Ultima chance: ${product} com desconto`, body: `Nao perca tempo! ${product} esta com oferta especial por tempo limitado. Garanta ja o seu.`, cta: "Garantir Agora", imageStyle: "Timer regressivo com foto do produto, cores quentes", colors: { background: "#2d1b1b", accent: "#EF4444", text: "#F1F5F9" } },
-        { label: "Variacao C - Premium", headline: `Experiencia premium: ${product}`, body: `Para quem busca excelencia. ${product} e a escolha dos que sabem o que querem.`, cta: "Descobrir", imageStyle: "Minimalista, fundo escuro, produto em destaque com luz suave", colors: { background: "#0f0f0f", accent: "#F59E0B", text: "#F1F5F9" } },
-      ]);
-      setCopyLoading(false);
-    }, 2500);
-  };
-
-  const goToCampaign = () => {
-    setCampaignData({
-      keywords: [product, "comprar online", "melhor preco", "oferta especial", "frete gratis"],
-      interests: ["Marketing digital", "Empreendedorismo", "Negocios online", "Infoprodutos"],
-      placements: ["Feed Instagram", "Reels", "Stories", "Feed Facebook"],
-    });
-    setStep(5);
-  };
-
-  const slug = domainSlug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-") || "meu-produto";
-  const inputStyle = { width: "100%", marginTop: 6, background: C.panelAlt, border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 12px", color: C.text, fontSize: 14, outline: "none" };
-  const labelStyle = { fontSize: 12, fontWeight: 600, color: C.dim };
-
-  return (
-    <div style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif", background: C.bg, minHeight: "100dvh", width: "100%", color: C.text, padding: "28px 16px", margin: 0 }}>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } } * { box-sizing: border-box; margin: 0; } input, textarea, select { font-family: inherit; } input::placeholder, textarea::placeholder { color: #56607A; } body { margin: 0; }`}</style>
-
-      <div style={{ maxWidth: 820, margin: "0 auto" }}>
-        <div style={{ marginBottom: 18 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: C.accent, letterSpacing: 1 }}>ADSFLOW</div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, margin: "4px 0 2px" }}>Produto → Mercado → Presell → Anuncio → Campanha</h1>
-          <p style={{ fontSize: 13, color: C.dim, margin: 0 }}>Prototipo funcional — IA para analise de mercado, copy e segmentacao.</p>
         </div>
+      </header>
 
-        <Stepper step={step} />
+      {/* Hero Section */}
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 24px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center" }}>
+          {/* Left side */}
+          <div>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                background: "rgba(34,176,125,0.1)",
+                border: "1px solid rgba(34,176,125,0.2)",
+                borderRadius: 999,
+                padding: "6px 16px",
+                marginBottom: 24,
+              }}
+            >
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#22B07D", animation: "pulse 2s infinite" }} />
+              <span style={{ color: "#5FD9A4", fontSize: 13, fontWeight: 600 }}>
+                Otimizando campanhas em tempo real
+              </span>
+            </div>
 
-        {step === 1 && (
-          <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20, display: "flex", flexDirection: "column", gap: 14 }}>
-            <div>
-              <label style={labelStyle}>Produto *</label>
-              <input value={product} onChange={(e) => setProduct(e.target.value)} placeholder="Ex: capsulas emagrecedoras naturais" style={inputStyle} />
+            <h1
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: 48,
+                fontWeight: 700,
+                lineHeight: 1.1,
+                color: "#FFFFFF",
+                marginBottom: 20,
+              }}
+            >
+              Suas campanhas de Meta Ads no piloto automático
+            </h1>
+
+            <p
+              style={{
+                fontSize: 18,
+                color: "#94A3B8",
+                lineHeight: 1.6,
+                marginBottom: 32,
+                maxWidth: 480,
+              }}
+            >
+              Automatize a criação, otimização e gestão das suas campanhas no Facebook e Instagram com inteligência artificial. Gaste menos,结果os melhores.
+            </p>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+              <a
+                href="/register"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  background: "#22B07D",
+                  color: "#FFFFFF",
+                  fontSize: 16,
+                  fontWeight: 600,
+                  textDecoration: "none",
+                  padding: "14px 28px",
+                  borderRadius: 10,
+                  transition: "background 0.2s",
+                }}
+              >
+                Começar agora
+                <span style={{ fontSize: 18 }}>→</span>
+              </a>
+              <a
+                href="#como-funciona"
+                style={{
+                  color: "#94A3B8",
+                  fontSize: 16,
+                  fontWeight: 500,
+                  textDecoration: "none",
+                  padding: "14px 20px",
+                  borderRadius: 10,
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  transition: "border-color 0.2s",
+                }}
+              >
+                Ver como funciona
+              </a>
             </div>
-            <div>
-              <label style={labelStyle}>Descricao (opcional)</label>
-              <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Diferenciais, faixa de preco, para quem e indicado..." rows={2} style={{ ...inputStyle, resize: "vertical" } as React.CSSProperties} />
+
+            <p style={{ color: "#64748B", fontSize: 14, fontWeight: 500 }}>
+              <span style={{ color: "#22B07D" }}>✓</span> Sem cartão de crédito · <span style={{ color: "#22B07D" }}>✓</span> Configuração em 5 minutos
+            </p>
+          </div>
+
+          {/* Right side - Dashboard mockup */}
+          <div
+            style={{
+              background: "#0F1524",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 16,
+              padding: 24,
+              boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+              <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 14, fontWeight: 600, color: "#FFFFFF" }}>
+                Dashboard
+              </span>
+              <span style={{ fontSize: 12, color: "#64748B" }}>Últimos 30 dias</span>
             </div>
-            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-              <div style={{ flex: "1 1 200px" }}>
-                <label style={labelStyle}>Publico-alvo (opcional)</label>
-                <input value={audience} onChange={(e) => setAudience(e.target.value)} placeholder="Ex: mulheres 30-50 anos" style={inputStyle} />
+
+            {/* KPI Cards */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
+              <div
+                style={{
+                  background: "rgba(34,176,125,0.08)",
+                  border: "1px solid rgba(34,176,125,0.15)",
+                  borderRadius: 12,
+                  padding: 16,
+                }}
+              >
+                <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 4 }}>ROAS</div>
+                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 28, fontWeight: 700, color: "#22B07D" }}>
+                  4.2x
+                </div>
               </div>
-              <div style={{ flex: "1 1 140px" }}>
-                <label style={labelStyle}>Orcamento de midia</label>
-                <select value={budget} onChange={(e) => setBudget(e.target.value)} style={inputStyle}>
-                  <option value="baixo">Baixo</option>
-                  <option value="medio">Medio</option>
-                  <option value="alto">Alto</option>
-                </select>
+              <div
+                style={{
+                  background: "rgba(95,217,164,0.08)",
+                  border: "1px solid rgba(95,217,164,0.15)",
+                  borderRadius: 12,
+                  padding: 16,
+                }}
+              >
+                <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 4 }}>Custo por lead</div>
+                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 28, fontWeight: 700, color: "#5FD9A4" }}>
+                  R$6.80
+                </div>
               </div>
             </div>
-            <div>
-              <label style={labelStyle}>Estagio de funil</label>
-              <div style={{ display: "flex", gap: 8, marginTop: 6, flexWrap: "wrap" }}>
-                {FUNNEL_STAGES.map((f) => (
-                  <button key={f.id} onClick={() => setFunnelStage(f.id)}
-                    style={{ flex: "1 1 150px", textAlign: "left", background: funnelStage === f.id ? C.accentSoft : C.panelAlt, border: `1px solid ${funnelStage === f.id ? C.accent : C.border}`, borderRadius: 9, padding: "10px 12px", color: C.text, cursor: "pointer" }}>
-                    <div style={{ fontWeight: 700, fontSize: 13 }}>{f.label}</div>
-                    <div style={{ fontSize: 11, color: C.dim, marginTop: 2 }}>{f.desc}</div>
-                  </button>
+
+            {/* Bar Chart */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 12 }}>Performance semanal</div>
+              <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 100 }}>
+                {[60, 80, 45, 90, 70, 95, 85].map((h, i) => (
+                  <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                    <div
+                      style={{
+                        width: "100%",
+                        height: h,
+                        background: i === 5 ? "#22B07D" : "rgba(34,176,125,0.2)",
+                        borderRadius: 4,
+                      }}
+                    />
+                    <span style={{ fontSize: 10, color: "#64748B" }}>
+                      {["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"][i]}
+                    </span>
+                  </div>
                 ))}
               </div>
             </div>
-            <button onClick={() => { setStep(2); analyzeMarkets(); }}
-              style={{ background: C.accent, border: "none", color: "#fff", fontWeight: 700, fontSize: 14, padding: "12px 0", borderRadius: 9, marginTop: 4, cursor: "pointer" }}>
-              Analisar mercados →
-            </button>
-          </div>
-        )}
 
-        {step === 2 && (
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-              <button onClick={() => setStep(1)} style={{ background: "none", border: "none", color: C.dim, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>← Editar produto</button>
+            {/* Campaign List */}
+            <div>
+              <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 8 }}>Campanhas ativas</div>
+              {[
+                { name: "Conversão - Lookalike", status: "Otimizando", color: "#22B07D" },
+                { name: "Retargeting - Carrinho", status: "Ativa", color: "#3FCB92" },
+                { name: "Topo - Brand Awareness", status: "Pausada", color: "#F72585" },
+              ].map((c, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "10px 0",
+                    borderBottom: i < 2 ? "1px solid rgba(255,255,255,0.04)" : "none",
+                  }}
+                >
+                  <span style={{ fontSize: 13, color: "#E2E8F0" }}>{c.name}</span>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: c.color }}>{c.status}</span>
+                </div>
+              ))}
             </div>
-            {marketLoading ? (
-              <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 14, padding: 24 }}>
-                <Spinner label="Analisando mercados globais com IA..." />
-              </div>
-            ) : (
-              <>
-                <div style={{ background: C.accentSoft, border: `1px solid ${C.accent}`, borderRadius: 10, padding: "12px 16px", fontSize: 13, marginBottom: 14, color: "#C7D2FE" }}>
-                  Analise completa: identificamos os melhores mercados para <strong>{product}</strong>. Considere comecar pelo Brasil (maior demanda) ou Mexico (menor custo de CPM).
-                </div>
-                <div style={{ fontSize: 12, color: C.dim, marginBottom: 8, fontWeight: 600 }}>Escolha um pais:</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {MOCK_MARKETS.sort((a, b) => b.demandScore - a.demandScore).map((c, i) => {
-                    const comp = { baixa: { color: C.green, label: "Baixa concorrencia" }, media: { color: C.amber, label: "Concorrencia media" }, alta: { color: C.red, label: "Alta concorrencia" } }[c.competitionLevel];
-                    return (
-                      <button key={i} onClick={() => { setSelectedCountry(c); setPresellLang(c.suggestedLanguage); setStep(3); }}
-                        style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 12, padding: 16, display: "flex", gap: 14, alignItems: "center", textAlign: "left", cursor: "pointer" }}
-                        onMouseEnter={(e) => (e.currentTarget.style.borderColor = C.accent)} onMouseLeave={(e) => (e.currentTarget.style.borderColor = C.border)}>
-                        <ScoreRing score={c.demandScore} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                            <span style={{ fontSize: 15, fontWeight: 800 }}>{c.flag} {c.country}</span>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: comp.color, background: `${comp.color}22`, padding: "2px 8px", borderRadius: 999 }}>{comp.label}</span>
-                          </div>
-                          <div style={{ fontSize: 12.5, color: C.dim, margin: "6px 0" }}>{c.reasoning}</div>
-                          <div style={{ display: "flex", gap: 14, fontSize: 12, color: "#B0B9CC" }}>
-                            <span>🗣 {c.suggestedLanguage}</span>
-                            <span>💵 CPM {c.estimatedCpm}</span>
-                          </div>
-                        </div>
-                        <span style={{ color: C.accent, fontSize: 18 }}>→</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </>
-            )}
           </div>
-        )}
+        </div>
+      </section>
 
-        {step === 3 && selectedCountry && (
-          <div>
-            <button onClick={() => setStep(2)} style={{ background: "none", border: "none", color: C.dim, fontSize: 13, fontWeight: 600, marginBottom: 12, cursor: "pointer" }}>← Trocar pais</button>
-            <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20, display: "flex", flexDirection: "column", gap: 16 }}>
+      {/* Stats Bar */}
+      <section
+        style={{
+          background: "rgba(34,176,125,0.05)",
+          borderTop: "1px solid rgba(34,176,125,0.1)",
+          borderBottom: "1px solid rgba(34,176,125,0.1)",
+          padding: "40px 24px",
+        }}
+      >
+        <div style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 32, textAlign: "center" }}>
+          {[
+            { value: "+1.200", label: "Contas conectadas" },
+            { value: "R$ 40M+", label: "Verba otimizada" },
+            { value: "3.9x", label: "ROAS médio" },
+            { value: "24/7", label: "Otimização" },
+          ].map((stat, i) => (
+            <div key={i}>
+              <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 32, fontWeight: 700, color: "#22B07D", marginBottom: 4 }}>
+                {stat.value}
+              </div>
+              <div style={{ fontSize: 14, color: "#94A3B8" }}>{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Campaigns Section */}
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 24px", textAlign: "center" }}>
+        <h2
+          style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontSize: 36,
+            fontWeight: 700,
+            color: "#FFFFFF",
+            marginBottom: 48,
+          }}
+        >
+          Suas campanhas do Meta Ads, organizadas em um só lugar
+        </h2>
+
+        {/* Browser Mockup */}
+        <div
+          style={{
+            background: "#0F1524",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 16,
+            overflow: "hidden",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
+          }}
+        >
+          {/* Browser bar */}
+          <div
+            style={{
+              background: "#161D2E",
+              padding: "12px 16px",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              borderBottom: "1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#F72585" }} />
+            <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#F59E0B" }} />
+            <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#22B07D" }} />
+            <div
+              style={{
+                flex: 1,
+                background: "rgba(255,255,255,0.05)",
+                borderRadius: 6,
+                padding: "6px 12px",
+                marginLeft: 12,
+                fontSize: 12,
+                color: "#64748B",
+              }}
+            >
+              app.adsflow.com/campanhas
+            </div>
+          </div>
+
+          {/* Table */}
+          <div style={{ padding: "0" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                  {["Campanha", "Status", "Orçamento", "ROAS", "Leads"].map((h) => (
+                    <th
+                      key={h}
+                      style={{
+                        padding: "14px 20px",
+                        textAlign: "left",
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: "#64748B",
+                        textTransform: "uppercase" as const,
+                        letterSpacing: 0.5,
+                      }}
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { name: "Black Friday - Conversão", status: "Ativa", statusColor: "#22B07D", budget: "R$ 150/dia", roas: "5.1x", leads: "1.247" },
+                  { name: "Stories Remarketing", status: "Otimizando", statusColor: "#5FD9A4", budget: "R$ 80/dia", roas: "3.8x", leads: "892" },
+                  { name: "Topo de funil - Branding", status: "Pausada", statusColor: "#F72585", budget: "R$ 200/dia", roas: "2.4x", leads: "3.156" },
+                ].map((row, i) => (
+                  <tr key={i} style={{ borderBottom: i < 2 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
+                    <td style={{ padding: "16px 20px", fontSize: 14, color: "#E2E8F0", fontWeight: 500 }}>{row.name}</td>
+                    <td style={{ padding: "16px 20px" }}>
+                      <span
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: row.statusColor,
+                          background: `${row.statusColor}15`,
+                          padding: "4px 10px",
+                          borderRadius: 999,
+                        }}
+                      >
+                        {row.status}
+                      </span>
+                    </td>
+                    <td style={{ padding: "16px 20px", fontFamily: "'JetBrains Mono', monospace", fontSize: 13, color: "#94A3B8" }}>{row.budget}</td>
+                    <td style={{ padding: "16px 20px", fontFamily: "'JetBrains Mono', monospace", fontSize: 13, color: "#22B07D", fontWeight: 600 }}>{row.roas}</td>
+                    <td style={{ padding: "16px 20px", fontFamily: "'JetBrains Mono', monospace", fontSize: 13, color: "#94A3B8" }}>{row.leads}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* Integrations Section */}
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "60px 24px", textAlign: "center" }}>
+        <p style={{ fontSize: 14, color: "#64748B", marginBottom: 24, fontWeight: 500 }}>Integra com suas plataformas favoritas</p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 32, flexWrap: "wrap" }}>
+          {["Hotmart", "Kiwify", "ClickBank", "Eduzz", "Webvork"].map((name) => (
+            <div
+              key={name}
+              style={{
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: 12,
+                padding: "16px 28px",
+                fontSize: 15,
+                fontWeight: 600,
+                color: "#94A3B8",
+              }}
+            >
+              {name}
+            </div>
+          ))}
+          <div
+            style={{
+              background: "rgba(34,176,125,0.08)",
+              border: "1px solid rgba(34,176,125,0.2)",
+              borderRadius: 12,
+              padding: "16px 28px",
+              fontSize: 15,
+              fontWeight: 600,
+              color: "#22B07D",
+            }}
+          >
+            +20 plataformas
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="recursos" style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 24px" }}>
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#22B07D", letterSpacing: 1, marginBottom: 12, textTransform: "uppercase" as const }}>
+            Recursos
+          </div>
+          <h2
+            style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: 36,
+              fontWeight: 700,
+              color: "#FFFFFF",
+            }}
+          >
+            Tudo que você precisa em uma plataforma
+          </h2>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+          {[
+            {
+              title: "Criação automática",
+              desc: "Gere campanhas completas com segmentação, criativos e orçamento em segundos com IA.",
+              icon: "⚡",
+            },
+            {
+              title: "Otimização com IA",
+              desc: "A inteligência artificial ajusta lances, públicos e criativos para maximizar seus resultados.",
+              icon: "🧠",
+            },
+            {
+              title: "Testes A/B",
+              desc: "Teste variações de anúncios automaticamente e escale os vencedores.",
+              icon: "🔬",
+            },
+            {
+              title: "Relatórios em tempo real",
+              desc: "Acompanhe métricas como ROAS, CPA e conversões em dashboards atualizados.",
+              icon: "📊",
+            },
+            {
+              title: "Alertas inteligentes",
+              desc: "Receba notificações quando algo precisar de atenção: orçamento, CTR, frequência.",
+              icon: "🔔",
+            },
+            {
+              title: "Multi-contas",
+              desc: "Gerencie várias contas de anúncios e projetos em um único painel centralizado.",
+              icon: "👥",
+            },
+          ].map((feature, i) => (
+            <div
+              key={i}
+              style={{
+                background: "#0D1220",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: 16,
+                padding: 28,
+                transition: "border-color 0.2s",
+              }}
+            >
+              <div style={{ fontSize: 32, marginBottom: 16 }}>{feature.icon}</div>
+              <h3
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontSize: 18,
+                  fontWeight: 600,
+                  color: "#FFFFFF",
+                  marginBottom: 8,
+                }}
+              >
+                {feature.title}
+              </h3>
+              <p style={{ fontSize: 14, color: "#94A3B8", lineHeight: 1.6 }}>{feature.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* How it Works */}
+      <section id="como-funciona" style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 24px" }}>
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#22B07D", letterSpacing: 1, marginBottom: 12, textTransform: "uppercase" as const }}>
+            Como funciona
+          </div>
+          <h2
+            style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: 36,
+              fontWeight: 700,
+              color: "#FFFFFF",
+            }}
+          >
+            Pronto em 3 passos simples
+          </h2>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 40 }}>
+          {[
+            {
+              step: "01",
+              title: "Conecte sua conta Meta Ads",
+              desc: "Autorize o acesso seguro à sua conta de anúncios com um clique. Seus dados estão protegidos.",
+            },
+            {
+              step: "02",
+              title: "Defina suas metas",
+              desc: "Informe seu orçamento, público-alvo e objetivos. A IA cuida do resto.",
+            },
+            {
+              step: "03",
+              title: "Deixe a automação otimizar",
+              desc: "A IA ajusta campanhas 24/7, reduzindo custo e aumentando resultados automaticamente.",
+            },
+          ].map((item, i) => (
+            <div key={i} style={{ textAlign: "center" }}>
+              <div
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 16,
+                  background: "rgba(34,176,125,0.1)",
+                  border: "1px solid rgba(34,176,125,0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "0 auto 20px",
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: "#22B07D",
+                }}
+              >
+                {item.step}
+              </div>
+              <h3
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontSize: 20,
+                  fontWeight: 600,
+                  color: "#FFFFFF",
+                  marginBottom: 10,
+                }}
+              >
+                {item.title}
+              </h3>
+              <p style={{ fontSize: 14, color: "#94A3B8", lineHeight: 1.6, maxWidth: 300, margin: "0 auto" }}>
+                {item.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="precos" style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 24px" }}>
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#22B07D", letterSpacing: 1, marginBottom: 12, textTransform: "uppercase" as const }}>
+            Preços
+          </div>
+          <h2
+            style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: 36,
+              fontWeight: 700,
+              color: "#FFFFFF",
+            }}
+          >
+            Planos para cada fase do seu negócio
+          </h2>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, maxWidth: 800, margin: "0 auto" }}>
+          {/* Start Plan */}
+          <div
+            style={{
+              background: "#0D1220",
+              border: "1px solid rgba(255,255,255,0.06)",
+              borderRadius: 20,
+              padding: 36,
+            }}
+          >
+            <div style={{ fontSize: 14, fontWeight: 600, color: "#94A3B8", marginBottom: 8 }}>Start</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 24 }}>
+              <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 40, fontWeight: 700, color: "#FFFFFF" }}>R$99</span>
+              <span style={{ fontSize: 14, color: "#64748B" }}>/mês</span>
+            </div>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 14 }}>
+              {[
+                "1 conta Meta Ads",
+                "Otimização automática com IA",
+                "Relatórios em tempo real",
+                "Integração com plataformas",
+                "Suporte por e-mail",
+              ].map((item, i) => (
+                <li key={i} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "#94A3B8" }}>
+                  <span style={{ color: "#22B07D", fontWeight: 700 }}>✓</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <a
+              href="/register"
+              style={{
+                display: "block",
+                textAlign: "center",
+                marginTop: 28,
+                padding: "12px 0",
+                borderRadius: 10,
+                border: "1px solid rgba(255,255,255,0.1)",
+                color: "#FFFFFF",
+                fontSize: 15,
+                fontWeight: 600,
+                textDecoration: "none",
+                transition: "background 0.2s",
+              }}
+            >
+              Começar grátis
+            </a>
+          </div>
+
+          {/* Pro Plan */}
+          <div
+            style={{
+              background: "#0D1220",
+              border: "1px solid rgba(34,176,125,0.3)",
+              borderRadius: 20,
+              padding: 36,
+              position: "relative",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: -12,
+                left: "50%",
+                transform: "translateX(-50%)",
+                background: "#22B07D",
+                color: "#FFFFFF",
+                fontSize: 11,
+                fontWeight: 700,
+                padding: "4px 14px",
+                borderRadius: 999,
+                textTransform: "uppercase" as const,
+                letterSpacing: 0.5,
+              }}
+            >
+              Mais popular
+            </div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: "#22B07D", marginBottom: 8 }}>Pro</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 24 }}>
+              <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 40, fontWeight: 700, color: "#FFFFFF" }}>R$149</span>
+              <span style={{ fontSize: 14, color: "#64748B" }}>/mês</span>
+            </div>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 14 }}>
+              {[
+                "5 contas Meta Ads",
+                "Testes A/B automatizados",
+                "Alertas inteligentes",
+                "Regras personalizadas",
+                "+20 plataformas integradas",
+                "Suporte prioritário",
+              ].map((item, i) => (
+                <li key={i} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "#94A3B8" }}>
+                  <span style={{ color: "#22B07D", fontWeight: 700 }}>✓</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <a
+              href="/register"
+              style={{
+                display: "block",
+                textAlign: "center",
+                marginTop: 28,
+                padding: "12px 0",
+                borderRadius: 10,
+                background: "#22B07D",
+                color: "#FFFFFF",
+                fontSize: 15,
+                fontWeight: 600,
+                textDecoration: "none",
+                transition: "background 0.2s",
+              }}
+            >
+              Começar agora
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section id="depoimentos" style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 24px" }}>
+        <div style={{ textAlign: "center", marginBottom: 48 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#22B07D", letterSpacing: 1, marginBottom: 12, textTransform: "uppercase" as const }}>
+            Depoimentos
+          </div>
+          <h2
+            style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: 36,
+              fontWeight: 700,
+              color: "#FFFFFF",
+            }}
+          >
+            Quem já usa, recomenda
+          </h2>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+          {[
+            {
+              name: "Rafael Martins",
+              role: "Infoprodutor",
+              text: "Reduzi meu CPA em 40% no primeiro mês. A automação da AdsFlow é absurdamente boa. Não perco mais tempo ajustando campanha manualmente.",
+            },
+            {
+              name: "Camila Souza",
+              role: "Gestora de Tráfego",
+              text: "Gerencio 12 contas de clientes e a AdsFlow salvou minha vida. Os relatórios em tempo real e os alertas inteligentes são incríveis.",
+            },
+            {
+              name: "Thiago Lima",
+              role: "E-commercer",
+              text: "Meu ROAS subiu de 2.1x para 4.5x em 45 dias. A IA realmente entende o que funciona para cada público. Ferramenta indispensável.",
+            },
+          ].map((t, i) => (
+            <div
+              key={i}
+              style={{
+                background: "#0D1220",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: 16,
+                padding: 28,
+              }}
+            >
+              <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
+                {[...Array(5)].map((_, j) => (
+                  <span key={j} style={{ color: "#F59E0B", fontSize: 16 }}>★</span>
+                ))}
+              </div>
+              <p style={{ fontSize: 14, color: "#94A3B8", lineHeight: 1.7, marginBottom: 20 }}>"{t.text}"</p>
               <div>
-                <label style={labelStyle}>Rede de afiliados</label>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 8, marginTop: 6 }}>
-                  {AFFILIATE_NETWORKS.map((n) => (
-                    <button key={n.id} onClick={() => { setNetworkId(n.id); setNetworkName(n.name); }}
-                      style={{ background: networkId === n.id ? C.accentSoft : C.panelAlt, border: `1px solid ${networkId === n.id ? C.accent : C.border}`, borderRadius: 8, padding: "8px 10px", textAlign: "left", color: C.text, cursor: "pointer" }}>
-                      <div style={{ fontWeight: 700, fontSize: 12.5 }}>{n.name}</div>
-                      <div style={{ fontSize: 10, color: C.dim }}>{n.tag}</div>
-                    </button>
-                  ))}
-                </div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#FFFFFF" }}>{t.name}</div>
+                <div style={{ fontSize: 13, color: "#64748B" }}>{t.role}</div>
               </div>
-              {networkId && (
-                <>
-                  <div>
-                    <label style={labelStyle}>Link de afiliado ({networkName})</label>
-                    <input value={affLink} onChange={(e) => setAffLink(e.target.value)} placeholder="Cole aqui o link da oferta original" style={inputStyle} />
-                  </div>
-                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                    <div style={{ flex: "1 1 180px" }}>
-                      <label style={labelStyle}>Idioma da presell</label>
-                      <input value={presellLang} onChange={(e) => setPresellLang(e.target.value)} style={inputStyle} />
-                    </div>
-                    <div style={{ flex: "1 1 180px" }}>
-                      <label style={labelStyle}>Dominio da presell</label>
-                      <input value={domainSlug} onChange={(e) => setDomainSlug(e.target.value)} placeholder="nome-do-produto" style={inputStyle} />
-                      <div style={{ marginTop: 6, fontSize: 12.5, color: C.accent, fontFamily: "monospace" }}>http://localhost:3000/p/{slug}</div>
-                    </div>
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Template da presell</label>
-                    <div style={{ display: "flex", gap: 8, marginTop: 6, flexWrap: "wrap" }}>
-                      {(TEMPLATES[funnelStage] || []).map((t) => (
-                        <button key={t.id} onClick={() => { setTemplateId(t.id); setTemplateLabel(t.label); }}
-                          style={{ flex: "1 1 180px", textAlign: "left", background: templateId === t.id ? C.accentSoft : C.panelAlt, border: `1px solid ${templateId === t.id ? C.accent : C.border}`, borderRadius: 9, padding: "10px 12px", color: C.text, cursor: "pointer" }}>
-                          <div style={{ fontWeight: 700, fontSize: 13 }}>{t.label}</div>
-                          <div style={{ fontSize: 11, color: C.dim, marginTop: 2 }}>{t.desc}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <button onClick={() => { if (templateId) setStep(4); }}
-                    disabled={!templateId}
-                    style={{ background: templateId ? C.accent : C.panelAlt, border: "none", color: "#fff", fontWeight: 700, fontSize: 14, padding: "12px 0", borderRadius: 9, opacity: templateId ? 1 : 0.6, cursor: "pointer" }}>
-                    Gerar anuncios →
-                  </button>
-                </>
-              )}
             </div>
-          </div>
-        )}
+          ))}
+        </div>
+      </section>
 
-        {step === 4 && selectedCountry && (
+      {/* CTA Banner */}
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px 80px" }}>
+        <div
+          style={{
+            background: "linear-gradient(135deg, rgba(34,176,125,0.15), rgba(247,37,133,0.08))",
+            border: "1px solid rgba(34,176,125,0.2)",
+            borderRadius: 24,
+            padding: "60px 48px",
+            textAlign: "center",
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: 32,
+              fontWeight: 700,
+              color: "#FFFFFF",
+              marginBottom: 16,
+            }}
+          >
+            Pronto para colocar suas campanhas no automático?
+          </h2>
+          <p style={{ fontSize: 16, color: "#94A3B8", marginBottom: 32, maxWidth: 500, margin: "0 auto 32px" }}>
+            Comece gratuitamente e veja a diferença que a automação inteligente faz nos seus resultados.
+          </p>
+          <a
+            href="/register"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              background: "#22B07D",
+              color: "#FFFFFF",
+              fontSize: 16,
+              fontWeight: 600,
+              textDecoration: "none",
+              padding: "14px 32px",
+              borderRadius: 10,
+              transition: "background 0.2s",
+            }}
+          >
+            Criar conta grátis
+            <span style={{ fontSize: 18 }}>→</span>
+          </a>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "48px 24px" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 40 }}>
           <div>
-            <button onClick={() => setStep(3)} style={{ background: "none", border: "none", color: C.dim, fontSize: 13, fontWeight: 600, marginBottom: 12, cursor: "pointer" }}>← Editar presell</button>
-            <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20, marginBottom: 16 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-                <div>
-                  <div style={labelStyle}>Gerando anuncios para</div>
-                  <div style={{ fontSize: 18, fontWeight: 800, marginTop: 2 }}>{selectedCountry.flag} {selectedCountry.country} · {presellLang}</div>
-                </div>
-                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                  <select value={tone} onChange={(e) => setTone(e.target.value)} style={{ ...inputStyle, width: 150, marginTop: 0 }}>
-                    <option value="confiante">Confiante</option>
-                    <option value="divertido">Divertido</option>
-                    <option value="urgente">Urgente</option>
-                    <option value="premium">Premium</option>
-                    <option value="acolhedor">Acolhedor</option>
-                  </select>
-                  <button onClick={generateCopy} disabled={copyLoading}
-                    style={{ background: C.accent, border: "none", color: "#fff", fontWeight: 700, fontSize: 13, padding: "10px 18px", borderRadius: 9, opacity: copyLoading ? 0.7 : 1, whiteSpace: "nowrap", cursor: "pointer" }}>
-                    {copyLoading ? "Gerando..." : variations ? "Gerar de novo" : "Gerar anuncios"}
-                  </button>
-                </div>
-              </div>
-              {copyLoading && <div style={{ marginTop: 14 }}><Spinner label="Criando 3 variacoes de anuncio com IA..." /></div>}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                <rect width="32" height="32" rx="8" fill="#22B07D"/>
+                <path d="M8 16L13 21L24 10" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 18, color: "#FFFFFF" }}>
+                AdsFlow
+              </span>
             </div>
-            {variations && (
-              <>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 14, marginBottom: 16 }}>
-                  {variations.map((v, i) => (
-                    <div key={i} style={{ borderRadius: 14, overflow: "hidden", border: `1px solid ${C.border}`, background: v.colors?.background || C.panel, color: v.colors?.text || C.text }}>
-                      <div style={{ padding: "8px 14px", background: "rgba(0,0,0,0.15)", fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>{v.label}</div>
-                      <div style={{ padding: 18 }}>
-                        <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 8, lineHeight: 1.25 }}>{v.headline}</div>
-                        <div style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 14, opacity: 0.9 }}>{v.body}</div>
-                        <button style={{ background: v.colors?.accent || C.accent, border: "none", color: "#fff", fontWeight: 700, fontSize: 13, padding: "9px 16px", borderRadius: 8, marginBottom: 12 }}>{v.cta}</button>
-                        <div style={{ fontSize: 11, opacity: 0.7, borderTop: "1px solid rgba(255,255,255,0.15)", paddingTop: 8 }}>🎨 {v.imageStyle}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <button onClick={goToCampaign} style={{ background: C.accent, border: "none", color: "#fff", fontWeight: 700, fontSize: 14, padding: "12px 0", borderRadius: 9, width: "100%", cursor: "pointer" }}>
-                  Montar campanha →
-                </button>
-              </>
-            )}
+            <p style={{ fontSize: 14, color: "#64748B", lineHeight: 1.6, maxWidth: 280 }}>
+              Automatize suas campanhas de Meta Ads com inteligência artificial. Gaste menos,结果os melhores.
+            </p>
           </div>
-        )}
 
-        {step === 5 && selectedCountry && campaignData && (
           <div>
-            <button onClick={() => setStep(4)} style={{ background: "none", border: "none", color: C.dim, fontSize: 13, fontWeight: 600, marginBottom: 12, cursor: "pointer" }}>← Editar anuncios</button>
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.accent, marginBottom: 10 }}>RESUMO DA CAMPANHA</div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px,1fr))", gap: 12, fontSize: 13 }}>
-                  <div><div style={labelStyle}>Produto</div><div style={{ fontWeight: 700 }}>{product}</div></div>
-                  <div><div style={labelStyle}>Pais</div><div style={{ fontWeight: 700 }}>{selectedCountry.flag} {selectedCountry.country}</div></div>
-                  <div><div style={labelStyle}>Funil</div><div style={{ fontWeight: 700, textTransform: "capitalize" }}>{funnelStage}</div></div>
-                  <div><div style={labelStyle}>Rede</div><div style={{ fontWeight: 700 }}>{networkName}</div></div>
-                  <div><div style={labelStyle}>Presell</div><div style={{ fontWeight: 700, fontFamily: "monospace", fontSize: 12 }}>localhost:3000/p/{slug}</div></div>
-                  <div><div style={labelStyle}>Template</div><div style={{ fontWeight: 700 }}>{templateLabel}</div></div>
-                </div>
-              </div>
-
-              <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.accent, marginBottom: 10 }}>VERBA SUGERIDA / DIA</div>
-                <div style={{ fontSize: 28, fontWeight: 800 }}>$25<span style={{ fontSize: 13, color: C.dim, fontWeight: 600 }}> /dia</span></div>
-                <div style={{ fontSize: 12.5, color: C.dim, marginTop: 6 }}>{funnelStage === "topo" ? "Topo de funil precisa de mais alcance." : funnelStage === "fundo" ? "Fundo de funil e publico qualificado, verba mais enxuta." : "Meio de funil equilibra alcance e qualificacao."}</div>
-              </div>
-
-              <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.accent, marginBottom: 10 }}>SEGMENTACAO POR DISPOSITIVO</div>
-                <div style={{ display: "flex", height: 10, borderRadius: 999, overflow: "hidden", marginBottom: 10 }}>
-                  <div style={{ width: "68%", background: C.accent }} />
-                  <div style={{ width: "22%", background: C.green }} />
-                  <div style={{ width: "10%", background: C.amber }} />
-                </div>
-                <div style={{ display: "flex", gap: 16, fontSize: 12.5 }}>
-                  <span>📱 Mobile 68%</span>
-                  <span>🖥 Desktop 22%</span>
-                  <span>📱 Tablet 10%</span>
-                </div>
-              </div>
-
-              <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.accent, marginBottom: 10 }}>PALAVRAS-CHAVE E INTERESSES</div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
-                  {campaignData.keywords.map((k, i) => (
-                    <span key={i} style={{ fontSize: 12, background: C.panelAlt, border: `1px solid ${C.border}`, borderRadius: 999, padding: "4px 10px" }}>{k}</span>
-                  ))}
-                </div>
-                <div style={labelStyle}>Interesses (Meta Ads Manager)</div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
-                  {campaignData.interests.map((k, i) => (
-                    <span key={i} style={{ fontSize: 12, background: C.accentSoft, border: `1px solid ${C.accent}`, borderRadius: 999, padding: "4px 10px" }}>{k}</span>
-                  ))}
-                </div>
-              </div>
-
-              <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.accent, marginBottom: 10 }}>POSICIONAMENTOS RECOMENDADOS</div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                  {campaignData.placements.map((p, i) => (
-                    <span key={i} style={{ fontSize: 12, background: C.panelAlt, border: `1px solid ${C.border}`, borderRadius: 999, padding: "4px 10px" }}>{p}</span>
-                  ))}
-                </div>
-              </div>
-
-              <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 14, padding: 20, textAlign: "center" }}>
-                {!activated ? (
-                  <>
-                    <button onClick={() => setActivated(true)}
-                      style={{ background: C.green, border: "none", color: "#fff", fontWeight: 800, fontSize: 15, padding: "14px 28px", borderRadius: 10, cursor: "pointer" }}>
-                      Ativar campanha
-                    </button>
-                    <div style={{ fontSize: 11, color: C.dim, marginTop: 10 }}>Para publicar de verdade, conecte sua conta Meta Ads.</div>
-                  </>
-                ) : (
-                  <div>
-                    <div style={{ fontSize: 32 }}>✅</div>
-                    <div style={{ fontWeight: 800, fontSize: 15, marginTop: 6 }}>Campanha pronta!</div>
-                    <div style={{ fontSize: 12, color: C.dim, marginTop: 4 }}>Material pronto para ser publicado no Meta Ads.</div>
-                  </div>
-                )}
-              </div>
+            <h4 style={{ fontSize: 14, fontWeight: 600, color: "#FFFFFF", marginBottom: 16 }}>Produto</h4>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {["Recursos", "Preços", "Integrações", "Como funciona"].map((link) => (
+                <a key={link} href="#" style={{ fontSize: 14, color: "#64748B", textDecoration: "none" }}>{link}</a>
+              ))}
             </div>
           </div>
-        )}
-      </div>
+
+          <div>
+            <h4 style={{ fontSize: 14, fontWeight: 600, color: "#FFFFFF", marginBottom: 16 }}>Conta</h4>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {["Entrar", "Criar conta", "Dashboard"].map((link) => (
+                <a key={link} href="#" style={{ fontSize: 14, color: "#64748B", textDecoration: "none" }}>{link}</a>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h4 style={{ fontSize: 14, fontWeight: 600, color: "#FFFFFF", marginBottom: 16 }}>Suporte</h4>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {["Central de ajuda", "Contato", "Termos de uso", "Privacidade"].map((link) => (
+                <a key={link} href="#" style={{ fontSize: 14, color: "#64748B", textDecoration: "none" }}>{link}</a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ maxWidth: 1200, margin: "40px auto 0", paddingTop: 24, borderTop: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
+          <p style={{ fontSize: 13, color: "#475569" }}>
+            © 2025 AdsFlow. Todos os direitos reservados.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
