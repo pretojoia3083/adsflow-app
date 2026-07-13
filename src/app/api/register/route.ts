@@ -1,21 +1,21 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const { name, email, password } = await request.json();
+    const { name, email, password } = await req.json();
 
-    if (!email || !password) {
+    if (!name || !email || !password) {
       return NextResponse.json(
-        { error: "Email e senha sao obrigatorios" },
+        { error: "Name, email, and password are required" },
         { status: 400 }
       );
     }
 
-    if (password.length < 6) {
+    if (typeof password !== "string" || password.length < 8) {
       return NextResponse.json(
-        { error: "A senha deve ter pelo menos 6 caracteres" },
+        { error: "Password must be at least 8 characters" },
         { status: 400 }
       );
     }
@@ -26,28 +26,29 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "Email ja cadastrado" },
-        { status: 400 }
+        { error: "A user with this email already exists" },
+        { status: 409 }
       );
     }
 
-    const passwordHash = await bcrypt.hash(password, 12);
+    const hashedPassword = await bcrypt.hash(password, 12);
 
     const user = await prisma.user.create({
       data: {
         name,
         email,
-        passwordHash,
+        password: hashedPassword,
       },
     });
 
-    return NextResponse.json({
-      user: { id: user.id, name: user.name, email: user.email },
-    });
+    return NextResponse.json(
+      { user: { id: user.id, name: user.name, email: user.email } },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      { error: "Erro interno do servidor" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

@@ -1,119 +1,103 @@
-export interface Product {
-  name: string;
+export interface CampaignData {
+  productName: string;
   description?: string;
   audience?: string;
-  budget: string;
   funnelStage: string;
-}
-
-export interface Country {
+  budgetPref: string;
   country: string;
   countryCode: string;
-  flag: string;
-  demandScore: number;
-  competitionLevel: "baixa" | "media" | "alta";
-  suggestedLanguage: string;
-  estimatedCpm: string;
-  reasoning: string;
-}
-
-export interface PresellSetup {
-  networkId: string;
-  networkName: string;
-  affLink: string;
-  trackingId?: string;
-  domainSlug: string;
-  templateId: string;
-  templateLabel: string;
-}
-
-export interface AdCopy {
-  label: string;
-  headline: string;
-  body: string;
-  cta: string;
-  imageStyle: string;
-  colors: {
-    background: string;
-    accent: string;
-    text: string;
-  };
-}
-
-export interface CampaignSetup {
+  language: string;
+  estimatedCpm?: string;
+  networkId?: string;
+  networkName?: string;
+  affLink?: string;
   keywords: string[];
   interests: string[];
   placements: string[];
-  budgetDaily: number;
-  deviceSplit: {
-    desktop: number;
-    mobile: number;
-    tablet: number;
-  };
+  budgetDaily?: number;
+  deviceSplit: Record<string, number>;
+  adCopy: AdCopy;
+  tone?: string;
 }
 
-export type Step = 1 | 2 | 3 | 4 | 5;
+export interface AdCopy {
+  headline: string;
+  primaryText: string;
+  description: string;
+  cta: string;
+}
+
+export interface MarketAnalysis {
+  score: number;
+  competition: string;
+  saturation: string;
+  opportunity: string;
+  cpmEstimate: string;
+  audienceSize: string;
+  recommendations: string[];
+}
+
+export interface PresellData {
+  slug: string;
+  title: string;
+  headline: string;
+  subheadline?: string;
+  bodyText?: string;
+  ctaText?: string;
+  ctaLink?: string;
+  bgColor?: string;
+  accentColor?: string;
+  textColor?: string;
+  customHtml?: string;
+  template: string;
+}
+
+export const COUNTRIES = [
+  { name: "Brasil", code: "BR", language: "pt", currency: "BRL" },
+  { name: "Estados Unidos", code: "US", language: "en", currency: "USD" },
+  { name: "Portugal", code: "PT", language: "pt", currency: "EUR" },
+  { name: "Moçambique", code: "MZ", language: "pt", currency: "MZN" },
+  { name: "Angola", code: "AO", language: "pt", currency: "AOA" },
+  { name: "Cabo Verde", code: "CV", language: "pt", currency: "CVE" },
+  { name: "Guiné-Bissau", code: "GW", language: "pt", currency: "XOF" },
+  { name: "São Tomé e Príncipe", code: "ST", language: "pt", currency: "STN" },
+  { name: "Timor-Leste", code: "TL", language: "pt", currency: "USD" },
+  { name: "Espanha", code: "ES", language: "es", currency: "EUR" },
+  { name: "Argentina", code: "AR", language: "es", currency: "ARS" },
+  { name: "Colômbia", code: "CO", language: "es", currency: "COP" },
+  { name: "México", code: "MX", language: "es", currency: "MXN" },
+  { name: "Chile", code: "CL", language: "es", currency: "CLP" },
+] as const;
 
 export const FUNNEL_STAGES = [
-  { id: "topo", label: "Topo de funil", desc: "Descoberta" },
-  { id: "meio", label: "Meio de funil", desc: "Consideração" },
-  { id: "fundo", label: "Fundo de funil", desc: "Decisão" },
+  { value: "topo", label: "Topo de funil (Reconhecimento)" },
+  { value: "meio", label: "Meio de funil (Consideração)" },
+  { value: "fundo", label: "Fundo de funil (Conversão)" },
 ] as const;
 
-export const AFFILIATE_NETWORKS = [
-  { id: "hotmart", name: "Hotmart", tag: "Infoproduto" },
-  { id: "kiwify", name: "Kiwify", tag: "Infoproduto" },
-  { id: "eduzz", name: "Eduzz", tag: "Infoproduto" },
-  { id: "monetizze", name: "Monetizze", tag: "Infoproduto/Fisico" },
-  { id: "braip", name: "Braip", tag: "Recorrencia/Fisico" },
-  { id: "ticto", name: "Ticto", tag: "Infoproduto premium" },
-  { id: "herospark", name: "Herospark", tag: "Infoproduto" },
-  { id: "clickbank", name: "ClickBank", tag: "Global" },
-  { id: "digistore24", name: "Digistore24", tag: "Europa" },
-  { id: "awin", name: "Awin", tag: "Rede global" },
-  { id: "cj", name: "CJ Affiliate", tag: "E-commerce" },
-  { id: "webvork", name: "Webvork", tag: "CPA Nutra" },
-  { id: "maxbounty", name: "MaxBounty", tag: "CPA generalista" },
-  { id: "drcash", name: "DrCash", tag: "CPA Nutra" },
-  { id: "amazon", name: "Amazon Associados", tag: "E-commerce" },
-  { id: "shopee", name: "Shopee Afiliados", tag: "E-commerce" },
+export const BUDGET_PREFS = [
+  { value: "baixo", label: "Baixo (R$10-30/dia)" },
+  { value: "medio", label: "Médio (R$30-100/dia)" },
+  { value: "alto", label: "Alto (R$100+/dia)" },
 ] as const;
 
-export const TEMPLATES = {
-  topo: [
-    {
-      id: "advertorial",
-      label: "Advertorial / Noticia",
-      desc: "Formato de materia, alto engajamento em descoberta",
-    },
-    {
-      id: "quiz",
-      label: "Quiz interativo",
-      desc: "Engaja e qualifica antes de mostrar a oferta",
-    },
-  ],
-  meio: [
-    {
-      id: "comparacao",
-      label: "Comparacao",
-      desc: "Produto vs concorrentes / vs metodo antigo",
-    },
-    {
-      id: "depoimentos",
-      label: "Depoimentos",
-      desc: "Prova social pra vencer objecoes",
-    },
-  ],
-  fundo: [
-    {
-      id: "contagem",
-      label: "Contagem regressiva",
-      desc: "Urgencia/escassez pra fechar a venda",
-    },
-    {
-      id: "depoimentos",
-      label: "Depoimentos",
-      desc: "Reforco de confianca antes do checkout",
-    },
-  ],
-} as const;
+export const PLACEMENTS = [
+  "Feed do Facebook",
+  "Stories do Facebook",
+  "Reels do Facebook",
+  "Feed do Instagram",
+  "Stories do Instagram",
+  "Reels do Instagram",
+  "Audience Network",
+  "Messenger",
+] as const;
+
+export const CTA_OPTIONS = [
+  "Saiba Mais",
+  "Compre Agora",
+  "Cadastre-se",
+  "Baixar Grátis",
+  "Comece Agora",
+  "Assine Agora",
+  "Experimente Grátis",
+] as const;

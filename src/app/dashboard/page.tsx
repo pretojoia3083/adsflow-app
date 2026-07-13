@@ -1,26 +1,80 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { AdsFlowWizard } from "@/components/AdsFlowWizard";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
-interface Campaign {
+const COLORS = {
+  bg: "#080B14",
+  card: "#121826",
+  border: "#232D40",
+  accent: "#6366F1",
+  text: "#E2E8F0",
+  muted: "#94A3B8",
+  success: "#22C55E",
+  warning: "#F59E0B",
+  error: "#EF4444",
+  info: "#3B82F6",
+};
+
+type Campaign = {
   id: string;
-  productName: string;
-  country: string;
-  countryCode: string;
+  name: string;
   status: string;
   createdAt: string;
+  budget?: number | null;
+};
+
+const STATUS_CONFIG: Record<
+  string,
+  { bg: string; color: string; label: string }
+> = {
+  DRAFT: { bg: "rgba(148,163,184,0.15)", color: "#94A3B8", label: "DRAFT" },
+  READY: { bg: "rgba(59,130,246,0.15)", color: "#3B82F6", label: "READY" },
+  ACTIVE: {
+    bg: "rgba(34,197,94,0.15)",
+    color: "#22C55E",
+    label: "ACTIVE",
+  },
+  PAUSED: {
+    bg: "rgba(245,158,11,0.15)",
+    color: "#F59E0B",
+    label: "PAUSED",
+  },
+  COMPLETED: {
+    bg: "rgba(99,102,241,0.15)",
+    color: "#6366F1",
+    label: "COMPLETED",
+  },
+};
+
+function StatusBadge({ status }: { status: string }) {
+  const config = STATUS_CONFIG[status] || STATUS_CONFIG.DRAFT;
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        padding: "4px 10px",
+        borderRadius: 6,
+        fontSize: 12,
+        fontWeight: 600,
+        letterSpacing: 0.5,
+        background: config.bg,
+        color: config.color,
+      }}
+    >
+      {config.label}
+    </span>
+  );
 }
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [view, setView] = useState<"list" | "create">("list");
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showWizard, setShowWizard] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -29,133 +83,291 @@ export default function DashboardPage() {
   }, [status, router]);
 
   useEffect(() => {
-    if (session) {
+    if (status === "authenticated") {
       fetch("/api/campaigns")
         .then((res) => res.json())
         .then((data) => {
-          setCampaigns(Array.isArray(data) ? data : []);
-          setLoading(false);
+          setCampaigns(Array.isArray(data) ? data : data.campaigns || []);
         })
-        .catch(() => setLoading(false));
+        .catch(() => setCampaigns([]))
+        .finally(() => setLoading(false));
     }
-  }, [session]);
+  }, [status]);
 
-  if (status === "loading") {
+  if (status === "loading" || status === "unauthenticated") {
     return (
-      <div className="min-h-[100dvh] bg-[#0B0F17] text-gray-100 flex items-center justify-center">
-        <div className="text-gray-400">Carregando...</div>
+      <div
+        style={{
+          minHeight: "100vh",
+          background: COLORS.bg,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily:
+            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        }}
+      >
+        <p style={{ color: COLORS.muted, fontSize: 14 }}>Loading...</p>
       </div>
     );
   }
 
-  if (!session) return null;
-
-  const statusColors: Record<string, string> = {
-    DRAFT: "text-gray-400 bg-gray-500/15 border-gray-500",
-    READY: "text-blue-400 bg-blue-500/15 border-blue-500",
-    ACTIVE: "text-green-400 bg-green-500/15 border-green-500",
-    PAUSED: "text-amber-400 bg-amber-500/15 border-amber-500",
-    COMPLETED: "text-purple-400 bg-purple-500/15 border-purple-500",
-  };
-
-  const statusLabels: Record<string, string> = {
-    DRAFT: "Rascunho",
-    READY: "Pronta",
-    ACTIVE: "Ativa",
-    PAUSED: "Pausada",
-    COMPLETED: "Concluida",
-  };
-
   return (
-    <div className="min-h-[100dvh] bg-[#0B0F17] text-gray-100 p-4 sm:p-7">
-      <div className="max-w-[1000px] mx-auto">
-        <div className="flex justify-between items-center mb-6">
+    <div
+      style={{
+        minHeight: "100vh",
+        background: COLORS.bg,
+        fontFamily:
+          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      }}
+    >
+      <header
+        style={{
+          borderBottom: `1px solid ${COLORS.border}`,
+          padding: "16px 32px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: 20,
+            fontWeight: 800,
+            color: COLORS.accent,
+            letterSpacing: 2,
+            margin: 0,
+          }}
+        >
+          ADSFLOW
+        </h1>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <span style={{ color: COLORS.muted, fontSize: 13 }}>
+            {session?.user?.name || session?.user?.email}
+          </span>
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            style={{
+              padding: "8px 16px",
+              background: "transparent",
+              border: `1px solid ${COLORS.border}`,
+              borderRadius: 8,
+              color: COLORS.muted,
+              fontSize: 13,
+              cursor: "pointer",
+              transition: "border-color 0.2s, color 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = COLORS.error;
+              e.currentTarget.style.color = COLORS.error;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = COLORS.border;
+              e.currentTarget.style.color = COLORS.muted;
+            }}
+          >
+            Sign Out
+          </button>
+        </div>
+      </header>
+
+      <main style={{ padding: "32px", maxWidth: 1000, margin: "0 auto" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 32,
+          }}
+        >
           <div>
-            <div className="text-xs font-bold text-indigo-500 tracking-wider">
-              ADSFLOW
-            </div>
-            <h1 className="text-xl font-extrabold mt-1">Dashboard</h1>
-          </div>
-          <div className="flex gap-3 items-center">
-            <span className="text-sm text-gray-400 hidden sm:inline">
-              {session.user?.name || session.user?.email}
-            </span>
-            <Link
-              href="/api/auth/signout"
-              className="text-sm text-gray-400 hover:text-gray-100 transition-colors"
+            <h2
+              style={{
+                fontSize: 24,
+                fontWeight: 700,
+                color: COLORS.text,
+                margin: 0,
+              }}
             >
-              Sair
-            </Link>
+              Campaigns
+            </h2>
+            <p
+              style={{ color: COLORS.muted, fontSize: 14, marginTop: 4, margin: "4px 0 0 0" }}
+            >
+              Manage your advertising campaigns
+            </p>
           </div>
+          <button
+            onClick={() => setShowWizard(true)}
+            style={{
+              padding: "10px 20px",
+              background: COLORS.accent,
+              color: "#fff",
+              border: "none",
+              borderRadius: 8,
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "opacity 0.2s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
+            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+          >
+            + New Campaign
+          </button>
         </div>
 
-        {view === "list" && (
-          <>
-            <button
-              onClick={() => setView("create")}
-              className="bg-indigo-500 border-none text-white font-bold text-sm px-6 py-3 rounded-[9px] hover:bg-indigo-600 transition-colors mb-6"
+        {showWizard && (
+          <div
+            style={{
+              background: COLORS.card,
+              border: `1px solid ${COLORS.border}`,
+              borderRadius: 12,
+              padding: 32,
+              marginBottom: 32,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 20,
+              }}
             >
-              + Nova campanha
-            </button>
+              <h3 style={{ color: COLORS.text, fontSize: 18, margin: 0 }}>
+                AdsFlowWizard
+              </h3>
+              <button
+                onClick={() => setShowWizard(false)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: COLORS.muted,
+                  fontSize: 20,
+                  cursor: "pointer",
+                  padding: "0 4px",
+                }}
+              >
+                x
+              </button>
+            </div>
+            <p style={{ color: COLORS.muted, fontSize: 14 }}>
+              Campaign wizard will be rendered here.
+            </p>
+          </div>
+        )}
 
-            {loading ? (
-              <div className="text-gray-400 text-sm">Carregando campanhas...</div>
-            ) : campaigns.length === 0 ? (
-              <div className="bg-[#121826] border border-[#232D40] rounded-[14px] p-8 sm:p-10 text-center">
-                <div className="text-4xl mb-3">📋</div>
-                <div className="font-bold text-lg mb-2">
-                  Nenhuma campanha ainda
-                </div>
-                <div className="text-sm text-gray-400 mb-4">
-                  Crie sua primeira campanha em poucos passos com ajuda da IA.
-                </div>
-                <button
-                  onClick={() => setView("create")}
-                  className="bg-indigo-500 border-none text-white font-bold text-sm px-6 py-3 rounded-[9px] hover:bg-indigo-600"
-                >
-                  Criar primeira campanha
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2.5">
-                {campaigns.map((c) => (
-                  <div
-                    key={c.id}
-                    className="bg-[#121826] border border-[#232D40] rounded-[14px] p-4 flex items-center gap-4 hover:border-indigo-500/50 transition-colors"
+        {loading ? (
+          <p style={{ color: COLORS.muted, fontSize: 14 }}>Loading campaigns...</p>
+        ) : campaigns.length === 0 ? (
+          <div
+            style={{
+              background: COLORS.card,
+              border: `1px solid ${COLORS.border}`,
+              borderRadius: 12,
+              padding: 64,
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: 16,
+                background: "rgba(99,102,241,0.1)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "0 auto 20px",
+                fontSize: 28,
+              }}
+            >
+              📊
+            </div>
+            <h3
+              style={{
+                color: COLORS.text,
+                fontSize: 18,
+                fontWeight: 600,
+                margin: "0 0 8px 0",
+              }}
+            >
+              No campaigns yet
+            </h3>
+            <p
+              style={{
+                color: COLORS.muted,
+                fontSize: 14,
+                margin: "0 0 24px 0",
+              }}
+            >
+              Create your first campaign to start tracking performance.
+            </p>
+            <button
+              onClick={() => setShowWizard(true)}
+              style={{
+                padding: "10px 24px",
+                background: COLORS.accent,
+                color: "#fff",
+                border: "none",
+                borderRadius: 8,
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Create Campaign
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {campaigns.map((campaign) => (
+              <div
+                key={campaign.id}
+                style={{
+                  background: COLORS.card,
+                  border: `1px solid ${COLORS.border}`,
+                  borderRadius: 10,
+                  padding: "16px 20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  transition: "border-color 0.2s",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.borderColor = COLORS.accent)
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.borderColor = COLORS.border)
+                }
+              >
+                <div>
+                  <h4
+                    style={{
+                      color: COLORS.text,
+                      fontSize: 15,
+                      fontWeight: 600,
+                      margin: "0 0 4px 0",
+                    }}
                   >
-                    <div className="flex-1 min-w-0">
-                      <div className="font-bold truncate">{c.productName}</div>
-                      <div className="text-sm text-gray-400">
-                        {c.countryCode} ·{" "}
-                        {new Date(c.createdAt).toLocaleDateString("pt-BR")}
-                      </div>
-                    </div>
-                    <span
-                      className={`text-xs font-bold px-2.5 py-1 rounded-full border whitespace-nowrap ${
-                        statusColors[c.status] || statusColors.DRAFT
-                      }`}
-                    >
-                      {statusLabels[c.status] || c.status}
-                    </span>
-                  </div>
-                ))}
+                    {campaign.name}
+                  </h4>
+                  <span style={{ color: COLORS.muted, fontSize: 12 }}>
+                    Created{" "}
+                    {new Date(campaign.createdAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </span>
+                </div>
+                <StatusBadge status={campaign.status} />
               </div>
-            )}
-          </>
+            ))}
+          </div>
         )}
-
-        {view === "create" && (
-          <>
-            <button
-              onClick={() => setView("list")}
-              className="bg-transparent border-none text-gray-400 text-sm font-semibold mb-3"
-            >
-              ← Voltar para lista
-            </button>
-            <AdsFlowWizard />
-          </>
-        )}
-      </div>
+      </main>
     </div>
   );
 }

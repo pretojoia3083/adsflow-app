@@ -1,27 +1,29 @@
 import type { Metadata, Viewport } from "next";
-import { Providers } from "@/components/Providers";
 import "./globals.css";
+import Providers from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: "AdsFlow - Automacao de Campanhas Meta Ads",
-  description:
-    "Da ideia do produto ate a campanha pronta pra rodar. IA para analise de mercado, copy e segmentacao.",
+  title: "AdsFlow - Meta Ads Automation",
+  description: "Automação inteligente de campanhas para Meta Ads",
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  userScalable: false,
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body>
         <Providers>{children}</Providers>
       </body>

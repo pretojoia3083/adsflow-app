@@ -1,22 +1,21 @@
+@import "tailwindcss";
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
-  font-family: 'Inter', 'Segoe UI', sans-serif;
-  background: #0B0F17;
-  color: #F1F5F9;
-  min-height: 100vh;
-  width: 100%;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
+  background: #080B14;
+  color: #F3F5FF;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   min-height: 100dvh;
+  overflow-x: hidden;
 }
 
 input, textarea, select {
@@ -27,35 +26,19 @@ input::placeholder, textarea::placeholder {
   color: #56607A;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 ::-webkit-scrollbar {
   width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B0F17;
+  background: #121830;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #232D40;
+  background: #232C52;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #374357;
-}
-
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-textarea:-webkit-autofill,
-select:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0 1000px #1A2333 inset !important;
-  -webkit-text-fill-color: #F1F5F9 !important;
-  transition: background-color 5000s ease-in-out 0s;
+  background: #354060;
 }

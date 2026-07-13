@@ -84,7 +84,7 @@ model Campaign {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Presell {
@@ -111,7 +111,7 @@ model Presell {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user     User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Subscription {
