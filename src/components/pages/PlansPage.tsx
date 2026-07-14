@@ -57,6 +57,7 @@ const plans = [
 
 export default function PlansPage() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [loadingPortal, setLoadingPortal] = useState(false);
 
   async function handleCheckout(planId: string) {
     setLoadingPlan(planId);
@@ -77,6 +78,21 @@ export default function PlansPage() {
     }
   }
 
+  async function handleManageSubscription() {
+    setLoadingPortal(true);
+    try {
+      const res = await fetch("/api/billing", { method: "POST" });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch {
+      //
+    } finally {
+      setLoadingPortal(false);
+    }
+  }
+
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto" }}>
       <div style={{ marginBottom: 36 }}>
@@ -87,7 +103,7 @@ export default function PlansPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20, alignItems: "start" }}>
         {plans.map((plan) => (
           <div
-            key={plan.name}
+            key={plan.id}
             style={{
               background: plan.highlight ? "rgba(34,176,125,0.06)" : "#121830",
               border: plan.highlight ? "2px solid #22B07D" : "1px solid #232C52",
@@ -150,6 +166,26 @@ export default function PlansPage() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Gerenciar assinatura */}
+      <div style={{ marginTop: 32, textAlign: "center" as const }}>
+        <button
+          onClick={handleManageSubscription}
+          disabled={loadingPortal}
+          style={{
+            padding: "12px 24px",
+            background: "transparent",
+            border: "1px solid #232C52",
+            borderRadius: 10,
+            color: "#8C93B8",
+            fontSize: 14,
+            fontWeight: 500,
+            cursor: loadingPortal ? "not-allowed" : "pointer",
+          }}
+        >
+          {loadingPortal ? "Abrindo portal..." : "Ja tem assinatura? Gerenciar"}
+        </button>
       </div>
     </div>
   );

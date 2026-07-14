@@ -1,34 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getStripe } from "@/lib/stripe";
-
-const PLANS: Record<string, { name: string; amount: number; interval: string; intervalCount: number }> = {
-  mensal: { name: "AdsFlow Mensal", amount: 5990, interval: "month", intervalCount: 1 },
-  semestral: { name: "AdsFlow 6 Meses", amount: 29990, interval: "month", intervalCount: 6 },
-  anual: { name: "AdsFlow Anual", amount: 59990, interval: "year", intervalCount: 1 },
-};
+import { getStripe, PLAN_PRICES } from "@/lib/stripe";
+import { auth } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
   const { plan } = await req.json();
 
-  if (!plan || !PLANS[plan]) {
-    return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
+  if (!plan || !(plan in PLAN_PRICES)) {
+    return NextResponse.json({ error: "Plano invalido" }, { status: 400 });
   }
 
   const stripe = getStripe();
-  const selected = PLANS[plan];
-  const origin = req.headers.get("origin") || "https://adsflow-app-git-master-rotaflex.vercel.app";
+  const selected = PLAN_PRICES[plan as keyof typeof PLAN_PRICES];
+  const origin = req.headers.get("origin") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
   try {
-    const session = await stripe.checkout.sessions.create({
+    const userEmail = session?.user?.email || "guest@adsflow.com";
+    const userId = session?.user?.id || null;
+
+    const stripeSession = await stripe.checkout.sessions.create({
       mode: "subscription",
+      customer_email: userEmail,
+      ...(userId ? { metadata: { userId } } : {}),
       payment_method_types: ["card", "boleto", "pix"],
       line_items: [
         {
           price_data: {
             currency: "brl",
-            product_data: { name: selected.name },
+            product_data: {
+              name: selected.name,
+              description: `AdsFlow - ${selected.name}`,
+            },
             unit_amount: selected.amount,
-            recurring: { interval: selected.interval as "month" | "year", interval_count: selected.intervalCount },
+            recurring: {
+              interval: selected.interval,
+              interval_count: selected.intervalCount,
+            },
           },
           quantity: 1,
         },
@@ -36,11 +43,13 @@ export async function POST(req: NextRequest) {
       success_url: `${origin}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/payment/cancel`,
       locale: "pt-BR",
+      billing_address_collection: "auto",
+      allow_promotion_codes: true,
     });
 
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: stripeSession.url });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Erro ao criar sessao";
+    const message = error instanceof Error ? error.message : "Erro ao criar sessao de pagamento";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
