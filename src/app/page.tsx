@@ -1,3 +1,5 @@
+"use client";
+
 const s = {
   /* ───────── tokens ───────── */
   bg: "#080B14",
@@ -75,7 +77,7 @@ const s = {
 /* ================================================================== */
 /*  SVG ICONS (inline)                                                */
 /* ================================================================== */
-const LogoIcon = ({ size = 32 }: { size?: number }) => (
+const LogoIcon = ({ size = 48 }: { size?: number }) => (
   <svg
     width={size}
     height={size}
@@ -84,8 +86,8 @@ const LogoIcon = ({ size = 32 }: { size?: number }) => (
     style={{ flexShrink: 0 }}
   >
     <rect width="96" height="96" rx="20" fill="#171A21" stroke="#262B36" />
-    <path d="M24 32 L40 48 L52 38 L72 60" stroke="#22B07D" stroke-width="5" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M60 60 H72 V48" stroke="#22B07D" stroke-width="5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M24 32 L40 48 L52 38 L72 60" stroke="#22B07D" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M60 60 H72 V48" stroke="#22B07D" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
     <circle cx="24" cy="32" r="4" fill="#3FCB92" />
     <circle cx="52" cy="38" r="4" fill="#3FCB92" />
   </svg>
@@ -119,7 +121,7 @@ export default function Home() {
           style={{
             maxWidth: 1200,
             margin: "0 auto",
-            padding: "14px clamp(16px, 4vw, 24px)",
+            padding: "16px clamp(16px, 4vw, 24px)",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -128,13 +130,13 @@ export default function Home() {
           }}
         >
           {/* logo */}
-          <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <LogoIcon />
+          <a href="/" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}>
+            <LogoIcon size={48} />
             <span
               style={{
                 fontFamily: "'Space Grotesk', sans-serif",
                 fontWeight: 700,
-                fontSize: 22,
+                fontSize: 28,
                 display: "flex",
                 alignItems: "baseline",
                 gap: 1,
@@ -153,7 +155,7 @@ export default function Home() {
             </span>
             <span
               style={{
-                fontSize: 11,
+                fontSize: 12,
                 color: "#5B628A",
                 borderLeft: "1px solid #232C52",
                 paddingLeft: 10,
@@ -179,7 +181,7 @@ export default function Home() {
               <a
                 key={href}
                 href={href}
-                style={{ color: "#8C93B8", textDecoration: "none", fontSize: 14, fontWeight: 500, transition: "color .2s" }}
+                style={{ color: "#8C93B8", textDecoration: "none", fontSize: 15, fontWeight: 500, transition: "color .2s" }}
               >
                 {label}
               </a>
@@ -796,32 +798,32 @@ export default function Home() {
             alignItems: "stretch",
           }}
         >
-          {/* Start */}
+          {/* Mensal */}
           <div
             style={{
               ...s.card({
                 flex: "1 1 300px",
-                maxWidth: 400,
+                maxWidth: 360,
                 display: "flex",
                 flexDirection: "column",
               }),
             }}
           >
             <p style={{ fontSize: 14, fontWeight: 600, color: "#5B628A", textTransform: "uppercase" as const, letterSpacing: 1, marginBottom: 8 }}>
-              Start
+              Mensal
             </p>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 24 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
               <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 44, fontWeight: 700, color: "#F3F5FF" }}>
-                R$99
+                R$59,90
               </span>
-              <span style={{ fontSize: 16, color: "#5B628A" }}>/mês</span>
             </div>
+            <span style={{ fontSize: 14, color: "#5B628A", marginBottom: 24 }}>/mês</span>
             {[
-              "Até 3 campanhas ativas",
-              "Criação automática de criativos",
-              "Relatórios semanais",
-              "Suporte por e-mail",
-              "1 conta Meta Ads",
+              "Campanhas ilimitadas",
+              "IA para copy e segmentação",
+              "Presell hospedada",
+              "Análise de mercado",
+              "Suporte via chat",
             ].map((feat, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
                 <span style={{ color: "#22B07D", fontWeight: 700 }}>✓</span>
@@ -844,12 +846,12 @@ export default function Home() {
             </a>
           </div>
 
-          {/* Pro */}
+          {/* 6 Meses */}
           <div
             style={{
               ...s.card({
                 flex: "1 1 300px",
-                maxWidth: 400,
+                maxWidth: 360,
                 display: "flex",
                 flexDirection: "column",
                 border: "2px solid #22B07D",
@@ -857,7 +859,6 @@ export default function Home() {
               }),
             }}
           >
-            {/* badge */}
             <div
               style={{
                 position: "absolute",
@@ -874,24 +875,25 @@ export default function Home() {
                 borderRadius: 999,
               }}
             >
-              MAIS COMPLETO
+              MAIS POPULAR
             </div>
             <p style={{ fontSize: 14, fontWeight: 600, color: "#22B07D", textTransform: "uppercase" as const, letterSpacing: 1, marginBottom: 8, marginTop: 8 }}>
-              Pro
+              6 Meses
             </p>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 24 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
               <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 44, fontWeight: 700, color: "#F3F5FF" }}>
-                R$149
+                R$299,90
               </span>
-              <span style={{ fontSize: 16, color: "#5B628A" }}>/mês</span>
             </div>
+            <span style={{ fontSize: 14, color: "#5B628A", marginBottom: 4 }}>/6 meses</span>
+            <span style={{ fontSize: 13, color: "#22B07D", fontWeight: 600, marginBottom: 24 }}>R$ 49,98/mês</span>
             {[
-              "Campanhas ilimitadas",
-              "Criação automática de criativos",
-              "Otimização IA em tempo real",
-              "Testes A/B automatizados",
-              "Relatórios diários + alertas",
-              "Suporte prioritário via WhatsApp",
+              "Tudo do plano Mensal",
+              "Economia de 17%",
+              "Relatórios avançados",
+              "Prioridade no suporte",
+              "Integração Meta Ads API",
+              "Templates de presell premium",
             ].map((feat, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
                 <span style={{ color: "#22B07D", fontWeight: 700 }}>✓</span>
@@ -909,7 +911,56 @@ export default function Home() {
                 }),
               }}
             >
-              Começar agora
+              Assinar 6 meses
+            </a>
+          </div>
+
+          {/* Anual */}
+          <div
+            style={{
+              ...s.card({
+                flex: "1 1 300px",
+                maxWidth: 360,
+                display: "flex",
+                flexDirection: "column",
+              }),
+            }}
+          >
+            <p style={{ fontSize: 14, fontWeight: 600, color: "#5B628A", textTransform: "uppercase" as const, letterSpacing: 1, marginBottom: 8 }}>
+              Anual
+            </p>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
+              <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 44, fontWeight: 700, color: "#F3F5FF" }}>
+                R$599,90
+              </span>
+            </div>
+            <span style={{ fontSize: 14, color: "#5B628A", marginBottom: 4 }}>/ano</span>
+            <span style={{ fontSize: 13, color: "#22B07D", fontWeight: 600, marginBottom: 24 }}>R$ 49,99/mês</span>
+            {[
+              "Tudo do plano 6 Meses",
+              "Acesso antecipado a novidades",
+              "Suporte prioritário VIP",
+              "Consultoria mensal (1h)",
+              "API completa para automação",
+            ].map((feat, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                <span style={{ color: "#22B07D", fontWeight: 700 }}>✓</span>
+                <span style={{ fontSize: 14, color: "#8C93B8" }}>{feat}</span>
+              </div>
+            ))}
+            <div style={{ flex: 1 }} />
+            <a
+              href="/register"
+              style={{
+                ...s.btn("transparent", "#F3F5FF", {
+                  border: "1px solid #232C52",
+                  marginTop: 24,
+                  padding: "14px 0",
+                  width: "100%",
+                }),
+              }}
+            >
+              Assinar anual
             </a>
           </div>
         </div>
@@ -1045,13 +1096,13 @@ export default function Home() {
         >
           {/* brand */}
           <div style={{ flex: "1 1 260px", minWidth: 220 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-              <LogoIcon />
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+              <LogoIcon size={48} />
               <span
                 style={{
                   fontFamily: "'Space Grotesk', sans-serif",
                   fontWeight: 700,
-                  fontSize: 22,
+                  fontSize: 28,
                   display: "flex",
                   alignItems: "baseline",
                   gap: 1,

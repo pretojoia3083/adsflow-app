@@ -48,6 +48,8 @@ export async function POST(req: NextRequest) {
       networkId: data.networkId ?? null,
       networkName: data.networkName ?? null,
       affLink: data.affLink ?? null,
+      affiliateLink: data.affiliateLink ?? null,
+      presellSlug: data.presellSlug ?? null,
       keywords: JSON.stringify(data.keywords ?? []),
       interests: JSON.stringify(data.interests ?? []),
       placements: JSON.stringify(data.placements ?? []),

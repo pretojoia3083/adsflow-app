@@ -11,6 +11,8 @@ export interface CampaignData {
   networkId?: string;
   networkName?: string;
   affLink?: string;
+  affiliateLink?: string;
+  presellSlug?: string;
   keywords: string[];
   interests: string[];
   placements: string[];

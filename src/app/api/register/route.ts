@@ -8,14 +8,14 @@ export async function POST(req: Request) {
 
     if (!name || !email || !password) {
       return NextResponse.json(
-        { error: "Name, email, and password are required" },
+        { error: "Nome, email e senha sao obrigatorios" },
         { status: 400 }
       );
     }
 
-    if (typeof password !== "string" || password.length < 8) {
+    if (typeof password !== "string" || password.length < 6) {
       return NextResponse.json(
-        { error: "Password must be at least 8 characters" },
+        { error: "A senha deve ter pelo menos 6 caracteres" },
         { status: 400 }
       );
     }
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "A user with this email already exists" },
+        { error: "Email ja cadastrado" },
         { status: 409 }
       );
     }
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
       data: {
         name,
         email,
-        password: hashedPassword,
+        passwordHash: hashedPassword,
       },
     });
 
