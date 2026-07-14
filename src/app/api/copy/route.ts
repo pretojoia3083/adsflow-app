@@ -1,73 +1,65 @@
 import { NextRequest, NextResponse } from "next/server";
+import { aiGenerateJSON, getOpenAI } from "@/lib/ai";
+
+interface CopyResult {
+  headline: string;
+  primaryText: string;
+  description: string;
+  cta: string;
+}
+
+function mockCopy(body: { productName: string; funnelStage?: string }): CopyResult {
+  const stage = body.funnelStage || "meio";
+  const p = body.productName;
+  const headlines: Record<string, string[]> = {
+    topo: [`${p} — A solucao que voce estava procurando`, `Descubra como ${p} pode transformar seus resultados`, `Chega de complicacao. Conheca ${p}`],
+    meio: [`Por que milhares de pessoas estao escolhendo ${p}?`, `${p}: veja os resultados que ninguem te conta`, `A diferenca entre ${p} e as alternativas`],
+    fundo: [`Ultima chance — ${p} com condicao especial`, `Garanta ja seu acesso ao ${p}`, `${p}: comece hoje e veja resultados em 7 dias`],
+  };
+  const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+  return {
+    headline: pick(headlines[stage] ?? headlines.meio),
+    primaryText: `${p} foi criado para entregar resultados reais. Metodo comprovado que ja ajudou milhares de pessoas a alcancar seus objetivos.`,
+    description: `${p}: a forma mais eficiente de alcancar seus objetivos. Simples, poderosa e feita para voce.`,
+    cta: "Saiba Mais",
+  };
+}
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-
   const { productName, audience, country, funnelStage, tone } = body;
 
   if (!productName) {
-    return NextResponse.json(
-      { error: "productName is required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "productName is required" }, { status: 400 });
   }
 
-  const headlines: Record<string, string[]> = {
-    topo: [
-      `${productName} — A solução que você estava procurando`,
-      `Descubra como ${productName} pode transformar seus resultados`,
-      `Chega de complicação. Conheça ${productName}`,
-    ],
-    meio: [
-      `Por que milhares de pessoas estão escolhendo ${productName}?`,
-      `${productName}: veja os resultados que ninguém te conta`,
-      `A diferença entre ${productName} e as alternças`,
-    ],
-    fundo: [
-      `Última chance — ${productName} com condição especial`,
-      `Garanta já seu acesso ao ${productName}`,
-      `${productName}: comece hoje e veja resultados em 7 dias`,
-    ],
-  };
+  const openai = getOpenAI();
 
-  const primaryTexts: Record<string, string[]> = {
-    topo: [
-      `Você sabia que a maioria das pessoas perde tempo com soluções que não funcionam? ${productName} foi criado justamente para mudar isso. Uma abordagem simples, direta e comprovada que vai te ajudar a alcançar seus objetivos sem complicação.`,
-      `Imagine ter nas mãos uma ferramenta que automatiza o que hoje leva horas. O ${productName} faz exatamente isso — de forma inteligente, rápida e acessível.`,
-    ],
-    meio: [
-      `Já pensou por que alguns resultados aparecem para poucos e não para você? O segredo está na方法. ${productName} utiliza uma方法 comprovada que já ajudou milhares de pessoas a transformar seus resultados.`,
-      `Não é sorte, é método. O ${productName} foi desenhado para entregar resultados consistentes, mesmo que você esteja começando do zero.`,
-    ],
-    fundo: [
-      `Não deixe para depois. A condição especial do ${productName} expira em breve e você não vai querer perder essa oportunidade. Clique agora e comece a transformar seus resultados hoje mesmo.`,
-      `São apenas algumas vagas restantes. Garanta seu acesso ao ${productName} agora e comece a ver resultados reais a partir de hoje.`,
-    ],
-  };
+  if (!openai) {
+    return NextResponse.json(mockCopy(body));
+  }
 
-  const descriptions: Record<string, string[]> = {
-    topo: [
-      `${productName}: a forma mais eficiente de alcançar seus objetivos. Simples, poderosa e feita para você.`,
-      `Conheça o ${productName} — uma solução completa para quem busca resultados reais.`,
-    ],
-    meio: [
-      `${productName} já ajudou milhares a alcançar seus objetivos. Descubra o porquê.`,
-      `Veja o que torna o ${productName} diferente de tudo que você já tentou.`,
-    ],
-    fundo: [
-      `Não espere mais. ${productName} com condição especial — garanta o seu agora.`,
-      `Acesso liberado imediatamente. Comece agora com o ${productName}.`,
-    ],
-  };
+  const stageLabel = funnelStage === "topo" ? "topo de funil (consciencia)" : funnelStage === "fundo" ? "fundo de funil (conversao)" : "meio de funil (consideracao)";
 
-  const stage = (funnelStage as string) || "meio";
+  const result = await aiGenerateJSON<CopyResult>(
+    `Gere um copy para anuncio do Meta Ads para o produto "${productName}".
+Pais alvo: ${country || "Brasil"}.
+Publico-alvo: ${audience || "geral"}.
+Estagio do funil: ${stageLabel}.
+Tom de voz: ${tone || "profissional e persuasivo"}.
 
-  const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+Retorne um JSON com exatamente esses campos:
+- headline: titulo chamativo (max 40 caracteres)
+- primaryText: texto principal do anuncio (150-300 caracteres, persuasivo)
+- description: descricao curta do anuncio (max 90 caracteres)
+- cta: call to action em portugues (ex: Saiba Mais, Comprar Agora, Quero Testar, Assinar Agora)`,
 
-  return NextResponse.json({
-    headline: pick(headlines[stage] ?? headlines.meio),
-    primaryText: pick(primaryTexts[stage] ?? primaryTexts.meio),
-    description: pick(descriptions[stage] ?? descriptions.meio),
-    cta: "Saiba Mais",
-  });
+    `Voce e um especialista em copywriting para Meta Ads. Gere textos persuasivos, com gatilhos mentais, em portugues do Brasil. Nao use aspas no headline. O texto principal deve gerar curiosidade e urgencia.`
+  );
+
+  if (result && result.headline) {
+    return NextResponse.json(result);
+  }
+
+  return NextResponse.json(mockCopy(body));
 }

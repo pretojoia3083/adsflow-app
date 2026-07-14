@@ -1,4 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
+import { aiGenerateJSON, getOpenAI } from "@/lib/ai";
+
+interface PresellResult {
+  slug: string;
+  title: string;
+  headline: string;
+  subheadline: string;
+  ctaText: string;
+  bgColor: string;
+  accentColor: string;
+  textColor: string;
+  niche: string;
+  mood: string;
+  affiliateLink: string;
+}
 
 const NICHE_COLORS: Record<string, { bg: string; accent: string; text: string; mood: string }> = {
   saude: { bg: "#0A1628", accent: "#00B4D8", text: "#F0F4F8", mood: "conforto e confianca" },
@@ -70,13 +85,46 @@ export async function POST(req: NextRequest) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 
+  const openai = getOpenAI();
+
+  if (!openai) {
+    return NextResponse.json({
+      slug,
+      title: productName,
+      headline: generateHeadline(productName, colors.mood),
+      subheadline: generateSubheadline(productName),
+      ctaText: "Saiba Mais",
+      bgColor: colors.bg,
+      accentColor: colors.accent,
+      textColor: colors.text,
+      niche,
+      mood: colors.mood,
+      affiliateLink: affiliateLink || "",
+    });
+  }
+
+  const aiResult = await aiGenerateJSON<{ headline: string; subheadline: string; ctaText: string }>(
+    `Gere textos para uma pagina de presell (pre-venda) de afiliado.
+Produto: "${productName}"
+Descricao: ${description || "N/A"}
+Publico-alvo: ${audience || "geral"}
+Nicho: ${niche}
+Mood das cores: ${colors.mood}
+
+Retorne um JSON com:
+- headline: titulo chamativo da pagina (max 60 caracteres, persuasivo)
+- subheadline: subtitulo que complementa e gera curiosidade (max 120 caracteres)
+- ctaText: texto do botao de call to action em portugues (max 25 caracteres)`,
+
+    `Voce e um copywriter especializado em presell e paginas de captura para afiliados. O objetivo e maximizar a taxa de clique no botao CTA. Use gatilhos de curiosidade, prova social e urgencia. Idioma: portugues do Brasil.`
+  );
+
   return NextResponse.json({
     slug,
     title: productName,
-    headline: generateHeadline(productName, colors.mood),
-    subheadline: generateSubheadline(productName),
-    bodyText: generateBodyText(productName, audience || ""),
-    ctaText: "Saiba Mais",
+    headline: aiResult?.headline || generateHeadline(productName, colors.mood),
+    subheadline: aiResult?.subheadline || generateSubheadline(productName),
+    ctaText: aiResult?.ctaText || "Saiba Mais",
     bgColor: colors.bg,
     accentColor: colors.accent,
     textColor: colors.text,
