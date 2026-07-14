@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export default auth((req) => {
   const { pathname } = req.nextUrl;
 
-  const isPublic = pathname === "/" || pathname === "/login" || pathname === "/register" || pathname.startsWith("/p/");
+  const isPublic = pathname === "/" || pathname === "/login" || pathname === "/register" || pathname.startsWith("/p/") || pathname.startsWith("/payment/");
 
   if (!isPublic && !req.auth) {
     return NextResponse.redirect(new URL("/login", req.url));

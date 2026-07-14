@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
+
 const plans = [
   {
+    id: "mensal",
     name: "Mensal",
     price: "R$ 59,90",
     period: "/mes",
@@ -16,6 +19,7 @@ const plans = [
     cta: "Comecar agora",
   },
   {
+    id: "semestral",
     name: "6 Meses",
     price: "R$ 299,90",
     period: "/6 meses",
@@ -33,6 +37,7 @@ const plans = [
     cta: "Assinar 6 meses",
   },
   {
+    id: "anual",
     name: "Anual",
     price: "R$ 599,90",
     period: "/ano",
@@ -51,6 +56,27 @@ const plans = [
 ];
 
 export default function PlansPage() {
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+
+  async function handleCheckout(planId: string) {
+    setLoadingPlan(planId);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: planId }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch {
+      //
+    } finally {
+      setLoadingPlan(null);
+    }
+  }
+
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto" }}>
       <div style={{ marginBottom: 36 }}>
@@ -93,21 +119,24 @@ export default function PlansPage() {
               <div style={{ fontSize: 14, color: "#6B739E", marginBottom: 28 }}>{plan.period}</div>
 
               <button
+                onClick={() => handleCheckout(plan.id)}
+                disabled={loadingPlan === plan.id}
                 style={{
                   width: "100%",
                   padding: "14px 0",
-                  background: plan.highlight ? "linear-gradient(90deg,#22B07D,#3FCB92)" : "transparent",
+                  background: loadingPlan === plan.id ? "#1a7a55" : plan.highlight ? "linear-gradient(90deg,#22B07D,#3FCB92)" : "transparent",
                   color: plan.highlight ? "#080B14" : "#3FCB92",
                   border: plan.highlight ? "none" : "1px solid #232C52",
                   borderRadius: 12,
                   fontSize: 15,
                   fontWeight: 700,
-                  cursor: "pointer",
+                  cursor: loadingPlan === plan.id ? "not-allowed" : "pointer",
                   marginBottom: 28,
                   transition: "all 0.15s",
+                  opacity: loadingPlan && loadingPlan !== plan.id ? 0.5 : 1,
                 }}
               >
-                {plan.cta}
+                {loadingPlan === plan.id ? "Redirecionando..." : plan.cta}
               </button>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>

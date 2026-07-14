@@ -143,6 +143,7 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
     subheadline: "",
     ctaText: "Saiba Mais",
     affiliateLink: "",
+    videoUrl: "",
     bgColor: "#080B14",
     accentColor: "#22B07D",
     textColor: "#F3F5FF",
@@ -727,6 +728,18 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
                       Link completo da oferta de afiliado. O CTA da presell apontara para este link.
                     </div>
                   </div>
+                  <div>
+                    <label style={labelStyle()}>Video da Presell (URL)</label>
+                    <input
+                      style={inputStyle()}
+                      placeholder="https://youtube.com/watch?v=... ou https://exemplo.com/video.mp4"
+                      value={presell.videoUrl}
+                      onChange={(e) => setPresell({ ...presell, videoUrl: e.target.value })}
+                    />
+                    <div style={{ fontSize: 13, color: C.muted, marginTop: 6 }}>
+                      URL do video (YouTube, Vimeo ou link direto MP4). Aparece na presell acima do botao CTA.
+                    </div>
+                  </div>
 
                   {/* PREVIEW DA PRESELL */}
                   <div>
@@ -748,6 +761,33 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
                         <p style={{ fontSize: 16, color: `${presell.textColor}cc`, marginBottom: 32, maxWidth: 480, margin: "0 auto 32px", lineHeight: 1.6 }}>
                           {presell.subheadline || "Subheadline da presell"}
                         </p>
+                        {presell.videoUrl && (
+                          <div style={{ marginBottom: 32, maxWidth: 560, margin: "0 auto 32px" }}>
+                            {presell.videoUrl.includes("youtube.com") || presell.videoUrl.includes("youtu.be") ? (
+                              <div style={{ position: "relative" as const, paddingBottom: "56.25%", height: 0, overflow: "hidden", borderRadius: 12 }}>
+                                <iframe
+                                  src={`https://www.youtube.com/embed/${presell.videoUrl.includes("youtu.be") ? presell.videoUrl.split("youtu.be/")[1]?.split("?")[0] : presell.videoUrl.split("v=")[1]?.split("&")[0]}`}
+                                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", borderRadius: 12 }}
+                                  allowFullScreen
+                                />
+                              </div>
+                            ) : presell.videoUrl.includes("vimeo.com") ? (
+                              <div style={{ position: "relative" as const, paddingBottom: "56.25%", height: 0, overflow: "hidden", borderRadius: 12 }}>
+                                <iframe
+                                  src={`https://player.vimeo.com/video/${presell.videoUrl.split("vimeo.com/")[1]?.split("?")[0]}`}
+                                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", borderRadius: 12 }}
+                                  allowFullScreen
+                                />
+                              </div>
+                            ) : (
+                              <video
+                                controls
+                                style={{ width: "100%", borderRadius: 12, maxHeight: 320, background: "#000" }}
+                                src={presell.videoUrl}
+                              />
+                            )}
+                          </div>
+                        )}
                         <a
                           href={presell.affiliateLink || "#"}
                           target="_blank"
