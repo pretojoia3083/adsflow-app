@@ -206,7 +206,7 @@ export default function AdsShopPage() {
                   Em Alta Agora
                 </h3>
                 <p style={{ fontSize: 12, color: "#6B739E", margin: 0 }}>
-                  Google Trends + produtos sugeridos
+                  Produtos sugeridos para este nicho
                 </p>
               </div>
             </div>
