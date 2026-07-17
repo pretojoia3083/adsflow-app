@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export type SidebarPage = "dashboard" | "plans" | "ia" | "support" | "meta-api";
+export type SidebarPage = "dashboard" | "campaigns" | "metrics" | "creatives" | "radar" | "ads-shop" | "install" | "settings" | "plans" | "ia" | "meta-api" | "support";
 
 interface SidebarProps {
   currentPage: SidebarPage;
@@ -10,12 +10,39 @@ interface SidebarProps {
   userName?: string;
 }
 
-const MENU = [
-  { id: "dashboard" as SidebarPage, label: "Dashboard", icon: "📊" },
-  { id: "plans" as SidebarPage, label: "Planos", icon: "💎" },
-  { id: "ia" as SidebarPage, label: "IA", icon: "🤖" },
-  { id: "meta-api" as SidebarPage, label: "Meta Ads API", icon: "⚙️" },
-  { id: "support" as SidebarPage, label: "Suporte", icon: "💬" },
+const MENU_SECTIONS = [
+  {
+    title: "Principal",
+    items: [
+      { id: "dashboard" as SidebarPage, label: "Dashboard", icon: "📊" },
+      { id: "campaigns" as SidebarPage, label: "Campanhas", icon: "🎯" },
+      { id: "metrics" as SidebarPage, label: "Metricas", icon: "📈" },
+      { id: "creatives" as SidebarPage, label: "Criativos", icon: "🎨" },
+      { id: "radar" as SidebarPage, label: "Radar de Anuncios", icon: "🔍" },
+      { id: "ads-shop" as SidebarPage, label: "ADS SHOP", icon: "🛒" },
+    ],
+  },
+  {
+    title: "Sistema",
+    items: [
+      { id: "install" as SidebarPage, label: "Instalar App", icon: "📱" },
+      { id: "settings" as SidebarPage, label: "Configuracao", icon: "⚙️" },
+    ],
+  },
+  {
+    title: "Integracoes",
+    items: [
+      { id: "ia" as SidebarPage, label: "IA", icon: "🤖" },
+      { id: "meta-api" as SidebarPage, label: "Meta Ads API", icon: "🔗" },
+    ],
+  },
+  {
+    title: "Conta",
+    items: [
+      { id: "plans" as SidebarPage, label: "Planos", icon: "💎" },
+      { id: "support" as SidebarPage, label: "Suporte", icon: "💬" },
+    ],
+  },
 ];
 
 export default function Sidebar({ currentPage, onNavigate, userName }: SidebarProps) {
@@ -34,7 +61,6 @@ export default function Sidebar({ currentPage, onNavigate, userName }: SidebarPr
         overflow: "hidden",
       }}
     >
-      {/* Logo */}
       <div style={{ padding: collapsed ? "20px 8px" : "20px 20px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid #1A2040", minHeight: 72 }}>
         <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", flexShrink: 0 }}>
           <svg width="40" height="40" viewBox="0 0 96 96" fill="none">
@@ -53,53 +79,61 @@ export default function Sidebar({ currentPage, onNavigate, userName }: SidebarPr
         </a>
       </div>
 
-      {/* Menu */}
-      <nav style={{ flex: 1, padding: "12px 8px", display: "flex", flexDirection: "column", gap: 4 }}>
-        {MENU.map((item) => {
-          const active = currentPage === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => onNavigate(item.id)}
-              title={collapsed ? item.label : undefined}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                padding: collapsed ? "12px 0" : "12px 16px",
-                justifyContent: collapsed ? "center" : "flex-start",
-                background: active ? "rgba(34,176,125,0.1)" : "transparent",
-                border: "none",
-                borderRadius: 10,
-                color: active ? "#3FCB92" : "#6B739E",
-                fontSize: 16,
-                fontWeight: active ? 700 : 500,
-                cursor: "pointer",
-                transition: "all 0.15s",
-                whiteSpace: "nowrap",
-                width: "100%",
-              }}
-              onMouseEnter={(e) => {
-                if (!active) {
-                  e.currentTarget.style.background = "rgba(59,130,246,0.06)";
-                  e.currentTarget.style.color = "#A0A8CE";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!active) {
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.color = "#6B739E";
-                }
-              }}
-            >
-              <span style={{ fontSize: 20, flexShrink: 0 }}>{item.icon}</span>
-              {!collapsed && <span>{item.label}</span>}
-            </button>
-          );
-        })}
+      <nav style={{ flex: 1, padding: "12px 8px", display: "flex", flexDirection: "column", gap: 4, overflowY: "auto" }}>
+        {MENU_SECTIONS.map((section) => (
+          <div key={section.title} style={{ marginBottom: 8 }}>
+            {!collapsed && (
+              <div style={{ fontSize: 11, fontWeight: 600, color: "#4A5178", textTransform: "uppercase", letterSpacing: 1.2, padding: "8px 16px 4px" }}>
+                {section.title}
+              </div>
+            )}
+            {collapsed && <div style={{ height: 8, borderBottom: "1px solid #1A2040", margin: "8px 0" }} />}
+            {section.items.map((item) => {
+              const active = currentPage === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => onNavigate(item.id)}
+                  title={collapsed ? item.label : undefined}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    padding: collapsed ? "10px 0" : "10px 16px",
+                    justifyContent: collapsed ? "center" : "flex-start",
+                    background: active ? "rgba(34,176,125,0.1)" : "transparent",
+                    border: "none",
+                    borderRadius: 10,
+                    color: active ? "#3FCB92" : "#6B739E",
+                    fontSize: 15,
+                    fontWeight: active ? 700 : 500,
+                    cursor: "pointer",
+                    transition: "all 0.15s",
+                    whiteSpace: "nowrap",
+                    width: "100%",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!active) {
+                      e.currentTarget.style.background = "rgba(59,130,246,0.06)";
+                      e.currentTarget.style.color = "#A0A8CE";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!active) {
+                      e.currentTarget.style.background = "transparent";
+                      e.currentTarget.style.color = "#6B739E";
+                    }
+                  }}
+                >
+                  <span style={{ fontSize: 18, flexShrink: 0 }}>{item.icon}</span>
+                  {!collapsed && <span>{item.label}</span>}
+                </button>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
-      {/* Collapse toggle */}
       <div style={{ padding: "12px 8px", borderTop: "1px solid #1A2040" }}>
         <button
           onClick={() => setCollapsed(!collapsed)}
@@ -123,7 +157,6 @@ export default function Sidebar({ currentPage, onNavigate, userName }: SidebarPr
         </button>
       </div>
 
-      {/* User */}
       {!collapsed && userName && (
         <div style={{ padding: "16px 20px", borderTop: "1px solid #1A2040" }}>
           <div style={{ fontSize: 15, color: "#6B739E", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{userName}</div>

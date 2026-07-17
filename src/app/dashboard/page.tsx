@@ -10,6 +10,14 @@ import PlansPage from "@/components/pages/PlansPage";
 import MetaApiPage from "@/components/pages/MetaApiPage";
 import SupportPage from "@/components/pages/SupportPage";
 import IaPage from "@/components/pages/IaPage";
+import CampaignsPage from "@/components/pages/CampaignsPage";
+import MetricsPage from "@/components/pages/MetricsPage";
+import CreativesPage from "@/components/pages/CreativesPage";
+import InstallAppPage from "@/components/pages/InstallAppPage";
+import SettingsPage from "@/components/pages/SettingsPage";
+import AdRadarPage from "@/components/pages/AdRadarPage";
+import AdsShopPage from "@/components/pages/AdsShopPage";
+import InstallBanner from "@/components/InstallBanner";
 
 const STEP_NAMES = [
   "Produto",
@@ -29,6 +37,7 @@ interface Campaign {
   countryCode: string;
   status: string;
   createdAt: string;
+  metaCampaignId: string | null;
 }
 
 const STATUS_COLORS: Record<string, { color: string; bg: string }> = {
@@ -55,6 +64,7 @@ export default function DashboardPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleStepChange = useCallback((step: number) => {
     setCurrentStep(step);
@@ -72,6 +82,15 @@ export default function DashboardPage() {
         .catch(() => setLoading(false));
     }
   }, [session]);
+
+  async function handleDeleteCampaign(id: string) {
+    setDeletingId(id);
+    try {
+      await fetch(`/api/campaigns?id=${id}`, { method: "DELETE" });
+      setCampaigns((prev) => prev.filter((c) => c.id !== id));
+    } catch {}
+    setDeletingId(null);
+  }
 
   function handleNavigate(page: SidebarPage) {
     setCurrentPage(page);
@@ -94,7 +113,6 @@ export default function DashboardPage() {
       <Sidebar currentPage={currentPage} onNavigate={handleNavigate} userName={session.user?.name || session.user?.email || ""} />
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        {/* Header */}
         <header style={{ borderBottom: "1px solid #1A2040", padding: "14px clamp(16px, 4vw, 32px)", display: "flex", alignItems: "center", gap: 24, background: "#0C1022" }}>
           {showWizard && (
             <div style={{ flex: 1, minWidth: 0 }}>
@@ -115,7 +133,6 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        {/* Content */}
         <main style={{ padding: "clamp(16px, 4vw, 32px)", flex: 1, overflow: "auto" }}>
           {currentPage === "dashboard" && (
             !showWizard ? (
@@ -157,9 +174,19 @@ export default function DashboardPage() {
                             <p style={{ fontWeight: 600, color: "#F3F5FF", fontSize: 16, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.productName}</p>
                             <p style={{ color: "#8C93B8", fontSize: 14, margin: "4px 0 0 0" }}>{c.countryCode} · {new Date(c.createdAt).toLocaleDateString("pt-BR")}</p>
                           </div>
-                          <span style={{ padding: "5px 14px", borderRadius: 99, fontSize: 13, fontWeight: 600, color: s.color, background: s.bg, whiteSpace: "nowrap" }}>
-                            {STATUS_LABELS[c.status] || c.status}
-                          </span>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                            <span style={{ padding: "5px 14px", borderRadius: 99, fontSize: 13, fontWeight: 600, color: s.color, background: s.bg, whiteSpace: "nowrap" }}>
+                              {STATUS_LABELS[c.status] || c.status}
+                            </span>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); if (confirm(`Excluir "${c.productName}"?`)) handleDeleteCampaign(c.id); }}
+                              disabled={deletingId === c.id}
+                              title="Excluir campanha"
+                              style={{ padding: "6px 10px", background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: 8, color: "#F87171", fontSize: 14, cursor: deletingId === c.id ? "wait" : "pointer" }}
+                            >
+                              🗑️
+                            </button>
+                          </div>
                         </div>
                       );
                     })}
@@ -179,12 +206,20 @@ export default function DashboardPage() {
             )
           )}
 
+          {currentPage === "campaigns" && <CampaignsPage />}
+          {currentPage === "metrics" && <MetricsPage />}
+          {currentPage === "creatives" && <CreativesPage />}
+          {currentPage === "radar" && <AdRadarPage />}
+          {currentPage === "ads-shop" && <AdsShopPage />}
+          {currentPage === "install" && <InstallAppPage />}
+          {currentPage === "settings" && <SettingsPage />}
           {currentPage === "plans" && <PlansPage />}
           {currentPage === "ia" && <IaPage />}
           {currentPage === "meta-api" && <MetaApiPage />}
           {currentPage === "support" && <SupportPage />}
         </main>
       </div>
+      <InstallBanner />
     </div>
   );
 }
