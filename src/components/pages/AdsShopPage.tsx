@@ -2,6 +2,24 @@
 
 import { useState, useEffect, useCallback } from "react";
 
+interface TrendingTopic {
+  title: string;
+  traffic: string;
+  source: string;
+  articles: { title: string; url: string; source: string; timeAgo: string }[];
+  niche: string;
+  suggestedProducts: { id: string; name: string; match: number; commission: number; gravity: number }[];
+}
+
+const NICHE_COLORS: Record<string, { color: string; bg: string; icon: string }> = {
+  saude: { color: "#3FCB92", bg: "rgba(63,203,146,0.1)", icon: "💊" },
+  financeiro: { color: "#F7C948", bg: "rgba(247,201,72,0.1)", icon: "💰" },
+  fitness: { color: "#F72585", bg: "rgba(247,37,133,0.1)", icon: "💪" },
+  educacao: { color: "#60A5FA", bg: "rgba(96,165,250,0.1)", icon: "📚" },
+  tecnologia: { color: "#A78BFA", bg: "rgba(167,139,250,0.1)", icon: "💻" },
+  geral: { color: "#8C93B8", bg: "rgba(140,147,184,0.1)", icon: "🔥" },
+};
+
 const CATEGORIES = [
   { id: "all", label: "Todos", icon: "🔥" },
   { id: "health", label: "Saude", icon: "💊" },
@@ -70,6 +88,9 @@ export default function AdsShopPage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
   const [searchDebounce, setSearchDebounce] = useState("");
+  const [trends, setTrends] = useState<TrendingTopic[]>([]);
+  const [trendsLoading, setTrendsLoading] = useState(true);
+  const [showTrends, setShowTrends] = useState(true);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -100,6 +121,21 @@ export default function AdsShopPage() {
     const timer = setTimeout(() => setSearchDebounce(searchQuery), 400);
     return () => clearTimeout(timer);
   }, [searchQuery]);
+
+  useEffect(() => {
+    async function loadTrends() {
+      setTrendsLoading(true);
+      try {
+        const res = await fetch(`/api/trends?country=${selectedCountry === "ALL" ? "BR" : selectedCountry}`);
+        const data = await res.json();
+        setTrends(data.trends || []);
+      } catch {
+        setTrends([]);
+      }
+      setTrendsLoading(false);
+    }
+    loadTrends();
+  }, [selectedCountry]);
 
   return (
     <div>
@@ -149,6 +185,129 @@ export default function AdsShopPage() {
           </div>
         ))}
       </div>
+
+      {/* Em Alta Agora - Google Trends */}
+      {showTrends && (
+        <div style={{
+          background: "linear-gradient(135deg, #121830 0%, #1A2340 100%)",
+          border: "1px solid #232C52", borderRadius: 16,
+          padding: "24px 28px", marginBottom: 28,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 10,
+                background: "linear-gradient(135deg, #FF4444, #FF6B35)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 18, animation: "pulse 2s infinite",
+              }}>📈</div>
+              <div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: "#F3F5FF", margin: 0 }}>
+                  Em Alta Agora
+                </h3>
+                <p style={{ fontSize: 12, color: "#6B739E", margin: 0 }}>
+                  Google Trends + produtos sugeridos
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowTrends(false)}
+              style={{
+                background: "transparent", border: "1px solid #232C52",
+                borderRadius: 8, padding: "6px 12px", color: "#6B739E",
+                cursor: "pointer", fontSize: 12,
+              }}
+            >Fechar</button>
+          </div>
+
+          {trendsLoading ? (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 14 }}>
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} style={{
+                  background: "#0C1022", border: "1px solid #232C52",
+                  borderRadius: 12, padding: 18, height: 120,
+                  animation: "pulse 1.5s infinite",
+                }} />
+              ))}
+            </div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 14 }}>
+              {trends.slice(0, 8).map((topic, idx) => {
+                const nicheStyle = NICHE_COLORS[topic.niche] || NICHE_COLORS.geral;
+                return (
+                  <div key={idx} style={{
+                    background: "#0C1022", border: "1px solid #232C52",
+                    borderRadius: 12, padding: "16px 18px",
+                    cursor: "pointer", transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = nicheStyle.color;
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "#232C52";
+                    e.currentTarget.style.transform = "none";
+                  }}
+                  onClick={() => {
+                    setSearchQuery(topic.title);
+                    setShowTrends(false);
+                  }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ fontSize: 14 }}>{nicheStyle.icon}</span>
+                        <span style={{
+                          fontSize: 11, fontWeight: 600, color: nicheStyle.color,
+                          background: nicheStyle.bg, padding: "2px 8px", borderRadius: 6,
+                          textTransform: "uppercase", letterSpacing: 0.5,
+                        }}>{topic.niche}</span>
+                      </div>
+                      <span style={{ fontSize: 11, color: "#6B739E" }}>{topic.traffic}</span>
+                    </div>
+
+                    <h4 style={{ fontSize: 14, fontWeight: 600, color: "#F3F5FF", margin: "0 0 6px 0" }}>
+                      {topic.title}
+                    </h4>
+
+                    {topic.articles[0] && (
+                      <p style={{ fontSize: 11, color: "#8C93B8", margin: "0 0 8px 0", lineHeight: 1.3 }}>
+                        {topic.articles[0].title} · {topic.articles[0].timeAgo}
+                      </p>
+                    )}
+
+                    {topic.suggestedProducts.length > 0 && (
+                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                        {topic.suggestedProducts.slice(0, 2).map((p) => (
+                          <span key={p.id} style={{
+                            fontSize: 10, fontWeight: 600,
+                            background: "rgba(63,203,146,0.1)", color: "#3FCB92",
+                            padding: "2px 8px", borderRadius: 6,
+                          }}>
+                            ${p.commission} · {p.match}% match
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {!showTrends && (
+        <button
+          onClick={() => setShowTrends(true)}
+          style={{
+            background: "linear-gradient(135deg, #121830, #1A2340)",
+            border: "1px dashed #232C52", borderRadius: 12,
+            padding: "12px 20px", marginBottom: 20,
+            color: "#F7C948", fontSize: 13, fontWeight: 600,
+            cursor: "pointer", display: "flex", alignItems: "center", gap: 8,
+          }}
+        >📈 Mostrar Em Alta Agora</button>
+      )}
 
       {/* Search + Filters */}
       <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap", alignItems: "center" }}>
