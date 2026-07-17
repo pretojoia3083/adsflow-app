@@ -29,13 +29,13 @@ const GEO_MAP: Record<string, string> = {
 };
 
 const NICHE_KEYWORDS: Record<string, string[]> = {
-  health: ["weight", "diet", "supplement", "health", "fitness", "keto", "detox", "gut", "sugar", "blood", "pain", "joint", "skin", "hair", "aging", "testosterone", "prostate", "diabetes", "cholesterol", "immunity", "sleep", "anxiety", "tinnitus", "vision", "dental", "oral"],
-  finance: ["money", "invest", "crypto", "bitcoin", "trading", "forex", "income", "wealth", "rich", "passive", "stock", "finance", "budget", "debt", "credit", "retire"],
-  fitness: ["workout", "exercise", "muscle", "gym", "abs", "yoga", "pilates", "running", "cardio", "strength", "body", "lean", "tone"],
-  education: ["learn", "course", "class", "skill", "language", "teach", "study", "training", "certification", "degree"],
-  tech: ["ai", "software", "app", "tech", "gadget", "phone", "laptop", "coding", "data", "cyber"],
-  home: ["home", "garden", "decor", "clean", "kitchen", "furniture", "diy", "renovate", "organize"],
-  entertainment: ["game", "stream", "music", "movie", "fun", "play", "content", "viral", "social"],
+  health: ["weight", "diet", "supplement", "health", "fitness", "keto", "detox", "gut", "sugar", "blood", "pain", "joint", "skin", "hair", "aging", "testosterone", "prostate", "diabetes", "cholesterol", "immunity", "sleep", "anxiety", "tinnitus", "vision", "dental", "oral", "emagrec", "saude", "dieta", "suplemento", "natural", "remedio", "gordura", "peso", "ansiedade", "sono", "imunidade", "probiotico"],
+  finance: ["money", "invest", "crypto", "bitcoin", "trading", "forex", "income", "wealth", "rich", "passive", "stock", "finance", "budget", "debt", "credit", "retire", "cripto", "renda", "investir", "dinheiro", "negocio", "ganhar"],
+  fitness: ["workout", "exercise", "muscle", "gym", "abs", "yoga", "pilates", "running", "cardio", "strength", "body", "lean", "tone", "treino", "exercicio", "musculo", "academia", "casa", "perda de peso", "calistenia"],
+  education: ["learn", "course", "class", "skill", "language", "teach", "study", "training", "certification", "degree", "aprender", "curso", "aula", "idioma", "estudar", "ensinar"],
+  tech: ["ai", "software", "app", "tech", "gadget", "phone", "laptop", "coding", "data", "cyber", "inteligencia artificial", "tecnologia", "programacao", "celular", "computador"],
+  home: ["home", "garden", "decor", "clean", "kitchen", "furniture", "diy", "renovate", "organize", "casa", "jardim", "decoracao", "limpar", "cozinha", "movel"],
+  entertainment: ["game", "stream", "music", "movie", "fun", "play", "content", "viral", "social", "jogo", "entretenimento", "musica", "filme", "diversao"],
 };
 
 function matchNiche(title: string): string {
@@ -143,11 +143,14 @@ function getFallbackTrends(country: string): TrendingTopic[] {
       { title: "Gut Health Probiotic", traffic: "250K+", source: "Google Trends", articles: [{ title: "Probiotics market expected to grow", url: "", source: "Health", timeAgo: "7h atras" }] },
     ],
     BR: [
-      { title: "Emagrecimento Rapido", traffic: "500K+", source: "Google Trends", articles: [{ title: "Novas dietas para emagrecer", url: "", source: "Saude", timeAgo: "3h atras" }] },
-      { title: "Renda Extra Online", traffic: "300K+", source: "Google Trends", articles: [{ title: "Como ganhar dinheiro na internet", url: "", source: "Financas", timeAgo: "2h atras" }] },
-      { title: "Criptomoedas Brasil", traffic: "400K+", source: "Google Trends", articles: [{ title: "Investimento em crypto cresce no BR", url: "", source: "Economia", timeAgo: "1h atras" }] },
-      { title: "Suplemento Natural", traffic: "200K+", source: "Google Trends", articles: [{ title: "Produtos naturais em alta", url: "", source: "Saude", timeAgo: "5h atras" }] },
-      { title: "Treino em Casa", traffic: "150K+", source: "Google Trends", articles: [{ title: "Fitness em casa continua em alta", url: "", source: "Fitness", timeAgo: "4h atras" }] },
+      { title: "Emagrecimento Rapido com Dieta", traffic: "500K+", source: "Google Trends", articles: [{ title: "Novas dietas para emagrecer rapido", url: "", source: "Saude", timeAgo: "3h atras" }] },
+      { title: "Renda Extra Online 2025", traffic: "300K+", source: "Google Trends", articles: [{ title: "Como ganhar dinheiro na internet", url: "", source: "Financas", timeAgo: "2h atras" }] },
+      { title: "Bitcoin Criptomoedas Brasil", traffic: "400K+", source: "Google Trends", articles: [{ title: "Investimento em criptomoedas cresce no BR", url: "", source: "Economia", timeAgo: "1h atras" }] },
+      { title: "Suplemento Natural para Saude", traffic: "200K+", source: "Google Trends", articles: [{ title: "Produtos naturais para saude em alta", url: "", source: "Saude", timeAgo: "5h atras" }] },
+      { title: "Treino em Casa Exercicio", traffic: "150K+", source: "Google Trends", articles: [{ title: "Fitness em casa continua em alta", url: "", source: "Fitness", timeAgo: "4h atras" }] },
+      { title: "Diabetes Remedio Natural", traffic: "350K+", source: "Google Trends", articles: [{ title: "Remedios naturais para diabetes ganham popularidade", url: "", source: "Saude", timeAgo: "2h atras" }] },
+      { title: "Curso Online para Ganhar Dinheiro", traffic: "280K+", source: "Google Trends", articles: [{ title: "Cursos online para renda extra vendem muito", url: "", source: "Educacao", timeAgo: "6h atras" }] },
+      { title: "Inteligencia Artificial App", traffic: "450K+", source: "Google Trends", articles: [{ title: "Apps de IA transformam o mercado", url: "", source: "Tecnologia", timeAgo: "1h atras" }] },
     ],
     UK: [
       { title: "Best Weight Loss Programme", traffic: "400K+", source: "Google Trends", articles: [{ title: "UK slimmers flock to new plans", url: "", source: "Health", timeAgo: "2h atras" }] },
