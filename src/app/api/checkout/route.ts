@@ -4,6 +4,10 @@ import { auth } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { plan } = await req.json();
 
   if (!plan || !(plan in PLAN_PRICES)) {
@@ -15,13 +19,13 @@ export async function POST(req: NextRequest) {
   const origin = req.headers.get("origin") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
   try {
-    const userEmail = session?.user?.email || "guest@adsflow.com";
-    const userId = session?.user?.id || null;
+    const userEmail = session.user.email;
+    const userId = session.user.id;
 
     const stripeSession = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer_email: userEmail,
-      ...(userId ? { metadata: { userId } } : {}),
+      metadata: { userId },
       payment_method_types: ["card", "boleto", "pix"],
       line_items: [
         {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 
 interface CountryIntel {
   name: string;
@@ -144,6 +145,11 @@ function generateInsights(productName: string, niche: string, topCountry: Countr
 }
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { productName, description, platform } = await req.json();
 
   if (!productName) {

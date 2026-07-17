@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const steps = [
   {
@@ -34,11 +34,69 @@ const steps = [
 export default function MetaApiPage() {
   const [token, setToken] = useState("");
   const [accountId, setAccountId] = useState("");
-  const [saved, setSaved] = useState(false);
+  const [connected, setConnected] = useState(false);
+  const [savedAccountId, setSavedAccountId] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  function handleSave() {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+  useEffect(() => {
+    fetch("/api/meta/config")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.connected) {
+          setConnected(true);
+          setSavedAccountId(d.accountId);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  async function handleSave() {
+    if (!token || !accountId) {
+      setError("Preencha o token e o ID da conta");
+      return;
+    }
+    setSaving(true);
+    setError("");
+    try {
+      const res = await fetch("/api/meta/config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accessToken: token, accountId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Erro ao salvar");
+        setSaving(false);
+        return;
+      }
+      setConnected(true);
+      setSavedAccountId(accountId);
+      setSuccess(true);
+      setToken("");
+      setAccountId("");
+      setTimeout(() => setSuccess(false), 3000);
+    } catch {
+      setError("Erro de conexao");
+    }
+    setSaving(false);
+  }
+
+  async function handleDisconnect() {
+    await fetch("/api/meta/config", { method: "DELETE" });
+    setConnected(false);
+    setSavedAccountId("");
+  }
+
+  if (loading) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 300 }}>
+        <p style={{ color: "#8C93B8", fontSize: 15 }}>Carregando...</p>
+      </div>
+    );
   }
 
   return (
@@ -48,7 +106,21 @@ export default function MetaApiPage() {
         <p style={{ color: "#8C93B8", fontSize: 15, marginTop: 6 }}>Conecte sua conta do Meta Ads para publicar campanhas automaticamente</p>
       </div>
 
-      {/* Passo a passo */}
+      {connected && (
+        <div style={{ background: "rgba(63,203,146,0.06)", border: "1px solid rgba(63,203,146,0.2)", borderRadius: 14, padding: 24, marginBottom: 32, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(63,203,146,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>✅</div>
+            <div>
+              <p style={{ fontWeight: 700, fontSize: 17, color: "#3FCB92", margin: 0 }}>Conta Conectada</p>
+              <p style={{ color: "#8C93B8", fontSize: 14, margin: "4px 0 0" }}>Conta: {savedAccountId}</p>
+            </div>
+          </div>
+          <button onClick={handleDisconnect} style={{ padding: "10px 20px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)", borderRadius: 10, color: "#F87171", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
+            Desconectar
+          </button>
+        </div>
+      )}
+
       <div style={{ display: "flex", flexDirection: "column", gap: 0, marginBottom: 36 }}>
         {steps.map((step, i) => (
           <div key={i} style={{ display: "flex", gap: 16 }}>
@@ -78,7 +150,6 @@ export default function MetaApiPage() {
         ))}
       </div>
 
-      {/* Formulario de configuracao */}
       <div style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 16, padding: 28 }}>
         <h3 style={{ fontSize: 18, fontWeight: 700, color: "#F3F5FF", margin: "0 0 20px 0" }}>Suas Credenciais</h3>
 
@@ -104,28 +175,33 @@ export default function MetaApiPage() {
             />
           </div>
 
+          {error && (
+            <div style={{ padding: "12px 16px", background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: 10, color: "#F87171", fontSize: 14 }}>{error}</div>
+          )}
+
           <button
             onClick={handleSave}
+            disabled={saving}
             style={{
               padding: "14px 0",
-              background: saved ? "#22B07D" : "linear-gradient(90deg,#22B07D,#3FCB92)",
+              background: success ? "#22B07D" : "linear-gradient(90deg,#22B07D,#3FCB92)",
               color: "#080B14",
               border: "none",
               borderRadius: 12,
               fontSize: 15,
               fontWeight: 700,
-              cursor: "pointer",
+              cursor: saving ? "wait" : "pointer",
               transition: "all 0.15s",
             }}
           >
-            {saved ? "✓ Salvo com sucesso!" : "Salvar configuracoes"}
+            {saving ? "Validando..." : success ? "✓ Salvo com sucesso!" : connected ? "Atualizar configuracoes" : "Salvar configuracoes"}
           </button>
         </div>
 
         <div style={{ marginTop: 20, padding: 16, background: "rgba(96,165,250,0.06)", borderRadius: 10, border: "1px solid rgba(96,165,250,0.15)" }}>
           <div style={{ fontSize: 13, fontWeight: 600, color: "#60A5FA", marginBottom: 4 }}>Dica de seguranca</div>
           <div style={{ fontSize: 13, color: "#8C93B8", lineHeight: 1.6 }}>
-            Seu token e armazenado de forma criptografada. Ele so e usado para criar e gerenciar campanhas no Meta Ads pela sua conta autorizada.
+            Seu token e armazenado de forma criptografada no banco de dados. Ele so e usado para criar e gerenciar campanhas no Meta Ads pela sua conta autorizada.
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 import { aiGenerateJSON, getOpenAI } from "@/lib/ai";
 
 interface TargetingResult {
@@ -30,6 +31,11 @@ function mockTargeting(body: { productName: string; funnelStage?: string }): Tar
 }
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { productName, audience, country, funnelStage } = await req.json();
 
   if (!productName) {

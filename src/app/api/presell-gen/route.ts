@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
 import { aiGenerateJSON, getOpenAI } from "@/lib/ai";
 
 interface PresellResult {
@@ -69,6 +70,11 @@ function generateBodyText(productName: string, audience: string): string {
 }
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { productName, description, audience, affiliateLink } = await req.json();
 
   if (!productName) {
@@ -78,12 +84,14 @@ export async function POST(req: NextRequest) {
   const niche = detectNiche(productName, description || "");
   const colors = NICHE_COLORS[niche] || NICHE_COLORS.default;
 
-  const slug = productName
+  const baseSlug = productName
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
+
+  const slug = baseSlug + "-" + Date.now().toString(36);
 
   const openai = getOpenAI();
 
