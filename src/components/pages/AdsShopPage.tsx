@@ -1,20 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 const CATEGORIES = [
   { id: "all", label: "Todos", icon: "🔥" },
   { id: "health", label: "Saude", icon: "💊" },
   { id: "fitness", label: "Fitness", icon: "💪" },
-  { id: "beauty", label: "Beleza", icon: "✨" },
   { id: "finance", label: "Financeiro", icon: "💰" },
   { id: "education", label: "Educacao", icon: "📚" },
   { id: "tech", label: "Tecnologia", icon: "💻" },
-  { id: "pets", label: "Pets", icon: "🐾" },
   { id: "home", label: "Casa", icon: "🏠" },
-  { id: "fashion", label: "Moda", icon: "👗" },
-  { id: "food", label: "Alimentacao", icon: "🍔" },
-  { id: "travel", label: "Viagem", icon: "✈️" },
+  { id: "entertainment", label: "Entretenimento", icon: "🎮" },
 ];
 
 const COUNTRIES_FILTER = [
@@ -32,7 +28,9 @@ const SORT_OPTIONS = [
   { id: "trending", label: "Em alta" },
   { id: "commission", label: "Maior comissao" },
   { id: "gravity", label: "Mais popular" },
-  { id: "newest", label: "Mais recente" },
+  { id: "price-high", label: "Maior preco" },
+  { id: "price-low", label: "Menor preco" },
+  { id: "refund", label: "Menor reembolso" },
 ];
 
 interface Product {
@@ -50,235 +48,58 @@ interface Product {
   recurring: boolean;
   refundRate: number;
   tags: string[];
+  affiliateUrl: string;
 }
 
-const MOCK_PRODUCTS: Product[] = [
-  {
-    id: "1",
-    name: "Java Burn",
-    description: "Suplemento termogenico que acelera o metabolismo quando misturado com cafe. Comissao alta e taxa de refund baixa.",
-    category: "health",
-    price: 149.00,
-    commission: 119.20,
-    commissionPercent: 80,
-    gravity: 587.32,
-    country: "US",
-    image: "🔥",
-    vendor: "javaburn",
-    recurring: true,
-    refundRate: 4.2,
-    tags: ["perda de peso", "suplemento", "recurring"],
-  },
-  {
-    id: "2",
-    name: "Ikaria Lean Belly Juice",
-    description: "Formula em po para emagrecimento baseada em ingredientes naturais da ilha grega de Ikaria.",
-    category: "health",
-    price: 129.00,
-    commission: 96.75,
-    commissionPercent: 75,
-    gravity: 432.18,
-    country: "US",
-    image: "🧪",
-    vendor: "ikarialean",
-    recurring: false,
-    refundRate: 5.8,
-    tags: ["perda de peso", "natural", "juice"],
-  },
-  {
-    id: "3",
-    name: "Crypto Quantum Leap",
-    description: "Curso completo de investimento em criptomoedas para iniciantes. Aprenda a comprar, armazenar e investir em BTC e altcoins.",
-    category: "finance",
-    price: 197.00,
-    commission: 118.20,
-    commissionPercent: 60,
-    gravity: 289.45,
-    country: "US",
-    image: "₿",
-    vendor: "cryptoquantum",
-    recurring: false,
-    refundRate: 3.1,
-    tags: ["crypto", "curso", "investimento"],
-  },
-  {
-    id: "4",
-    name: "Exipure",
-    description: "Suplemento focado em Brown Adipose Tissue (BAT) para promover perda de peso de forma natural.",
-    category: "health",
-    price: 159.00,
-    commission: 119.25,
-    commissionPercent: 75,
-    gravity: 365.87,
-    country: "US",
-    image: "🍃",
-    vendor: "exipure",
-    recurring: true,
-    refundRate: 6.3,
-    tags: ["perda de peso", "BAT", "natural"],
-  },
-  {
-    id: "5",
-    name: "SynoGut",
-    description: "Suplemento natural para saude digestiva. Combina probioticos, fibras e extratos botanicos.",
-    category: "health",
-    price: 69.00,
-    commission: 51.75,
-    commissionPercent: 75,
-    gravity: 198.23,
-    country: "US",
-    image: "🦠",
-    vendor: "synogut",
-    recurring: false,
-    refundRate: 4.7,
-    tags: ["saude digestiva", "probioticos", "natural"],
-  },
-  {
-    id: "6",
-    name: "Numerologist",
-    description: "Plataforma de numerologia personalizada. Relatorios diarios, analise de mapa numerologico e orientacao de vida.",
-    category: "finance",
-    price: 49.00,
-    commission: 36.75,
-    commissionPercent: 75,
-    gravity: 156.90,
-    country: "US",
-    image: "🔮",
-    vendor: "numerologist",
-    recurring: true,
-    refundRate: 2.9,
-    tags: ["numerologia", "espiritualidade", "recurring"],
-  },
-  {
-    id: "7",
-    name: "Puravive",
-    description: "Suporte a perda de peso com ingredientes tropicais que visam Brown Adipose Tissue.",
-    category: "health",
-    price: 139.00,
-    commission: 104.25,
-    commissionPercent: 75,
-    gravity: 521.64,
-    country: "US",
-    image: "🌴",
-    vendor: "puravive",
-    recurring: false,
-    refundRate: 5.1,
-    tags: ["emagrecimento", "tropical", "BAT"],
-  },
-  {
-    id: "8",
-    name: "Prodentim",
-    description: "Probiotico para saude bucal. 3.5 bilhoes de CFUs e 3 ingredientes Naturais para dentes e gengivas saudaveis.",
-    category: "health",
-    price: 69.00,
-    commission: 51.75,
-    commissionPercent: 75,
-    gravity: 478.31,
-    country: "US",
-    image: "🦷",
-    vendor: "prodentim",
-    recurring: true,
-    refundRate: 3.8,
-    tags: ["saude bucal", "probiotico", "dentes"],
-  },
-  {
-    id: "9",
-    name: "Quietum Plus",
-    description: "Suplemento natural para zumbido no ouvido. Ingredientes que nutrem e repararam o sistema auditivo.",
-    category: "health",
-    price: 69.00,
-    commission: 51.75,
-    commissionPercent: 75,
-    gravity: 142.56,
-    country: "US",
-    image: "👂",
-    vendor: "quietumplus",
-    recurring: false,
-    refundRate: 4.9,
-    tags: ["zumbido", "audiacao", "natural"],
-  },
-  {
-    id: "10",
-    name: "The Smoothie Diet",
-    description: "Programa de 21 dias com receitas de smoothies para perda de peso rapida e saudavel.",
-    category: "fitness",
-    price: 37.00,
-    commission: 25.90,
-    commissionPercent: 70,
-    gravity: 234.78,
-    country: "US",
-    image: "🥤",
-    vendor: "smoothiediet",
-    recurring: false,
-    refundRate: 2.1,
-    tags: ["dieta", "smoothie", "21 dias"],
-  },
-  {
-    id: "11",
-    name: "Kerassentials",
-    description: "Oleo natural para tratamento de fungos nos pes e unhas. Formula com 9 ingredientes naturais.",
-    category: "health",
-    price: 69.00,
-    commission: 51.75,
-    commissionPercent: 75,
-    gravity: 187.43,
-    country: "US",
-    image: "🦶",
-    vendor: "kerassentials",
-    recurring: false,
-    refundRate: 3.5,
-    tags: ["fungos", "unhas", "oleo natural"],
-  },
-  {
-    id: "12",
-    name: "Alpilean",
-    description: "Suplemento para perda de peso baseado na ciencia da temperatura interna do corpo. Ingredientes alpinos.",
-    category: "health",
-    price: 159.00,
-    commission: 119.25,
-    commissionPercent: 75,
-    gravity: 612.90,
-    country: "US",
-    image: "⛰️",
-    vendor: "alpilean",
-    recurring: false,
-    refundRate: 5.4,
-    tags: ["emagrecimento", "alpino", "temperatura"],
-  },
-];
+interface ProductStats {
+  total: number;
+  trending: number;
+  avgCommission: string;
+  avgGravity: string;
+  categories: number;
+}
 
 export default function AdsShopPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [stats, setStats] = useState<ProductStats>({ total: 0, trending: 0, avgCommission: "0", avgGravity: "0", categories: 0 });
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedCountry, setSelectedCountry] = useState("ALL");
   const [sortBy, setSortBy] = useState("trending");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
+  const [searchDebounce, setSearchDebounce] = useState("");
 
-  const filteredProducts = MOCK_PRODUCTS.filter((p) => {
-    if (selectedCategory !== "all" && p.category !== selectedCategory) return false;
-    if (selectedCountry !== "ALL" && p.country !== selectedCountry) return false;
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      if (
-        !p.name.toLowerCase().includes(q) &&
-        !p.description.toLowerCase().includes(q) &&
-        !p.tags.some((t) => t.toLowerCase().includes(q))
-      ) return false;
-    }
-    return true;
-  }).sort((a, b) => {
-    switch (sortBy) {
-      case "commission": return b.commission - a.commission;
-      case "gravity": return b.gravity - a.gravity;
-      case "newest": return 0;
-      default: return b.gravity - a.gravity;
-    }
-  });
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        category: selectedCategory,
+        country: selectedCountry,
+        sort: sortBy,
+      });
+      if (searchDebounce) params.set("q", searchDebounce);
+      if (searchDebounce) params.set("action", "search");
 
-  const trendingProducts = MOCK_PRODUCTS.filter((p) => p.gravity > 400).length;
-  const avgCommission = MOCK_PRODUCTS.reduce((s, p) => s + p.commissionPercent, 0) / MOCK_PRODUCTS.length;
-  const totalProducts = MOCK_PRODUCTS.length;
+      const res = await fetch(`/api/ads-shop?${params}`);
+      const data = await res.json();
+      setProducts(data.products || []);
+      setStats(data.stats || { total: 0, trending: 0, avgCommission: "0", avgGravity: "0", categories: 0 });
+    } catch {
+      setProducts([]);
+    }
+    setLoading(false);
+  }, [selectedCategory, selectedCountry, sortBy, searchDebounce]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setSearchDebounce(searchQuery), 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   return (
     <div>
@@ -305,10 +126,10 @@ export default function AdsShopPage() {
       {/* Stats Bar */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 28 }}>
         {[
-          { label: "Produtos", value: totalProducts.toString(), icon: "📦", color: "#60A5FA" },
-          { label: "Em alta", value: trendingProducts.toString(), icon: "📈", color: "#F72585" },
-          { label: "Comissao media", value: `${avgCommission.toFixed(0)}%`, icon: "💰", color: "#F7C948" },
-          { label: "Paises", value: "7+", icon: "🌍", color: "#3FCB92" },
+          { label: "Produtos", value: stats.total.toString(), icon: "📦", color: "#60A5FA" },
+          { label: "Em alta", value: stats.trending.toString(), icon: "📈", color: "#F72585" },
+          { label: "Comissao media", value: `${stats.avgCommission}%`, icon: "💰", color: "#F7C948" },
+          { label: "Gravity medio", value: stats.avgGravity, icon: "🚀", color: "#3FCB92" },
         ].map((stat) => (
           <div key={stat.label} style={{
             background: "#121830", border: "1px solid #232C52", borderRadius: 12,
@@ -404,12 +225,27 @@ export default function AdsShopPage() {
       {/* Product Count */}
       <div style={{ marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <p style={{ color: "#8C93B8", fontSize: 14, margin: 0 }}>
-          {filteredProducts.length} produto{filteredProducts.length !== 1 ? "s" : ""} encontrado{filteredProducts.length !== 1 ? "s" : ""}
+          {loading ? "Carregando..." : `${products.length} produto${products.length !== 1 ? "s" : ""} encontrado${products.length !== 1 ? "s" : ""}`}
         </p>
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 16 }}>
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} style={{
+              background: "#121830", border: "1px solid #232C52", borderRadius: 14,
+              height: 380, display: "flex", alignItems: "center", justifyContent: "center",
+              animation: "pulse 1.5s infinite",
+            }}>
+              <p style={{ color: "#6B739E", fontSize: 14 }}>Carregando...</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Products Grid */}
-      {filteredProducts.length === 0 ? (
+      {!loading && products.length === 0 ? (
         <div style={{
           background: "#121830", border: "1px solid #232C52", borderRadius: 16,
           padding: "56px 40px", textAlign: "center",
@@ -422,13 +258,13 @@ export default function AdsShopPage() {
             Tente ajustar os filtros ou buscar por outro termo.
           </p>
         </div>
-      ) : (
+      ) : !loading ? (
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
           gap: 16,
         }}>
-          {filteredProducts.map((product) => {
+          {products.map((product) => {
             const isHovered = hoveredProduct === product.id;
             return (
               <div
@@ -593,7 +429,7 @@ export default function AdsShopPage() {
             );
           })}
         </div>
-      )}
+      ) : null}
 
       {/* Product Detail Modal */}
       {selectedProduct && (
