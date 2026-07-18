@@ -81,7 +81,7 @@ export default function DashboardPage() {
         .then((r) => r.json())
         .then((d) => { setCampaigns(Array.isArray(d) ? d : []); setLoading(false); })
         .catch(() => setLoading(false));
-      fetch("/api/user/profile")
+      fetch("/api/user/profile?t=" + Date.now())
         .then((r) => r.json())
         .then((d) => { if (d.user?.avatarUrl) setAvatarUrl(d.user.avatarUrl); })
         .catch(() => {});
@@ -90,7 +90,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (session && currentPage === "dashboard") {
-      fetch("/api/user/profile")
+      fetch("/api/user/profile?t=" + Date.now())
         .then((r) => r.json())
         .then((d) => { if (d.user?.avatarUrl) setAvatarUrl(d.user.avatarUrl); })
         .catch(() => {});
