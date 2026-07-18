@@ -8,6 +8,7 @@ interface SidebarProps {
   currentPage: SidebarPage;
   onNavigate: (page: SidebarPage) => void;
   userName?: string;
+  avatarUrl?: string | null;
 }
 
 const MENU_SECTIONS = [
@@ -45,7 +46,7 @@ const MENU_SECTIONS = [
   },
 ];
 
-export default function Sidebar({ currentPage, onNavigate, userName }: SidebarProps) {
+export default function Sidebar({ currentPage, onNavigate, userName, avatarUrl }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -157,9 +158,38 @@ export default function Sidebar({ currentPage, onNavigate, userName }: SidebarPr
         </button>
       </div>
 
+      {collapsed && userName && (
+        <div style={{ padding: "12px 0", borderTop: "1px solid #1A2040", display: "flex", justifyContent: "center" }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
+            background: avatarUrl ? "none" : "linear-gradient(135deg, #22B07D, #3FCB92)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            overflow: "hidden", border: "2px solid #232C52",
+          }}>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <span style={{ color: "#080B14", fontSize: 12, fontWeight: 700 }}>{userName.charAt(0).toUpperCase()}</span>
+            )}
+          </div>
+        </div>
+      )}
+
       {!collapsed && userName && (
-        <div style={{ padding: "16px 20px", borderTop: "1px solid #1A2040" }}>
-          <div style={{ fontSize: 15, color: "#6B739E", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{userName}</div>
+        <div style={{ padding: "16px 20px", borderTop: "1px solid #1A2040", display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => onNavigate("settings")}>
+          <div style={{
+            width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
+            background: avatarUrl ? "none" : "linear-gradient(135deg, #22B07D, #3FCB92)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            overflow: "hidden", border: "2px solid #232C52",
+          }}>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <span style={{ color: "#080B14", fontSize: 14, fontWeight: 700 }}>{userName.charAt(0).toUpperCase()}</span>
+            )}
+          </div>
+          <div style={{ fontSize: 14, color: "#A0A8CE", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{userName}</div>
         </div>
       )}
     </aside>

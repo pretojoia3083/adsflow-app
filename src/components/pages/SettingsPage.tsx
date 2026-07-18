@@ -62,7 +62,7 @@ export default function SettingsPage() {
         body: JSON.stringify({ name, image: avatarUrl, agencyLogo }),
       });
       if (res.ok) {
-        await update({ name });
+        await update({ name, image: avatarUrl });
         setSaved(true);
         setTimeout(() => setSaved(false), 2000);
       }
