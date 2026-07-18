@@ -261,7 +261,7 @@ export default function AdRadarPage() {
     <div>
       <div style={{ marginBottom: 32 }}>
         <h2 style={{ fontSize: 28, fontWeight: 700, color: "#F3F5FF", margin: 0 }}>Radar de Anuncios</h2>
-        <p style={{ color: "#8C93B8", fontSize: 15, marginTop 6 }}>Analise criativos e copy — veja anuncios reais direto no Facebook Ad Library</p>
+        <p style={{ color: "#8C93B8", fontSize: 15, marginTop: 6 }}>Analise criativos e copy — veja anuncios reais direto no Facebook Ad Library</p>
       </div>
 
       <div style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 16, padding: 28, marginBottom: 28 }}>
