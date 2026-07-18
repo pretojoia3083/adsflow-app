@@ -9,6 +9,7 @@ interface AdResult {
   title: string;
   description: string;
   snapshotUrl: string;
+  pageUrl?: string;
   startTime: string;
   platforms: string[];
   mediaType: string;
@@ -503,7 +504,12 @@ export default function AdRadarPage() {
               {activeTab === "copy" && (
                 <div>
                   <div style={{ marginBottom: 16 }}>
-                    <p style={{ color: "#3FCB92", fontSize: 15, fontWeight: 600, margin: "0 0 4px" }}>{selectedAd.pageName}</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                      <p style={{ color: "#3FCB92", fontSize: 15, fontWeight: 600, margin: 0 }}>{selectedAd.pageName}</p>
+                      {selectedAd.pageUrl && (
+                        <a href={selectedAd.pageUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#60A5FA", fontSize: 12, textDecoration: "none" }}>Abrir original ↗</a>
+                      )}
+                    </div>
                     <p style={{ color: "#6B739E", fontSize: 13, margin: 0 }}>Ativo desde {new Date(selectedAd.startTime).toLocaleDateString("pt-BR")} · Plataformas: {selectedAd.platforms.join(", ")}</p>
                   </div>
                   {selectedAd.title && (
@@ -528,6 +534,9 @@ export default function AdRadarPage() {
                       <button onClick={() => downloadCreative(selectedAd.mediaUrl!, `ad-${selectedAd.id}-creative`)} style={{ flex: 1, padding: "12px 16px", background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.3)", borderRadius: 10, color: "#60A5FA", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Baixar criativo</button>
                     )}
                     <button onClick={() => downloadText(`ANUNCIO COMPLETO\n\nPagina: ${selectedAd.pageName}\nPlataformas: ${selectedAd.platforms.join(", ")}\nDesde: ${selectedAd.startTime}\n\n--- TITULO ---\n${selectedAd.title}\n\n--- TEXTO ---\n${selectedAd.body}\n\n--- DESCRICAO ---\n${selectedAd.description}`, `ad-${selectedAd.id}-transcricao.txt`)} style={{ flex: 1, padding: "12px 16px", background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: 10, color: "#A78BFA", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Baixar transcricao</button>
+                    {(selectedAd.pageUrl || selectedAd.snapshotUrl) && (
+                      <a href={selectedAd.pageUrl || selectedAd.snapshotUrl} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: "12px 16px", background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 10, color: "#FBBF24", fontSize: 14, fontWeight: 600, cursor: "pointer", textDecoration: "none", textAlign: "center", display: "block" }}>Abrir original ↗</a>
+                    )}
                   </div>
                 </div>
               )}
@@ -539,7 +548,7 @@ export default function AdRadarPage() {
                       <p style={{ fontSize: 36, marginBottom: 12 }}>🌐</p>
                       <p style={{ color: "#F3F5FF", fontSize: 16, fontWeight: 600, marginBottom: 8 }}>Ver pagina de vendas</p>
                       <p style={{ color: "#8C93B8", fontSize: 14, marginBottom: 20 }}>Analise a landing page do anuncio</p>
-                      <button onClick={() => handleFetchPage(selectedAd.snapshotUrl || `https://facebook.com/ads/library/?id=${selectedAd.id}`)} style={{ padding: "14px 28px", background: "linear-gradient(90deg,#22B07D,#3FCB92)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer" }}>Carregar pagina</button>
+                      <button onClick={() => handleFetchPage(selectedAd.pageUrl || selectedAd.snapshotUrl || `https://www.facebook.com/ads/library/?id=${selectedAd.id}`)} style={{ padding: "14px 28px", background: "linear-gradient(90deg,#22B07D,#3FCB92)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer" }}>Carregar pagina</button>
                     </div>
                   )}
                   {pageLoading && (
