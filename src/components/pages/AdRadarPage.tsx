@@ -10,6 +10,7 @@ interface AdResult {
   description: string;
   snapshotUrl: string;
   pageUrl?: string;
+  landingUrl?: string;
   startTime: string;
   platforms: string[];
   mediaType: string;
@@ -506,9 +507,7 @@ export default function AdRadarPage() {
                   <div style={{ marginBottom: 16 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
                       <p style={{ color: "#3FCB92", fontSize: 15, fontWeight: 600, margin: 0 }}>{selectedAd.pageName}</p>
-                      {selectedAd.pageUrl && (
-                        <a href={selectedAd.pageUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#60A5FA", fontSize: 12, textDecoration: "none" }}>Abrir original ↗</a>
-                      )}
+                      <a href={selectedAd.pageUrl || `https://www.facebook.com/ads/library/?id=${selectedAd.id}`} target="_blank" rel="noopener noreferrer" style={{ color: "#60A5FA", fontSize: 12, textDecoration: "none" }}>Ver no Ad Library ↗</a>
                     </div>
                     <p style={{ color: "#6B739E", fontSize: 13, margin: 0 }}>Ativo desde {new Date(selectedAd.startTime).toLocaleDateString("pt-BR")} · Plataformas: {selectedAd.platforms.join(", ")}</p>
                   </div>
@@ -534,9 +533,7 @@ export default function AdRadarPage() {
                       <button onClick={() => downloadCreative(selectedAd.mediaUrl!, `ad-${selectedAd.id}-creative`)} style={{ flex: 1, padding: "12px 16px", background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.3)", borderRadius: 10, color: "#60A5FA", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Baixar criativo</button>
                     )}
                     <button onClick={() => downloadText(`ANUNCIO COMPLETO\n\nPagina: ${selectedAd.pageName}\nPlataformas: ${selectedAd.platforms.join(", ")}\nDesde: ${selectedAd.startTime}\n\n--- TITULO ---\n${selectedAd.title}\n\n--- TEXTO ---\n${selectedAd.body}\n\n--- DESCRICAO ---\n${selectedAd.description}`, `ad-${selectedAd.id}-transcricao.txt`)} style={{ flex: 1, padding: "12px 16px", background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: 10, color: "#A78BFA", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Baixar transcricao</button>
-                    {(selectedAd.pageUrl || selectedAd.snapshotUrl) && (
-                      <a href={selectedAd.pageUrl || selectedAd.snapshotUrl} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: "12px 16px", background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 10, color: "#FBBF24", fontSize: 14, fontWeight: 600, cursor: "pointer", textDecoration: "none", textAlign: "center", display: "block" }}>Abrir original ↗</a>
-                    )}
+                    <a href={selectedAd.pageUrl || `https://www.facebook.com/ads/library/?id=${selectedAd.id}`} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: "12px 16px", background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 10, color: "#FBBF24", fontSize: 14, fontWeight: 600, cursor: "pointer", textDecoration: "none", textAlign: "center", display: "block" }}>Ver no Ad Library ↗</a>
                   </div>
                 </div>
               )}
@@ -547,8 +544,18 @@ export default function AdRadarPage() {
                     <div style={{ textAlign: "center", padding: "32px 0" }}>
                       <p style={{ fontSize: 36, marginBottom: 12 }}>🌐</p>
                       <p style={{ color: "#F3F5FF", fontSize: 16, fontWeight: 600, marginBottom: 8 }}>Ver pagina de vendas</p>
-                      <p style={{ color: "#8C93B8", fontSize: 14, marginBottom: 20 }}>Analise a landing page do anuncio</p>
-                      <button onClick={() => handleFetchPage(selectedAd.pageUrl || selectedAd.snapshotUrl || `https://www.facebook.com/ads/library/?id=${selectedAd.id}`)} style={{ padding: "14px 28px", background: "linear-gradient(90deg,#22B07D,#3FCB92)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer" }}>Carregar pagina</button>
+                      {selectedAd.landingUrl ? (
+                        <>
+                          <p style={{ color: "#8C93B8", fontSize: 14, marginBottom: 8 }}>Analise a landing page do anuncio</p>
+                          <p style={{ color: "#6B739E", fontSize: 12, marginBottom: 20, wordBreak: "break-all" }}>{selectedAd.landingUrl}</p>
+                          <button onClick={() => handleFetchPage(selectedAd.landingUrl!)} style={{ padding: "14px 28px", background: "linear-gradient(90deg,#22B07D,#3FCB92)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer" }}>Carregar pagina</button>
+                        </>
+                      ) : (
+                        <>
+                          <p style={{ color: "#8C93B8", fontSize: 14, marginBottom: 20 }}>URL de destino nao disponivel neste anuncio</p>
+                          <a href={selectedAd.snapshotUrl || `https://www.facebook.com/ads/library/?id=${selectedAd.id}`} target="_blank" rel="noopener noreferrer" style={{ padding: "14px 28px", background: "linear-gradient(90deg,#22B07D,#3FCB92)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer", textDecoration: "none", display: "inline-block" }}>Ver anuncio no Ad Library ↗</a>
+                        </>
+                      )}
                     </div>
                   )}
                   {pageLoading && (
@@ -568,7 +575,7 @@ export default function AdRadarPage() {
                       <div style={{ background: "#0C1022", borderRadius: 10, padding: "16px 18px", marginBottom: 16, border: "1px solid #1A2040" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                           <span style={{ color: "#3FCB92", fontSize: 13, fontWeight: 600 }}>{pageInfo.domain}</span>
-                          <a href={pageInfo.url} target="_blank" rel="noopener noreferrer" style={{ color: "#60A5FA", fontSize: 12, textDecoration: "none" }}>Abrir original ↗</a>
+                          <a href={selectedAd.pageUrl || `https://www.facebook.com/ads/library/?id=${selectedAd.id}`} target="_blank" rel="noopener noreferrer" style={{ color: "#60A5FA", fontSize: 12, textDecoration: "none" }}>Ver anuncio ↗</a>
                         </div>
                         {pageInfo.title && <p style={{ color: "#F3F5FF", fontSize: 16, fontWeight: 600, margin: "0 0 4px" }}>{pageInfo.title}</p>}
                         {pageInfo.description && <p style={{ color: "#A0A8CE", fontSize: 14, margin: 0 }}>{pageInfo.description}</p>}
