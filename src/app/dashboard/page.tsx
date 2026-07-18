@@ -88,6 +88,15 @@ export default function DashboardPage() {
     }
   }, [session]);
 
+  useEffect(() => {
+    if (session && currentPage === "dashboard") {
+      fetch("/api/user/profile")
+        .then((r) => r.json())
+        .then((d) => { if (d.user?.avatarUrl) setAvatarUrl(d.user.avatarUrl); })
+        .catch(() => {});
+    }
+  }, [currentPage]);
+
   async function handleDeleteCampaign(id: string) {
     setDeletingId(id);
     try {
