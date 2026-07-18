@@ -98,6 +98,8 @@ export default function AdsShopPage() {
   const [trends, setTrends] = useState<TrendingTopic[]>([]);
   const [trendsLoading, setTrendsLoading] = useState(true);
   const [showTrends, setShowTrends] = useState(true);
+  const [creatingCampaign, setCreatingCampaign] = useState(false);
+  const [campaignCreated, setCampaignCreated] = useState(false);
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -143,6 +145,55 @@ export default function AdsShopPage() {
     }
     loadTrends();
   }, [selectedCountry]);
+
+  const handleCreateCampaign = async (product: Product) => {
+    setCreatingCampaign(true);
+    setCampaignCreated(false);
+    try {
+      const res = await fetch("/api/campaigns", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productName: product.name,
+          description: product.description,
+          audience: product.tags.join(", "),
+          funnelStage: "meio",
+          budgetPref: "medio",
+          country: product.country,
+          countryCode: product.country,
+          language: "pt-BR",
+          networkId: "clickbank",
+          networkName: "ClickBank",
+          affiliateUrl: product.affiliateUrl,
+          affLink: product.affiliateUrl,
+          keywords: product.tags,
+          interests: product.tags,
+          placements: ["feed", "stories"],
+          adCopy: {
+            headline: product.name,
+            body: product.description,
+            cta: "Saiba Mais",
+          },
+          tone: "profissional",
+        }),
+      });
+      if (res.ok) {
+        setCampaignCreated(true);
+        setTimeout(() => {
+          setCreatingCampaign(false);
+          setCampaignCreated(false);
+          setSelectedProduct(null);
+          window.location.href = "/dashboard";
+        }, 1500);
+      } else {
+        setCreatingCampaign(false);
+        alert("Erro ao criar campanha. Tente novamente.");
+      }
+    } catch {
+      setCreatingCampaign(false);
+      alert("Erro ao criar campanha. Tente novamente.");
+    }
+  };
 
   return (
     <div>
@@ -728,17 +779,24 @@ export default function AdsShopPage() {
               {/* Actions */}
               <div style={{ display: "flex", gap: 12 }}>
                 <button
+                  disabled={creatingCampaign}
                   onClick={() => {
-                    setSelectedProduct(null);
+                    if (selectedProduct) handleCreateCampaign(selectedProduct);
                   }}
                   style={{
                     flex: 1, padding: "14px",
-                    background: "linear-gradient(90deg, #FF6B35, #F7C948)",
+                    background: creatingCampaign
+                      ? (campaignCreated ? "#3FCB92" : "#232C52")
+                      : "linear-gradient(90deg, #FF6B35, #F7C948)",
                     color: "#080B14", border: "none", borderRadius: 12,
-                    fontSize: 15, fontWeight: 700, cursor: "pointer",
+                    fontSize: 15, fontWeight: 700, cursor: creatingCampaign ? "default" : "pointer",
+                    opacity: creatingCampaign ? 0.8 : 1,
+                    transition: "all 0.3s",
                   }}
                 >
-                  🚀 Criar Campanha com este Produto
+                  {creatingCampaign
+                    ? (campaignCreated ? "✅ Campanha Criada!" : "⏳ Criando campanha...")
+                    : "🚀 Criar Campanha com este Produto"}
                 </button>
                 <button
                   onClick={() => setSelectedProduct(null)}
