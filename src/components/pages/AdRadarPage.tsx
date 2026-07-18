@@ -93,6 +93,7 @@ function ScoreBadge({ label }: { label?: string }) {
 export default function AdRadarPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [country, setCountry] = useState("BR");
+  const [countryInput, setCountryInput] = useState("Brasil");
   const [countryMode, setCountryMode] = useState<"manual" | "all" | "top3">("manual");
   const [minDays, setMinDays] = useState(14);
   const [maxDays, setMaxDays] = useState(90);
@@ -239,7 +240,13 @@ export default function AdRadarPage() {
               ].map((m) => (
                 <button
                   key={m.id}
-                  onClick={() => setCountryMode(m.id)}
+                  onClick={() => {
+                    setCountryMode(m.id);
+                    if (m.id === "manual") {
+                      const c = COUNTRIES.find((c) => c.code === country);
+                      setCountryInput(c ? c.name : "");
+                    }
+                  }}
                   style={{
                     padding: "6px 12px",
                     background: countryMode === m.id ? "rgba(34,176,125,0.15)" : "#0C1022",
@@ -261,14 +268,18 @@ export default function AdRadarPage() {
                 <input
                   type="text"
                   list="country-list"
-                  value={(() => {
-                    const c = COUNTRIES.find((c) => c.code === country);
-                    return c ? c.name : country;
-                  })()}
+                  value={countryInput}
                   onChange={(e) => {
+                    setCountryInput(e.target.value);
                     const found = COUNTRIES.find((c) => c.name.toLowerCase() === e.target.value.toLowerCase());
                     if (found) setCountry(found.code);
-                    else setCountry(e.target.value.toUpperCase().slice(0, 2));
+                  }}
+                  onBlur={() => {
+                    const found = COUNTRIES.find((c) => c.name.toLowerCase() === countryInput.toLowerCase());
+                    if (found) {
+                      setCountry(found.code);
+                      setCountryInput(found.name);
+                    }
                   }}
                   placeholder="Digite o nome do pais..."
                   style={{ width: "100%", padding: "10px 14px", background: "#0C1022", border: "1px solid #232C52", borderRadius: 8, color: "#F3F5FF", fontSize: 14, outline: "none", boxSizing: "border-box" }}
