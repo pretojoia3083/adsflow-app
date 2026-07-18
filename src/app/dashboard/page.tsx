@@ -136,8 +136,22 @@ export default function DashboardPage() {
 
           {!showWizard && <div style={{ flex: 1 }} />}
 
-          <div style={{ display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
-            <span style={{ color: "#8C93B8", fontSize: 14 }}>{session.user?.name || session.user?.email}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => handleNavigate("settings")}>
+              <div style={{
+                width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
+                background: avatarUrl ? "none" : "linear-gradient(135deg, #22B07D, #3FCB92)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                overflow: "hidden", border: "2px solid #232C52",
+              }}>
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                ) : (
+                  <span style={{ color: "#080B14", fontSize: 14, fontWeight: 700 }}>{(session.user?.name || session.user?.email || "U").charAt(0).toUpperCase()}</span>
+                )}
+              </div>
+              <span style={{ color: "#8C93B8", fontSize: 14 }}>{session.user?.name || session.user?.email}</span>
+            </div>
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}
               style={{ padding: "10px 20px", background: "transparent", border: "1px solid #232C52", borderRadius: 10, color: "#8C93B8", fontSize: 14, fontWeight: 500, cursor: "pointer" }}
