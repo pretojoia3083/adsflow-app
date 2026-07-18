@@ -411,6 +411,7 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
     if (step === 2) fetchTargeting();
     if (step === 3) fetchCopy();
     if (step === 4) fetchPresell();
+    if (step === 5) fetchFacebookPages();
     setStep((s) => Math.min(s + 1, STEP_NAMES.length));
   }
 
