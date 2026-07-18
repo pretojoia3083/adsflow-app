@@ -141,6 +141,7 @@ export default function AdRadarPage() {
   const countryRef = useRef<HTMLDivElement>(null);
 
   const [results, setResults] = useState<AdResult[]>([]);
+  const [facebookAdLibraryUrl, setFacebookAdLibraryUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [selectedAd, setSelectedAd] = useState<AdResult | null>(null);
@@ -178,8 +179,10 @@ export default function AdRadarPage() {
       const res = await fetch(`/api/ad-radar?q=${encodeURIComponent(searchTerm)}&country=${countryMode === "all" ? "ALL" : countryMode === "top3" ? "TOP3" : country}&minDays=${minDays}&maxDays=${maxDays}`);
       const data = await res.json();
       setResults(data.ads || []);
+      setFacebookAdLibraryUrl(data.facebookAdLibraryUrl || "");
     } catch {
       setResults([]);
+      setFacebookAdLibraryUrl("");
     }
     setLoading(false);
   }
@@ -258,7 +261,7 @@ export default function AdRadarPage() {
     <div>
       <div style={{ marginBottom: 32 }}>
         <h2 style={{ fontSize: 28, fontWeight: 700, color: "#F3F5FF", margin: 0 }}>Radar de Anuncios</h2>
-        <p style={{ color: "#8C93B8", fontSize: 15, marginTop: 6 }}>Descubra anuncios que estao rodando — analise criativos, copy, pagina de vendas e gere presells com IA</p>
+        <p style={{ color: "#8C93B8", fontSize: 15, marginTop 6 }}>Analise criativos e copy — veja anuncios reais direto no Facebook Ad Library</p>
       </div>
 
       <div style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 16, padding: 28, marginBottom: 28 }}>
@@ -440,7 +443,41 @@ export default function AdRadarPage() {
 
       {!loading && results.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <p style={{ color: "#8C93B8", fontSize: 14, margin: 0 }}>{results.length} anuncios encontrados</p>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+            <p style={{ color: "#8C93B8", fontSize: 14, margin: 0 }}>{results.length} anuncios encontrados — exemplos de copy para referencia</p>
+            {facebookAdLibraryUrl && (
+              <a
+                href={facebookAdLibraryUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "10px 20px",
+                  background: "linear-gradient(90deg,#1877F2,#4293F5)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 10,
+                  fontSize: 14,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  textDecoration: "none",
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                Ver anuncios REAIS no Facebook
+              </a>
+            )}
+          </div>
+
+          <div style={{ background: "rgba(24,119,242,0.06)", border: "1px solid rgba(24,119,242,0.2)", borderRadius: 10, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 18 }}>💡</span>
+            <p style={{ color: "#A0A8CE", fontSize: 13, margin: 0 }}>
+              Os anuncios acima sao <strong style={{ color: "#F3F5FF" }}>exemplos de copy</strong> para voce se inspirar. Clique no botao azul acima para ver <strong style={{ color: "#1877F2" }}>anuncios reais</strong> no Facebook Ad Library.
+            </p>
+          </div>
+
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 16 }}>
             {results.map((ad) => (
               <div key={ad.id} style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 14, overflow: "hidden", cursor: "pointer", transition: "border-color 0.2s" }}
@@ -508,9 +545,6 @@ export default function AdRadarPage() {
                   <div style={{ marginBottom: 16 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
                       <p style={{ color: "#3FCB92", fontSize: 15, fontWeight: 600, margin: 0 }}>{selectedAd.pageName}</p>
-                      {selectedAd.snapshotUrl && (
-                        <a href={selectedAd.snapshotUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#60A5FA", fontSize: 12, textDecoration: "none" }}>Ver no Facebook ↗</a>
-                      )}
                     </div>
                     <p style={{ color: "#6B739E", fontSize: 13, margin: 0 }}>Ativo desde {new Date(selectedAd.startTime).toLocaleDateString("pt-BR")} · Plataformas: {selectedAd.platforms.join(", ")}</p>
                   </div>
@@ -536,9 +570,6 @@ export default function AdRadarPage() {
                       <button onClick={() => downloadCreative(selectedAd.mediaUrl!, `ad-${selectedAd.id}-creative`)} style={{ flex: 1, padding: "12px 16px", background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.3)", borderRadius: 10, color: "#60A5FA", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Baixar criativo</button>
                     )}
                     <button onClick={() => downloadText(`ANUNCIO COMPLETO\n\nPagina: ${selectedAd.pageName}\nPlataformas: ${selectedAd.platforms.join(", ")}\nDesde: ${selectedAd.startTime}\n\n--- TITULO ---\n${selectedAd.title}\n\n--- TEXTO ---\n${selectedAd.body}\n\n--- DESCRICAO ---\n${selectedAd.description}`, `ad-${selectedAd.id}-transcricao.txt`)} style={{ flex: 1, padding: "12px 16px", background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: 10, color: "#A78BFA", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Baixar transcricao</button>
-                    {selectedAd.snapshotUrl && (
-                      <a href={selectedAd.snapshotUrl} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: "12px 16px", background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: 10, color: "#FBBF24", fontSize: 14, fontWeight: 600, cursor: "pointer", textDecoration: "none", textAlign: "center", display: "block" }}>Ver no Facebook ↗</a>
-                    )}
                   </div>
                 </div>
               )}
@@ -548,24 +579,26 @@ export default function AdRadarPage() {
                   {!pageInfo && !pageLoading && !pageError && (
                     <div style={{ textAlign: "center", padding: "32px 0" }}>
                       <p style={{ fontSize: 36, marginBottom: 12 }}>🌐</p>
-                      <p style={{ color: "#F3F5FF", fontSize: 16, fontWeight: 600, marginBottom: 8 }}>Ver pagina de vendas</p>
-                      {selectedAd.landingUrl ? (
-                        <>
-                          <p style={{ color: "#8C93B8", fontSize: 14, marginBottom: 8 }}>Analise a landing page do anuncio</p>
-                          <p style={{ color: "#6B739E", fontSize: 12, marginBottom: 20, wordBreak: "break-all" }}>{selectedAd.landingUrl}</p>
-                          <button onClick={() => handleFetchPage(selectedAd.landingUrl!)} style={{ padding: "14px 28px", background: "linear-gradient(90deg,#22B07D,#3FCB92)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer" }}>Carregar pagina</button>
-                        </>
-                      ) : selectedAd.snapshotUrl ? (
-                        <>
-                          <p style={{ color: "#8C93B8", fontSize: 14, marginBottom: 8 }}>URL de destino nao disponivel</p>
-                          <p style={{ color: "#6B739E", fontSize: 13, marginBottom: 20 }}>Veja o anuncio completo no Facebook</p>
-                          <a href={selectedAd.snapshotUrl} target="_blank" rel="noopener noreferrer" style={{ padding: "14px 28px", background: "linear-gradient(90deg,#22B07D,#3FCB92)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer", textDecoration: "none", display: "inline-block" }}>Ver anuncio no Facebook ↗</a>
-                        </>
-                      ) : (
-                        <>
-                          <p style={{ color: "#8C93B8", fontSize: 14, marginBottom: 8 }}>Dados simulados</p>
-                          <p style={{ color: "#6B739E", fontSize: 13, marginBottom: 20 }}>Este anuncio e uma simulacao — nao possui pagina real</p>
-                        </>
+                      <p style={{ color: "#F3F5FF", fontSize: 16, fontWeight: 600, marginBottom: 8 }}>Ver anuncios reais no Facebook</p>
+                      <p style={{ color: "#8C93B8", fontSize: 14, marginBottom: 20 }}>Acesse o Facebook Ad Library e veja todos os anuncios ativos para esta palavra-chave</p>
+                      {facebookAdLibraryUrl && (
+                        <a href={facebookAdLibraryUrl} target="_blank" rel="noopener noreferrer" style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 8,
+                          padding: "14px 28px",
+                          background: "linear-gradient(90deg,#1877F2,#4293F5)",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: 10,
+                          fontSize: 15,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          textDecoration: "none",
+                        }}>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                          Abrir no Facebook Ad Library
+                        </a>
                       )}
                     </div>
                   )}
@@ -586,9 +619,6 @@ export default function AdRadarPage() {
                       <div style={{ background: "#0C1022", borderRadius: 10, padding: "16px 18px", marginBottom: 16, border: "1px solid #1A2040" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                           <span style={{ color: "#3FCB92", fontSize: 13, fontWeight: 600 }}>{pageInfo.domain}</span>
-                          {selectedAd.snapshotUrl && (
-                            <a href={selectedAd.snapshotUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#60A5FA", fontSize: 12, textDecoration: "none" }}>Ver anuncio ↗</a>
-                          )}
                         </div>
                         {pageInfo.title && <p style={{ color: "#F3F5FF", fontSize: 16, fontWeight: 600, margin: "0 0 4px" }}>{pageInfo.title}</p>}
                         {pageInfo.description && <p style={{ color: "#A0A8CE", fontSize: 14, margin: 0 }}>{pageInfo.description}</p>}
