@@ -48,7 +48,10 @@ export async function GET(req: NextRequest) {
     }
 
     if (country !== "ALL") {
-      products = products.filter((p) => p.country === country);
+      const countryFiltered = products.filter((p) => p.country === country);
+      if (countryFiltered.length > 0) {
+        products = countryFiltered;
+      }
     }
 
     switch (sort) {
