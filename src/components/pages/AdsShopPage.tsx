@@ -32,14 +32,20 @@ const CATEGORIES = [
 ];
 
 const COUNTRIES_FILTER = [
-  { code: "ALL", label: "Todos" },
-  { code: "US", label: "EUA" },
-  { code: "BR", label: "Brasil" },
-  { code: "UK", label: "UK" },
-  { code: "CA", label: "Canada" },
-  { code: "AU", label: "Australia" },
-  { code: "DE", label: "Alemanha" },
-  { code: "FR", label: "Franca" },
+  { code: "ALL", name: "Todos" },
+  { code: "US", name: "Estados Unidos" }, { code: "BR", name: "Brasil" },
+  { code: "GB", name: "Reino Unido" }, { code: "CA", name: "Canada" },
+  { code: "AU", name: "Australia" }, { code: "DE", name: "Alemanha" },
+  { code: "FR", name: "Franca" }, { code: "PT", name: "Portugal" },
+  { code: "ES", name: "Espanha" }, { code: "IT", name: "Italia" },
+  { code: "JP", name: "Japao" }, { code: "KR", name: "Coreia do Sul" },
+  { code: "MX", name: "Mexico" }, { code: "AR", name: "Argentina" },
+  { code: "CO", name: "Colombia" }, { code: "NL", name: "Holanda" },
+  { code: "SE", name: "Suecia" }, { code: "NO", name: "Noruega" },
+  { code: "PL", name: "Polonia" }, { code: "TR", name: "Turquia" },
+  { code: "IN", name: "India" }, { code: "ZA", name: "Africa do Sul" },
+  { code: "NG", name: "Nigeria" }, { code: "AE", name: "Emirados Arabes" },
+  { code: "SA", name: "Arabia Saudita" }, { code: "SG", name: "Singapura" },
 ];
 
 const SORT_OPTIONS = [
@@ -83,6 +89,7 @@ export default function AdsShopPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedCountry, setSelectedCountry] = useState("ALL");
+  const [countryInput, setCountryInput] = useState("Todos");
   const [sortBy, setSortBy] = useState("trending");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -327,19 +334,36 @@ export default function AdsShopPage() {
           />
         </div>
 
-        <select
-          value={selectedCountry}
-          onChange={(e) => setSelectedCountry(e.target.value)}
-          style={{
-            padding: "12px 16px", background: "#0C1022",
-            border: "1px solid #232C52", borderRadius: 10,
-            color: "#F3F5FF", fontSize: 14, cursor: "pointer", outline: "none",
-          }}
-        >
-          {COUNTRIES_FILTER.map((c) => (
-            <option key={c.code} value={c.code}>{c.label}</option>
-          ))}
-        </select>
+        <div style={{ position: "relative" }}>
+          <input
+            type="text"
+            list="shop-country-list"
+            value={countryInput}
+            onChange={(e) => {
+              setCountryInput(e.target.value);
+              const found = COUNTRIES_FILTER.find((c) => c.name.toLowerCase() === e.target.value.toLowerCase());
+              if (found) setSelectedCountry(found.code);
+            }}
+            onBlur={() => {
+              const found = COUNTRIES_FILTER.find((c) => c.name.toLowerCase() === countryInput.toLowerCase());
+              if (found) {
+                setSelectedCountry(found.code);
+                setCountryInput(found.name);
+              }
+            }}
+            placeholder="Digite o nome do pais..."
+            style={{
+              padding: "12px 16px", background: "#0C1022",
+              border: "1px solid #232C52", borderRadius: 10,
+              color: "#F3F5FF", fontSize: 14, outline: "none", boxSizing: "border-box",
+            }}
+          />
+          <datalist id="shop-country-list">
+            {COUNTRIES_FILTER.map((c) => (
+              <option key={c.code} value={c.name}>{c.name}</option>
+            ))}
+          </datalist>
+        </div>
 
         <select
           value={sortBy}
