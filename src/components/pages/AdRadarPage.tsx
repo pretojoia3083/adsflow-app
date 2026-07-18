@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 
 interface AdResult {
   id?: string;
@@ -42,97 +42,6 @@ interface PresellDraft {
   style: string;
 }
 
-const COUNTRIES = [
-  { code: "BR", name: "Brasil", flag: "🇧🇷" },
-  { code: "US", name: "Estados Unidos", flag: "🇺🇸" },
-  { code: "PT", name: "Portugal", flag: "🇵🇹" },
-  { code: "AO", name: "Angola", flag: "🇦🇴" },
-  { code: "MZ", name: "Mocambique", flag: "🇲🇿" },
-  { code: "CV", name: "Cabo Verde", flag: "🇨🇻" },
-  { code: "TL", name: "Timor-Leste", flag: "🇹🇱" },
-  { code: "GW", name: "Guine-Bissau", flag: "🇬🇼" },
-  { code: "ST", name: "Sao Tome e Principe", flag: "🇸🇹" },
-  { code: "MX", name: "Mexico", flag: "🇲🇽" },
-  { code: "AR", name: "Argentina", flag: "🇦🇷" },
-  { code: "CO", name: "Colombia", flag: "🇨🇴" },
-  { code: "CL", name: "Chile", flag: "🇨🇱" },
-  { code: "PE", name: "Peru", flag: "🇵🇪" },
-  { code: "EC", name: "Equador", flag: "🇪🇨" },
-  { code: "VE", name: "Venezuela", flag: "🇻🇪" },
-  { code: "UY", name: "Uruguai", flag: "🇺🇾" },
-  { code: "PY", name: "Paraguai", flag: "🇵🇾" },
-  { code: "BO", name: "Bolivia", flag: "🇧🇴" },
-  { code: "CR", name: "Costa Rica", flag: "🇨🇷" },
-  { code: "PA", name: "Panama", flag: "🇵🇦" },
-  { code: "GT", name: "Guatemala", flag: "🇬🇹" },
-  { code: "DO", name: "Republica Dominicana", flag: "🇩🇴" },
-  { code: "CU", name: "Cuba", flag: "🇨🇺" },
-  { code: "HN", name: "Honduras", flag: "🇭🇳" },
-  { code: "SV", name: "El Salvador", flag: "🇸🇻" },
-  { code: "NI", name: "Nicaragua", flag: "🇳🇮" },
-  { code: "JM", name: "Jamaica", flag: "🇯🇲" },
-  { code: "TT", name: "Trinidad e Tobago", flag: "🇹🇹" },
-  { code: "PR", name: "Porto Rico", flag: "🇵🇷" },
-  { code: "CA", name: "Canada", flag: "🇨🇦" },
-  { code: "GB", name: "Reino Unido", flag: "🇬🇧" },
-  { code: "DE", name: "Alemanha", flag: "🇩🇪" },
-  { code: "FR", name: "Franca", flag: "🇫🇷" },
-  { code: "ES", name: "Espanha", flag: "🇪🇸" },
-  { code: "IT", name: "Italia", flag: "🇮🇹" },
-  { code: "NL", name: "Holanda", flag: "🇳🇱" },
-  { code: "BE", name: "Belgica", flag: "🇧🇪" },
-  { code: "CH", name: "Suica", flag: "🇨🇭" },
-  { code: "AT", name: "Austria", flag: "🇦🇹" },
-  { code: "SE", name: "Suecia", flag: "🇸🇪" },
-  { code: "NO", name: "Noruega", flag: "🇳🇴" },
-  { code: "DK", name: "Dinamarca", flag: "🇩🇰" },
-  { code: "FI", name: "Finlandia", flag: "🇫🇮" },
-  { code: "IE", name: "Irlanda", flag: "🇮🇪" },
-  { code: "PL", name: "Polonia", flag: "🇵🇱" },
-  { code: "CZ", name: "Chequia", flag: "🇨🇿" },
-  { code: "RO", name: "Romenia", flag: "🇷🇴" },
-  { code: "HU", name: "Hungria", flag: "🇭🇺" },
-  { code: "GR", name: "Grecia", flag: "🇬🇷" },
-  { code: "BG", name: "Bulgaria", flag: "🇧🇬" },
-  { code: "HR", name: "Croacia", flag: "🇭🇷" },
-  { code: "RS", name: "Servia", flag: "🇷🇸" },
-  { code: "UA", name: "Ucrania", flag: "🇺🇦" },
-  { code: "TR", name: "Turquia", flag: "🇹🇷" },
-  { code: "RU", name: "Russia", flag: "🇷🇺" },
-  { code: "JP", name: "Japao", flag: "🇯🇵" },
-  { code: "KR", name: "Coreia do Sul", flag: "🇰🇷" },
-  { code: "CN", name: "China", flag: "🇨🇳" },
-  { code: "TW", name: "Taiwan", flag: "🇹🇼" },
-  { code: "IN", name: "India", flag: "🇮🇳" },
-  { code: "TH", name: "Tailandia", flag: "🇹🇭" },
-  { code: "VN", name: "Vietna", flag: "🇻🇳" },
-  { code: "PH", name: "Filipinas", flag: "🇵🇭" },
-  { code: "MY", name: "Malasia", flag: "🇲🇾" },
-  { code: "SG", name: "Singapura", flag: "🇸🇬" },
-  { code: "ID", name: "Indonesia", flag: "🇮🇩" },
-  { code: "HK", name: "Hong Kong", flag: "🇭🇰" },
-  { code: "PK", name: "Paquistao", flag: "🇵🇰" },
-  { code: "AU", name: "Australia", flag: "🇦🇺" },
-  { code: "NZ", name: "Nova Zelandia", flag: "🇳🇿" },
-  { code: "ZA", name: "Africa do Sul", flag: "🇿🇦" },
-  { code: "NG", name: "Nigeria", flag: "🇳🇬" },
-  { code: "KE", name: "Quenia", flag: "🇰🇪" },
-  { code: "GH", name: "Gana", flag: "🇬🇭" },
-  { code: "EG", name: "Egito", flag: "🇪🇬" },
-  { code: "MA", name: "Marrocos", flag: "🇲🇦" },
-  { code: "TN", name: "Tunisia", flag: "🇹🇳" },
-  { code: "SA", name: "Arabia Saudita", flag: "🇸🇦" },
-  { code: "AE", name: "Emirados Arabes", flag: "🇦🇪" },
-  { code: "IL", name: "Israel", flag: "🇮🇱" },
-  { code: "QA", name: "Catar", flag: "🇶🇦" },
-  { code: "KW", name: "Kuwait", flag: "🇰🇼" },
-  { code: "BH", name: "Barein", flag: "🇧🇭" },
-  { code: "OM", name: "Oma", flag: "🇴🇲" },
-  { code: "JO", name: "Jordania", flag: "🇯🇴" },
-  { code: "LB", name: "Libano", flag: "🇱🇧" },
-  { code: "IQ", name: "Iraque", flag: "🇮🇶" },
-];
-
 function ScoreBadge({ label }: { label?: string }) {
   if (!label) return null;
   const config = {
@@ -152,11 +61,8 @@ export default function AdRadarPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [country, setCountry] = useState("BR");
   const [countryMode, setCountryMode] = useState<"manual" | "all" | "top3">("manual");
-  const [countrySearch, setCountrySearch] = useState("");
-  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [minDays, setMinDays] = useState(14);
   const [maxDays, setMaxDays] = useState(90);
-  const countryRef = useRef<HTMLDivElement>(null);
 
   const [results, setResults] = useState<AdResult[]>([]);
   const [facebookAdLibraryUrl, setFacebookAdLibraryUrl] = useState("");
@@ -172,21 +78,6 @@ export default function AdRadarPage() {
   const [aiLoading, setAiLoading] = useState(false);
   const [presellDraft, setPresellDraft] = useState<PresellDraft | null>(null);
   const [activeTab, setActiveTab] = useState<"copy" | "page" | "presell">("copy");
-
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (countryRef.current && !countryRef.current.contains(e.target as Node)) {
-        setShowCountryDropdown(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const selectedCountry = COUNTRIES.find((c) => c.code === country);
-  const filteredCountries = COUNTRIES.filter((c) =>
-    c.name.toLowerCase().includes(countrySearch.toLowerCase()) || c.code.toLowerCase().includes(countrySearch.toLowerCase())
-  );
 
   async function handleSearch() {
     if (!searchTerm.trim()) return;
@@ -304,8 +195,8 @@ export default function AdRadarPage() {
             />
           </label>
 
-          <div style={{ position: "relative" }} ref={countryRef}>
-            <span style={{ color: "#8C93B8", fontSize: 13, fontWeight: 500, display: "block", marginBottom: 6 }}>Pais / Regiao</span>
+          <div>
+            <span style={{ color: "#8C93B8", fontSize: 13, fontWeight: 500, display: "block", marginBottom: 6 }}>Pais (codigo)</span>
 
             <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
               {[
@@ -315,10 +206,7 @@ export default function AdRadarPage() {
               ].map((m) => (
                 <button
                   key={m.id}
-                  onClick={() => {
-                    setCountryMode(m.id);
-                    if (m.id === "manual") setShowCountryDropdown(true);
-                  }}
+                  onClick={() => setCountryMode(m.id)}
                   style={{
                     padding: "6px 12px",
                     background: countryMode === m.id ? "rgba(34,176,125,0.15)" : "#0C1022",
@@ -336,73 +224,14 @@ export default function AdRadarPage() {
             </div>
 
             {countryMode === "manual" && (
-              <div>
-                <button
-                  onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    background: "#0C1022",
-                    border: "1px solid #232C52",
-                    borderRadius: 8,
-                    color: "#F3F5FF",
-                    fontSize: 14,
-                    cursor: "pointer",
-                    textAlign: "left",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
-                  <span>{selectedCountry?.flag}</span>
-                  <span>{selectedCountry?.name || country}</span>
-                  <span style={{ marginLeft: "auto", color: "#6B739E", fontSize: 12 }}>▼</span>
-                </button>
-
-                {showCountryDropdown && (
-                  <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#0C1022", border: "1px solid #232C52", borderRadius: 10, maxHeight: 280, overflow: "hidden", zIndex: 50, marginTop: 4, boxShadow: "0 12px 40px rgba(0,0,0,0.5)" }}>
-                    <div style={{ padding: "8px 10px", borderBottom: "1px solid #1A2040" }}>
-                      <input
-                        type="text"
-                        value={countrySearch}
-                        onChange={(e) => setCountrySearch(e.target.value)}
-                        placeholder="Buscar pais..."
-                        autoFocus
-                        style={{ width: "100%", padding: "8px 12px", background: "#121830", border: "1px solid #232C52", borderRadius: 6, color: "#F3F5FF", fontSize: 14, outline: "none", boxSizing: "border-box" }}
-                      />
-                    </div>
-                    <div style={{ maxHeight: 240, overflowY: "auto" }}>
-                      {filteredCountries.map((c) => (
-                        <button
-                          key={c.code}
-                          onClick={() => { setCountry(c.code); setShowCountryDropdown(false); setCountrySearch(""); }}
-                          style={{
-                            width: "100%",
-                            padding: "10px 14px",
-                            background: country === c.code ? "rgba(34,176,125,0.1)" : "transparent",
-                            border: "none",
-                            borderBottom: "1px solid #1A2040",
-                            color: country === c.code ? "#3FCB92" : "#F3F5FF",
-                            fontSize: 14,
-                            cursor: "pointer",
-                            textAlign: "left",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 10,
-                          }}
-                        >
-                          <span style={{ fontSize: 18 }}>{c.flag}</span>
-                          <span>{c.name}</span>
-                          <span style={{ marginLeft: "auto", color: "#6B739E", fontSize: 12, fontWeight: 500 }}>{c.code}</span>
-                        </button>
-                      ))}
-                      {filteredCountries.length === 0 && (
-                        <div style={{ padding: 16, textAlign: "center", color: "#6B739E", fontSize: 14 }}>Nenhum pais encontrado</div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
+              <input
+                type="text"
+                value={country}
+                onChange={(e) => setCountry(e.target.value.toUpperCase().slice(0, 2))}
+                placeholder="Ex: BR, US, AT, GB..."
+                maxLength={2}
+                style={{ width: "100%", padding: "10px 14px", background: "#0C1022", border: "1px solid #232C52", borderRadius: 8, color: "#F3F5FF", fontSize: 14, outline: "none", boxSizing: "border-box", textTransform: "uppercase" }}
+              />
             )}
 
             {countryMode === "all" && (
