@@ -74,7 +74,22 @@ export async function GET(req: NextRequest) {
         products.sort((a, b) => b.gravity - a.gravity);
     }
 
-    const stats = getProductStats();
+    const trending = products.filter((p) => p.gravity > 400).length;
+    const avgCommission = products.length > 0
+      ? products.reduce((s, p) => s + p.commissionPercent, 0) / products.length
+      : 0;
+    const avgGravity = products.length > 0
+      ? products.reduce((s, p) => s + p.gravity, 0) / products.length
+      : 0;
+    const categories = [...new Set(products.map((p) => p.category))];
+
+    const stats = {
+      total: products.length,
+      trending,
+      avgCommission: avgCommission.toFixed(1),
+      avgGravity: avgGravity.toFixed(0),
+      categories: categories.length,
+    };
 
     return NextResponse.json({
       products,
