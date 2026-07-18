@@ -42,6 +42,39 @@ interface PresellDraft {
   style: string;
 }
 
+const COUNTRIES = [
+  { code: "BR", name: "Brasil" }, { code: "US", name: "Estados Unidos" }, { code: "GB", name: "Reino Unido" },
+  { code: "PT", name: "Portugal" }, { code: "DE", name: "Alemanha" }, { code: "FR", name: "Franca" },
+  { code: "ES", name: "Espanha" }, { code: "IT", name: "Italia" }, { code: "JP", name: "Japao" },
+  { code: "KR", name: "Coreia do Sul" }, { code: "CA", name: "Canada" }, { code: "AU", name: "Australia" },
+  { code: "MX", name: "Mexico" }, { code: "AR", name: "Argentina" }, { code: "CO", name: "Colombia" },
+  { code: "CL", name: "Chile" }, { code: "PE", name: "Peru" }, { code: "EC", name: "Equador" },
+  { code: "VE", name: "Venezuela" }, { code: "UY", name: "Uruguai" }, { code: "PY", name: "Paraguai" },
+  { code: "BO", name: "Bolivia" }, { code: "CR", name: "Costa Rica" }, { code: "PA", name: "Panama" },
+  { code: "GT", name: "Guatemala" }, { code: "DO", name: "Republica Dominicana" }, { code: "CU", name: "Cuba" },
+  { code: "HN", name: "Honduras" }, { code: "SV", name: "El Salvador" }, { code: "NI", name: "Nicaragua" },
+  { code: "JM", name: "Jamaica" }, { code: "TT", name: "Trinidad e Tobago" }, { code: "PR", name: "Porto Rico" },
+  { code: "NL", name: "Holanda" }, { code: "BE", name: "Belgica" }, { code: "CH", name: "Suica" },
+  { code: "AT", name: "Austria" }, { code: "SE", name: "Suecia" }, { code: "NO", name: "Noruega" },
+  { code: "DK", name: "Dinamarca" }, { code: "FI", name: "Finlandia" }, { code: "IE", name: "Irlanda" },
+  { code: "PL", name: "Polonia" }, { code: "CZ", name: "Chequia" }, { code: "RO", name: "Romenia" },
+  { code: "HU", name: "Hungria" }, { code: "GR", name: "Grecia" }, { code: "BG", name: "Bulgaria" },
+  { code: "HR", name: "Croacia" }, { code: "RS", name: "Servia" }, { code: "UA", name: "Ucrania" },
+  { code: "TR", name: "Turquia" }, { code: "RU", name: "Russia" }, { code: "CN", name: "China" },
+  { code: "TW", name: "Taiwan" }, { code: "IN", name: "India" }, { code: "TH", name: "Tailandia" },
+  { code: "VN", name: "Vietna" }, { code: "PH", name: "Filipinas" }, { code: "MY", name: "Malasia" },
+  { code: "SG", name: "Singapura" }, { code: "ID", name: "Indonesia" }, { code: "HK", name: "Hong Kong" },
+  { code: "PK", name: "Paquistao" }, { code: "NZ", name: "Nova Zelandia" }, { code: "ZA", name: "Africa do Sul" },
+  { code: "NG", name: "Nigeria" }, { code: "KE", name: "Quenia" }, { code: "GH", name: "Gana" },
+  { code: "EG", name: "Egito" }, { code: "MA", name: "Marrocos" }, { code: "TN", name: "Tunisia" },
+  { code: "SA", name: "Arabia Saudita" }, { code: "AE", name: "Emirados Arabes" }, { code: "IL", name: "Israel" },
+  { code: "QA", name: "Catar" }, { code: "KW", name: "Kuwait" }, { code: "BH", name: "Barein" },
+  { code: "OM", name: "Oma" }, { code: "JO", name: "Jordania" }, { code: "LB", name: "Libano" },
+  { code: "IQ", name: "Iraque" }, { code: "AO", name: "Angola" }, { code: "MZ", name: "Mocambique" },
+  { code: "CV", name: "Cabo Verde" }, { code: "TL", name: "Timor-Leste" }, { code: "GW", name: "Guine-Bissau" },
+  { code: "ST", name: "Sao Tome e Principe" },
+];
+
 function ScoreBadge({ label }: { label?: string }) {
   if (!label) return null;
   const config = {
@@ -224,14 +257,28 @@ export default function AdRadarPage() {
             </div>
 
             {countryMode === "manual" && (
-              <input
-                type="text"
-                value={country}
-                onChange={(e) => setCountry(e.target.value.toUpperCase().slice(0, 2))}
-                placeholder="Ex: BR, US, AT, GB..."
-                maxLength={2}
-                style={{ width: "100%", padding: "10px 14px", background: "#0C1022", border: "1px solid #232C52", borderRadius: 8, color: "#F3F5FF", fontSize: 14, outline: "none", boxSizing: "border-box", textTransform: "uppercase" }}
-              />
+              <div style={{ position: "relative" }}>
+                <input
+                  type="text"
+                  list="country-list"
+                  value={(() => {
+                    const c = COUNTRIES.find((c) => c.code === country);
+                    return c ? c.name : country;
+                  })()}
+                  onChange={(e) => {
+                    const found = COUNTRIES.find((c) => c.name.toLowerCase() === e.target.value.toLowerCase());
+                    if (found) setCountry(found.code);
+                    else setCountry(e.target.value.toUpperCase().slice(0, 2));
+                  }}
+                  placeholder="Digite o nome do pais..."
+                  style={{ width: "100%", padding: "10px 14px", background: "#0C1022", border: "1px solid #232C52", borderRadius: 8, color: "#F3F5FF", fontSize: 14, outline: "none", boxSizing: "border-box" }}
+                />
+                <datalist id="country-list">
+                  {COUNTRIES.map((c) => (
+                    <option key={c.code} value={c.name}>{c.flag} {c.name} ({c.code})</option>
+                  ))}
+                </datalist>
+              </div>
             )}
 
             {countryMode === "all" && (
