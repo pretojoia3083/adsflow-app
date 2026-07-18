@@ -11,6 +11,7 @@ import MetaApiPage from "@/components/pages/MetaApiPage";
 import SupportPage from "@/components/pages/SupportPage";
 import IaPage from "@/components/pages/IaPage";
 import CampaignsPage from "@/components/pages/CampaignsPage";
+import CampaignDetailModal from "@/components/CampaignDetailModal";
 import MetricsPage from "@/components/pages/MetricsPage";
 import CreativesPage from "@/components/pages/CreativesPage";
 import InstallAppPage from "@/components/pages/InstallAppPage";
@@ -33,11 +34,35 @@ const STEP_NAMES = [
 interface Campaign {
   id: string;
   productName: string;
+  description: string | null;
+  audience: string | null;
+  funnelStage: string;
+  budgetPref: string;
   country: string;
   countryCode: string;
+  language: string | null;
+  estimatedCpm: string | null;
+  networkId: string | null;
+  networkName: string | null;
+  affLink: string | null;
+  affiliateLink: string | null;
+  presellSlug: string | null;
+  keywords: string[];
+  interests: string[];
+  placements: string[];
+  budgetDaily: number | null;
+  deviceSplit: Record<string, unknown>;
+  adCopy: Record<string, string>;
+  tone: string | null;
   status: string;
-  createdAt: string;
   metaCampaignId: string | null;
+  targetCities: string[];
+  targetRegions: string[];
+  startTime: string | null;
+  endTime: string | null;
+  pageId: string | null;
+  creativeUrl: string | null;
+  createdAt: string;
 }
 
 const STATUS_COLORS: Record<string, { color: string; bg: string }> = {
@@ -66,6 +91,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
 
   const handleStepChange = useCallback((step: number) => {
     setCurrentStep(step);
@@ -207,6 +233,13 @@ export default function DashboardPage() {
                               {STATUS_LABELS[c.status] || c.status}
                             </span>
                             <button
+                              onClick={(e) => { e.stopPropagation(); setSelectedCampaign(c); }}
+                              title="Ver detalhes"
+                              style={{ padding: "6px 12px", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.2)", borderRadius: 8, color: "#60A5FA", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+                            >
+                              Ver
+                            </button>
+                            <button
                               onClick={(e) => { e.stopPropagation(); if (confirm(`Excluir "${c.productName}"?`)) handleDeleteCampaign(c.id); }}
                               disabled={deletingId === c.id}
                               title="Excluir campanha"
@@ -248,6 +281,16 @@ export default function DashboardPage() {
         </main>
       </div>
       <InstallBanner />
+      {selectedCampaign && (
+        <CampaignDetailModal
+          campaign={selectedCampaign}
+          onClose={() => setSelectedCampaign(null)}
+          onSaved={(updated) => {
+            setCampaigns((prev) => prev.map((c) => c.id === updated.id ? { ...c, ...updated } : c));
+            setSelectedCampaign({ ...selectedCampaign, ...updated } as Campaign);
+          }}
+        />
+      )}
     </div>
   );
 }

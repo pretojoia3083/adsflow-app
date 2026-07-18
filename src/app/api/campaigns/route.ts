@@ -215,3 +215,53 @@ export async function PATCH(req: NextRequest) {
 
   return NextResponse.json({ error: "Unknown action" }, { status: 400 });
 }
+
+export async function PUT(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const data = await req.json();
+  const { id, ...updates } = data;
+
+  if (!id) {
+    return NextResponse.json({ error: "Campaign ID required" }, { status: 400 });
+  }
+
+  const campaign = await prisma.campaign.findFirst({
+    where: { id, userId: session.user.id },
+  });
+  if (!campaign) {
+    return NextResponse.json({ error: "Campanha nao encontrada" }, { status: 404 });
+  }
+
+  const updateData: Record<string, unknown> = {};
+  const stringFields = ["productName", "description", "audience", "funnelStage", "budgetPref", "country", "countryCode", "language", "estimatedCpm", "networkId", "networkName", "affLink", "affiliateLink", "presellSlug", "budgetDaily", "tone", "startTime", "endTime", "pageId", "creativeUrl", "status"];
+  for (const f of stringFields) {
+    if (updates[f] !== undefined) updateData[f] = updates[f];
+  }
+  if (updates.keywords !== undefined) updateData.keywords = JSON.stringify(updates.keywords);
+  if (updates.interests !== undefined) updateData.interests = JSON.stringify(updates.interests);
+  if (updates.placements !== undefined) updateData.placements = JSON.stringify(updates.placements);
+  if (updates.deviceSplit !== undefined) updateData.deviceSplit = JSON.stringify(updates.deviceSplit);
+  if (updates.adCopy !== undefined) updateData.adCopy = JSON.stringify(updates.adCopy);
+  if (updates.targetCities !== undefined) updateData.targetCities = JSON.stringify(updates.targetCities);
+  if (updates.targetRegions !== undefined) updateData.targetRegions = JSON.stringify(updates.targetRegions);
+
+  const updated = await prisma.campaign.update({
+    where: { id },
+    data: updateData,
+  });
+
+  return NextResponse.json({
+    ...updated,
+    keywords: JSON.parse(updated.keywords),
+    interests: JSON.parse(updated.interests),
+    placements: JSON.parse(updated.placements),
+    deviceSplit: JSON.parse(updated.deviceSplit),
+    adCopy: JSON.parse(updated.adCopy),
+    targetCities: updated.targetCities ? JSON.parse(updated.targetCities) : [],
+    targetRegions: updated.targetRegions ? JSON.parse(updated.targetRegions) : [],
+  });
+}
