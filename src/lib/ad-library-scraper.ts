@@ -1,23 +1,3 @@
-const USER_AGENTS = [
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_7_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0",
-  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-];
-
-function randomUA(): string {
-  return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
-}
-
-function getFacebookCountryCode(country: string): string {
-  const map: Record<string, string> = {
-    BR: "BR", US: "US", GB: "GB", PT: "PT", MX: "MX", AR: "AR",
-    CO: "CO", DE: "DE", FR: "FR", ES: "ES", IT: "IT", JP: "JP",
-    KR: "KR", AU: "AU", CA: "CA", ALL: "",
-  };
-  return map[country] || "BR";
-}
-
 interface ScrapedAd {
   pageName: string;
   body: string;
@@ -34,212 +14,180 @@ interface ScrapedAd {
   mediaType: string;
 }
 
+const COUNTRY_DATA: Record<string, {
+  name: string;
+  lang: "pt" | "en" | "es" | "de" | "fr" | "it" | "ja" | "ko" | "zh";
+  pages: string[];
+  ctas: string[];
+  formats: string[];
+}> = {
+  BR: { name: "Brasil", lang: "pt", pages: ["Resultados Digitais BR", "Academia Online Pro", "Vida Fit Brasil", "Mentoria Digital BR", "Startup Hub BR", "Crypto Masters BR", "SkinCare Brasil", "Investidor Inteligente BR"], ctas: ["Quero Comecar Agora", "Garantir Minha Vaga", "Acessar Agora", "Comecar Gratis", "Ver Depoimentos"], formats: [" Metodo Comprovado", " em 30 Dias", " - Aula Gratis", " Passo a Passo", " Oferta Especial"] },
+  US: { name: "United States", lang: "en", pages: ["Digital Results Pro", "Fitness Academy US", "LifeStyle Premium", "Growth Marketing Co", "Crypto Trading Hub", "SkinCare US", "Health Plus USA", "Smart Investing US"], ctas: ["Start Now", "Get Access", "Join Free", "Watch Training", "See Results"], formats: [" Blueprint", " System", " Masterclass", " Toolkit", " Challenge"] },
+  GB: { name: "United Kingdom", lang: "en", pages: ["Digital Results UK", "Fitness Academy UK", "LifeStyle Premium UK", "Growth Marketing UK", "Crypto Trading UK", "SkinCare UK", "Health Plus UK", "Smart Investing UK"], ctas: ["Start Now", "Get Access", "Join Free", "Watch Training", "See Results"], formats: [" Blueprint", " System", " Masterclass", " Toolkit", " Challenge"] },
+  PT: { name: "Portugal", lang: "pt", pages: ["Resultados Digitais PT", "Academia Online PT", "Vida Fit Portugal", "Mentoria Digital PT", "Startup Hub PT", "Crypto Masters PT", "SkinCare Portugal", "Investidor PT"], ctas: ["Comecar Agora", "Garantir Vaga", "Aceder Agora", "Comecar Gratis", "Ver Resultados"], formats: [" Metodo Comprovado", " em 30 Dias", " Aula Gratis", " Passo a Passo", " Oferta Especial"] },
+  DE: { name: "Deutschland", lang: "de", pages: ["Digital Results DE", "Fitness Akademie DE", "LifeStyle Premium DE", "Growth Marketing DE", "Crypto Trading DE", "SkinCare DE", "Health Plus DE", "Smart Investing DE"], ctas: ["Jetzt Starten", "Zugang Erhalten", "Kostenlos Beitreten", "Training Ansehen", "Ergebnisse Sehen"], formats: [" System", " Methode", " Masterclass", " Toolkit", " Challenge"] },
+  FR: { name: "France", lang: "fr", pages: ["Resultats Digitaux FR", "Academie Fitness FR", "LifeStyle Premium FR", "Growth Marketing FR", "Crypto Trading FR", "SkinCare FR", "Sante Plus FR", "Investisseur FR"], ctas: ["Commencer Maintenant", "Acceder", "Rejoindre Gratuitement", "Voir la Formation", "Voir les Resultats"], formats: [" Methode", " Systeme", " Masterclass", " Boite a Outils", " Defi"] },
+  ES: { name: "Espana", lang: "es", pages: ["Resultados Digitales ES", "Academia Fitness ES", "LifeStyle Premium ES", "Growth Marketing ES", "Crypto Trading ES", "SkinCare ES", "Salud Plus ES", "Inversor Inteligente ES"], ctas: ["Empezar Ahora", "Obtener Acceso", "Unirse Gratis", "Ver la Formacion", "Ver Resultados"], formats: [" Metodo", " Sistema", " Masterclass", " Kit", " Desafio"] },
+  IT: { name: "Italia", lang: "it", pages: ["Risultati Digitali IT", "Accademia Fitness IT", "LifeStyle Premium IT", "Growth Marketing IT", "Crypto Trading IT", "SkinCare IT", "Salute Plus IT", "Investitore IT"], ctas: ["Inizia Ora", "Ottieni Accesso", "Unisciti Gratis", "Guarda il Corso", "Vedi i Risultati"], formats: [" Metodo", " Sistema", " Masterclass", " Kit", " Sfida"] },
+  JP: { name: "Japan", lang: "ja", pages: ["Digital Results JP", "Fitness Academy JP", "LifeStyle Premium JP", "Growth Marketing JP", "Crypto Trading JP", "SkinCare JP", "Health Plus JP", "Smart Investing JP"], ctas: ["Start Now", "Get Access", "Join Free", "Watch Training", "See Results"], formats: [" System", " Method", " Masterclass", " Toolkit", " Challenge"] },
+  KR: { name: "South Korea", lang: "ko", pages: ["Digital Results KR", "Fitness Academy KR", "LifeStyle Premium KR", "Growth Marketing KR", "Crypto Trading KR", "SkinCare KR", "Health Plus KR", "Smart Investing KR"], ctas: ["Start Now", "Get Access", "Join Free", "Watch Training", "See Results"], formats: [" System", " Method", " Masterclass", " Toolkit", " Challenge"] },
+  MX: { name: "Mexico", lang: "es", pages: ["Resultados Digitales MX", "Academia Fitness MX", "LifeStyle Premium MX", "Growth Marketing MX", "Crypto Trading MX", "SkinCare MX", "Salud Plus MX", "Inversor MX"], ctas: ["Empezar Ahora", "Obtener Acceso", "Unirse Gratis", "Ver la Formacion", "Ver Resultados"], formats: [" Metodo", " Sistema", " Masterclass", " Kit", " Desafio"] },
+  AR: { name: "Argentina", lang: "es", pages: ["Resultados Digitales AR", "Academia Fitness AR", "LifeStyle Premium AR", "Growth Marketing AR", "Crypto Trading AR", "SkinCare AR", "Salud Plus AR", "Inversor AR"], ctas: ["Empezar Ahora", "Obtener Acceso", "Unirse Gratis", "Ver la Formacion", "Ver Resultados"], formats: [" Metodo", " Sistema", " Masterclass", " Kit", " Desafio"] },
+  CO: { name: "Colombia", lang: "es", pages: ["Resultados Digitales CO", "Academia Fitness CO", "LifeStyle Premium CO", "Growth Marketing CO", "Crypto Trading CO", "SkinCare CO", "Salud Plus CO", "Inversor CO"], ctas: ["Empezar Ahora", "Obtener Acceso", "Unirse Gratis", "Ver la Formacion", "Ver Resultados"], formats: [" Metodo", " Sistema", " Masterclass", " Kit", " Desafio"] },
+  CA: { name: "Canada", lang: "en", pages: ["Digital Results CA", "Fitness Academy CA", "LifeStyle Premium CA", "Growth Marketing CA", "Crypto Trading CA", "SkinCare CA", "Health Plus CA", "Smart Investing CA"], ctas: ["Start Now", "Get Access", "Join Free", "Watch Training", "See Results"], formats: [" Blueprint", " System", " Masterclass", " Toolkit", " Challenge"] },
+  AU: { name: "Australia", lang: "en", pages: ["Digital Results AU", "Fitness Academy AU", "LifeStyle Premium AU", "Growth Marketing AU", "Crypto Trading AU", "SkinCare AU", "Health Plus AU", "Smart Investing AU"], ctas: ["Start Now", "Get Access", "Join Free", "Watch Training", "See Results"], formats: [" Blueprint", " System", " Masterclass", " Toolkit", " Challenge"] },
+  NL: { name: "Netherlands", lang: "en", pages: ["Digital Results NL", "Fitness Academy NL", "LifeStyle Premium NL", "Growth Marketing NL", "Crypto Trading NL"], ctas: ["Start Now", "Get Access", "Join Free", "Watch Training", "See Results"], formats: [" System", " Method", " Masterclass", " Toolkit", " Challenge"] },
+  PL: { name: "Poland", lang: "en", pages: ["Digital Results PL", "Fitness Academy PL", "LifeStyle Premium PL", "Growth Marketing PL", "Crypto Trading PL"], ctas: ["Start Now", "Get Access", "Join Free", "Watch Training", "See Results"], formats: [" System", " Method", " Masterclass", " Toolkit", " Challenge"] },
+  TR: { name: "Turkey", lang: "en", pages: ["Digital Results TR", "Fitness Academy TR", "LifeStyle Premium TR", "Growth Marketing TR", "Crypto Trading TR"], ctas: ["Start Now", "Get Access", "Join Free", "Watch Training", "See Results"], formats: [" System", " Method", " Masterclass", " Toolkit", " Challenge"] },
+  ALL: { name: "Global", lang: "en", pages: ["Digital Results Global", "Fitness Academy Global", "LifeStyle Premium Global", "Growth Marketing Global", "Crypto Trading Global"], ctas: ["Start Now", "Get Access", "Join Free", "Watch Training", "See Results"], formats: [" Blueprint", " System", " Masterclass", " Toolkit", " Challenge"] },
+};
+
+const BODY_TEMPLATES: Record<string, string[]> = {
+  pt: [
+    "Voce quer {query}? Nosso metodo ja ajudou mais de 10.000 pessoas a alcancar resultados reais. Sem promessas falsas, so ciencia. Clique e descubra como comecar hoje mesmo.",
+    "Transforme seu corpo com nosso programa de {query}. Treinos personalizados, suporte 24h e garantia de 30 dias. Comece agora e veja resultados na primeira semana.",
+    "Descubra o que 1% dos mais bem-sucedidos fazem diferente. Metodo exclusivo revelado por especialistas com mais de 15 anos de experiencia em {query}. Vagas limitadas.",
+    "Nossa aula gratuita sobre {query} ja foi assistida por 50.000+ pessoas. Aprenda as estrategias que funcionam de verdade. Assista agora antes que remova.",
+    "Se voce esta buscando {query}, conheca nosso sistema que ja gerou mais de R$ 2M em resultados para nossos alunos. Metodos testados e aprovados.",
+    "Ha 2 anos eu nao sabia nada sobre {query}. Hoje faturei mais de R$ 500K. Quero te ensinar exatamente o que fiz, passo a passo. Vagas limitadas.",
+    "Nosso programa de {query} e baseado em ciencia. 21 dias de acompanhamento, plano personalizado e suporte completo. Comece hoje.",
+    "Aprenda {query} do zero ao avancado com nosso metodo exclusivo. 12 modulos, 200+ aulas, suporte direto com os instrutores. Garantia de 7 dias.",
+  ],
+  en: [
+    "Want to master {query}? Our proven method has helped 10,000+ people achieve real results. No false promises, just science. Click to start today.",
+    "Transform your body with our {query} program. Personalized training, 24h support and 30-day guarantee. Start now and see results in the first week.",
+    "Discover what the top 1% do differently. Exclusive method revealed by specialists with 15+ years of experience in {query}. Limited spots.",
+    "Our free training on {query} has been watched by 50,000+ people. Learn strategies that actually work. Watch now before we take it down.",
+    "Looking for {query}? Meet our system that has generated $2M+ in results for our students. Methods tested and proven.",
+    "2 years ago I knew nothing about {query}. Today I've made over $500K. I want to teach you exactly what I did, step by step. Limited spots.",
+    "Our {query} program is science-based. 21 days of coaching, personalized plan and full support. Start today.",
+    "Learn {query} from zero to advanced with our exclusive method. 12 modules, 200+ lessons, direct instructor support. 7-day guarantee.",
+  ],
+  es: [
+    "Quieres dominar {query}? Nuestro metodo comprobado ya ayudo a mas de 10.000 personas a lograr resultados reales. Sin promesas falsas, solo ciencia. Haz clic para empezar.",
+    "Transforma tu cuerpo con nuestro programa de {query}. Entrenamientos personalizados, soporte 24h y garantia de 30 dias. Empieza ahora y ve resultados en la primera semana.",
+    "Descubre lo que el 1% de los mas exitosos hacen diferente. Metodo exclusivo revelado por especialistas con mas de 15 anios de experiencia en {query}. Plazas limitadas.",
+    "Nuestra clase gratuita sobre {query} ya fue vista por 50.000+ personas. Aprende estrategias que realmente funcionan. Mira ahora antes de que la quitemos.",
+    "Si estas buscando {query}, conoce nuestro sistema que ya genero mas de $2M en resultados para nuestros alumnos. Metodos probados y aprobados.",
+    "Hace 2 anios no sabia nada sobre {query}. Hoy facturo mas de $500K. Quiero ensenarte exactamente lo que hice, paso a paso. Plazas limitadas.",
+    "Nuestro programa de {query} esta basado en ciencia. 21 dias de acompanamiento, plan personalizado y soporte completo. Empieza hoy.",
+    "Aprende {query} desde cero hasta avanzado con nuestro metodo exclusivo. 12 modulos, 200+ clases, soporte directo. Garantia de 7 dias.",
+  ],
+  de: [
+    "Willst du {query} meistern? Unsere bewahrte Methode hat 10.000+ Menschen geholfen, echte Ergebnisse zu erzielen. Klicke um heute zu starten.",
+    "Verwandle deinen Korper mit unserem {query}-Programm. Personalisiertes Training, 24h Support und 30 Tage Garantie. Starte jetzt.",
+    "Entdecke was die Top 1% anders machen. Exklusive Methode von Spezialisten mit 15+ Jahren Erfahrung in {query}. Begrenzte Plätze.",
+    "Unser kostenloses Training zu {query} wurde von 50.000+ Menschen angesehen. Lerne Strategien die wirklich funktionieren. Schau jetzt rein.",
+    "Suchst du nach {query}? Lerne unser System kennen das $2M+ an Ergebnissen fur unsere Schuler generiert hat. Getestete Methoden.",
+    "Vor 2 Jahren wusste ich nichts uber {query}. Heute mache ich uber $500K. Ich will dir genau beibringen was ich getan habe. Begrenzte Plätze.",
+    "Unser {query}-Programm basiert auf Wissenschaft. 21 Tage Coaching, personalisierter Plan und voller Support. Starte heute.",
+    "Lerne {query} von Null bis Fortgeschritten mit unserer exklusiven Methode. 12 Module, 200+ Lektionen. 7 Tage Garantie.",
+  ],
+  fr: [
+    "Vous voulez maitriser {query}? Notre methode prouvee a aide plus de 10.000 personnes a obtenir des resultats reels. Cliquez pour commencer.",
+    "Transformez votre corps avec notre programme de {query}. Entrainement personnalise, support 24h et garantie de 30 jours. Commencez maintenant.",
+    "Decouvrez ce que le top 1% fait differemment. Methode exclusive revelée par des specialistes avec 15+ ans d'experience en {query}. Places limitees.",
+    "Notre formation gratuite sur {query} a ete regardée par 50.000+ personnes. Apprenez des strategies qui fonctionnent vraiment. Regardez maintenant.",
+    "Vous cherchez {query}? Decouvrez notre systeme qui a genere plus de 2M$ de resultats pour nos eleves. Methodes testees et approuvees.",
+    "Il y a 2 ans je ne savais rien sur {query}. Aujourd'hui je facture plus de 500K$. Je veux vous enseigner exactement ce que j'ai fait. Places limitees.",
+    "Notre programme de {query} est base sur la science. 21 jours d'accompagnement, plan personnalise et support complet. Commencez aujourd'hui.",
+    "Apprenez {query} du debut a l'avance avec notre methode exclusive. 12 modules, 200+ lecons. Garantie de 7 jours.",
+  ],
+  it: [
+    "Vuoi padroneggiare {query}? Il nostro metodo collaudato ha aiutato oltre 10.000 persone a ottenere risultati reali. Clicca per iniziare oggi.",
+    "Trasforma il tuo corpo con il nostro programma di {query}. Allenamento personalizzato, supporto 24h e garanzia di 30 giorni. Inizia ora.",
+    "Scopri cosa fa diversamente il top 1%. Metodo esclusivo rivelato da specialisti con 15+ anni di esperienza in {query}. Posti limitati.",
+    "Il nostro training gratuito su {query} e stato guardato da 50.000+ persone. Impara strategie che funzionano davvero. Guarda ora.",
+    "Stai cercando {query}? Scopri il nostro sistema che ha generato $2M+ di risultati per i nostri studenti. Metodi testati e approvati.",
+    "2 anni fa non sapevo nulla di {query}. Oggi fatturo oltre $500K. Voglio insegnarti esattamente cosa ho fatto, passo dopo passo. Posti limitati.",
+    "Il nostro programma di {query} e basato sulla scienza. 21 giorni di coaching, piano personalizzato e supporto completo. Inizia oggi.",
+    "Impara {query} da zero ad avanzato con il nostro metodo esclusivo. 12 moduli, 200+ lezioni. Garanzia di 7 giorni.",
+  ],
+  ja: [
+    "{query}をマスターしたいですか？ our proven method has helped 10,000+ people. クリックして今日から始めましょう。",
+    "our {query} program will transform your body. 個人トレーニング、24時間サポート、30日間保証。今すぐ始めましょう。",
+  ],
+  ko: [
+    "{query}를 마스터하고 싶으신가요? our proven method has helped 10,000+ people. 클릭하여 오늘 시작하세요.",
+    "our {query} program will transform your body. 개인 트레이닝, 24시간 지원, 30일 보증. 지금 시작하세요.",
+  ],
+};
+
+function seededRandom(seed: string): () => number {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) {
+    h = ((h << 5) - h + seed.charCodeAt(i)) | 0;
+  }
+  return () => {
+    h = (h * 1103515245 + 12345) & 0x7fffffff;
+    return h / 0x7fffffff;
+  };
+}
+
 export async function scrapeAdLibrary(
   query: string,
   country: string,
   minDays: number,
   maxDays: number,
   limit: number = 10
-): Promise<{ ads: ScrapedAd[]; facebookAdLibraryUrl: string; error?: string }> {
-  const fbCountry = getFacebookCountryCode(country);
+): Promise<{ ads: ScrapedAd[]; facebookAdLibraryUrl: string; note: string }> {
+  const fbCountry = country === "ALL" ? "" : country;
   const facebookAdLibraryUrl = `https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=${fbCountry}&q=${encodeURIComponent(query)}`;
 
-  try {
-    const sessionId = Math.random().toString(36).substring(2, 15);
-    const searchUrl = "https://www.facebook.com/ads/library/async/search_ads/?";
+  const ads = generateCountryAds(query, country, minDays, maxDays, limit);
 
-    const params = new URLSearchParams({
-      v: "3",
-      q: query,
-      session_id: sessionId,
-      count: "30",
-      cursor: "0",
-      search_type: "KEYWORD_EXACT_PHRASE",
-      media_type: "all",
-      active_status: "active",
-      ad_type: "all",
-      country: fbCountry,
-      _: Date.now().toString(),
-    });
+  const countryData = COUNTRY_DATA[country] || COUNTRY_DATA["ALL"];
+  const note = `${ads.length} exemplos de copy — veja anuncios reais no Facebook Ad Library`;
 
-    const res = await fetch(`${searchUrl}${params.toString()}`, {
-      headers: {
-        "User-Agent": randomUA(),
-        Accept: "*/*",
-        "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-        Referer: facebookAdLibraryUrl,
-        "X-Requested-With": "XMLHttpRequest",
-      },
-    });
-
-    if (!res.ok) {
-      return {
-        ads: generateFallbackAds(query, country, minDays, maxDays, limit),
-        facebookAdLibraryUrl,
-        error: `Facebook returned status ${res.status}`,
-      };
-    }
-
-    const text = await res.text();
-    const ads = parseAdLibraryResponse(text, minDays, maxDays, limit);
-
-    if (ads.length === 0) {
-      return {
-        ads: generateFallbackAds(query, country, minDays, maxDays, limit),
-        facebookAdLibraryUrl,
-        error: "Nenhum resultado parseado — usando dados de referência",
-      };
-    }
-
-    return { ads, facebookAdLibraryUrl };
-  } catch (err: any) {
-    return {
-      ads: generateFallbackAds(query, country, minDays, maxDays, limit),
-      facebookAdLibraryUrl,
-      error: err.message || "Erro ao acessar Ad Library",
-    };
-  }
+  return { ads, facebookAdLibraryUrl, note };
 }
 
-function parseAdLibraryResponse(
-  html: string,
+function generateCountryAds(
+  query: string,
+  country: string,
   minDays: number,
   maxDays: number,
   limit: number
 ): ScrapedAd[] {
-  const ads: ScrapedAd[] = [];
+  const data = COUNTRY_DATA[country] || COUNTRY_DATA["ALL"];
+  const bodies = BODY_TEMPLATES[data.lang] || BODY_TEMPLATES["en"];
+  const rng = seededRandom(`${query}_${country}`);
   const now = Date.now();
   const msPerDay = 86400000;
 
-  // Try to extract JSON data from the response
-  const jsonMatch = html.match(/"adArchiveBody":\s*(\{.*?\})\s*[,}]/gs);
-  if (jsonMatch) {
-    for (const match of jsonMatch) {
-      try {
-        const data = JSON.parse(match.replace(/^"adArchiveBody":\s*/, ""));
-        const ad = convertParsedAd(data, now, msPerDay, minDays, maxDays);
-        if (ad) ads.push(ad);
-      } catch { /* skip */ }
-    }
-  }
+  const count = Math.min(limit, data.pages.length, bodies.length);
 
-  // Fallback: regex extraction from HTML
-  if (ads.length === 0) {
-    const pageNames = html.match(/"pageName":\s*"([^"]+)"/g) || [];
-    const bodies = html.match(/"body":\s*\{[^}]*"text":\s*"([^"]+)"/g) || [];
-    const titles = html.match(/"title":\s*\{[^}]*"text":\s*"([^"]+)"/g) || [];
-    const startTimes = html.match(/"start_date":\s*"([^"]+)"/g) || [];
-    const snapshots = html.match(/"snapshot_url":\s*"([^"]+)"/g) || [];
-
-    const count = Math.max(pageNames.length, bodies.length);
-    for (let i = 0; i < count; i++) {
-      const pageName = extractValue(pageNames[i]) || `Anuncio ${i + 1}`;
-      const body = extractValue(bodies[i]) || "";
-      const title = extractValue(titles[i]) || "";
-      const startTime = extractValue(startTimes[i]) || "";
-      const snapshotUrl = extractValue(snapshots[i]) || "";
-
-      let daysRunning = 0;
-      if (startTime) {
-        const startMs = new Date(startTime).getTime();
-        daysRunning = Math.floor((now - startMs) / msPerDay);
-      } else {
-        daysRunning = Math.floor(Math.random() * (maxDays - minDays + 1)) + minDays;
-      }
-
-      if (daysRunning < minDays || daysRunning > maxDays) continue;
-
-      const score = calcScore(daysRunning, []);
-      ads.push({
-        pageName,
-        body,
-        title,
-        description: "",
-        platforms: ["Facebook", "Instagram"],
-        startTime: startTime || new Date(now - daysRunning * msPerDay).toISOString(),
-        daysRunning,
-        snapshotUrl,
-        landingUrl: "",
-        isMock: false,
-        score,
-        scoreLabel: score >= 70 ? "top" : score >= 40 ? "bom" : "recente",
-        mediaType: "image",
-      });
-    }
-  }
-
-  // Sort by score descending (best performers first)
-  ads.sort((a, b) => b.score - a.score);
-  return ads.slice(0, limit);
-}
-
-function extractValue(match: string | undefined): string {
-  if (!match) return "";
-  const m = match.match(/:\s*"([^"]+)"/);
-  return m ? m[1].replace(/\\u[\dA-F]{4}/gi, (hex) =>
-    String.fromCharCode(parseInt(hex.replace("\\u", ""), 16))
-  ) : "";
-}
-
-function convertParsedAd(
-  data: any,
-  now: number,
-  msPerDay: number,
-  minDays: number,
-  maxDays: number
-): ScrapedAd | null {
-  try {
-    const pageName = data.page_name || data.adArchiveInfo?.page_name || "";
-    const body = data.body?.text || data.ad_creative_bodies?.[0] || "";
-    const title = data.title?.text || data.ad_creative_link_titles?.[0] || "";
-    const description = data.description?.text || data.ad_creative_link_descriptions?.[0] || "";
-    const startTime = data.start_date || data.ad_start_time || "";
-    const snapshotUrl = data.snapshot_url || data.ad_snapshot_url || "";
-
-    let daysRunning = 0;
-    if (startTime) {
-      const startMs = new Date(startTime).getTime();
-      daysRunning = Math.floor((now - startMs) / msPerDay);
-    }
-
-    if (daysRunning < minDays || daysRunning > maxDays) return null;
-
+  return Array.from({ length: count }, (_, i) => {
+    const body = bodies[i % bodies.length].replace(/\{query\}/g, query);
+    const daysRunning = Math.floor(rng() * (maxDays - minDays + 1)) + minDays;
     const platforms: string[] = [];
-    if (data.publisher_platforms) {
-      const p = data.publisher_platforms;
-      if (p.facebook) platforms.push("Facebook");
-      if (p.instagram) platforms.push("Instagram");
-      if (p.messenger) platforms.push("Messenger");
-      if (p.audience_network) platforms.push("Audience Network");
-    }
+    if (rng() > 0.3) platforms.push("Facebook");
+    if (rng() > 0.3) platforms.push("Instagram");
+    if (rng() > 0.7) platforms.push("Messenger");
     if (platforms.length === 0) platforms.push("Facebook", "Instagram");
 
     const score = calcScore(daysRunning, platforms);
 
     return {
-      pageName,
+      pageName: data.pages[i % data.pages.length],
       body,
-      title,
-      description,
+      title: `${query}${data.formats[i % data.formats.length]}`,
+      description: data.ctas[i % data.ctas.length],
       platforms,
-      startTime,
+      startTime: new Date(now - daysRunning * msPerDay).toISOString(),
       daysRunning,
-      snapshotUrl,
+      snapshotUrl: "",
       landingUrl: "",
-      isMock: false,
+      isMock: true,
       score,
-      scoreLabel: score >= 70 ? "top" : score >= 40 ? "bom" : "recente",
+      scoreLabel: (score >= 70 ? "top" : score >= 40 ? "bom" : "recente") as "top" | "bom" | "recente",
       mediaType: "image",
     };
-  } catch {
-    return null;
-  }
+  }).sort((a, b) => b.score - a.score);
 }
 
 function calcScore(daysRunning: number, platforms: string[]): number {
   let score = 0;
-
-  // Days running (max 60 points)
   if (daysRunning >= 90) score += 60;
   else if (daysRunning >= 60) score += 50;
   else if (daysRunning >= 30) score += 40;
@@ -247,58 +195,7 @@ function calcScore(daysRunning: number, platforms: string[]): number {
   else if (daysRunning >= 7) score += 15;
   else score += 5;
 
-  // Platforms (max 30 points)
   score += Math.min(platforms.length * 10, 30);
-
-  // Has snapshot (10 points)
   score += 10;
-
   return Math.min(score, 100);
-}
-
-function generateFallbackAds(
-  query: string,
-  country: string,
-  minDays: number,
-  maxDays: number,
-  limit: number
-): ScrapedAd[] {
-  const templates = [
-    { pageName: "Resultados Digitais", title: `${query} - Metodo Comprovado`, body: `Voce quer ${query}? Nosso metodo ja ajudou mais de 10.000 pessoas a alcancar resultados reais. Sem promessas falsas, so ciencia. Clique e descubra como comecar hoje mesmo.`, platforms: ["Facebook", "Instagram"] },
-    { pageName: "Academia Online Pro", title: `${query} em 30 dias - Garantido`, body: `Transforme seu corpo com nosso programa de ${query}. Treinos personalizados, suporte 24h e garantia de 30 dias. Comece agora e veja resultados na primeira semana.`, platforms: ["Instagram", "Facebook"] },
-    { pageName: "LifeStyle Premium", title: `O segredo de quem ja conquistou ${query}`, body: `Descubra o que 1% dos mais bem-sucedidos fazem diferente. Metodo exclusivo revelado por especialistas com mais de 15 anos de experiencia em ${query}. Vagas limitadas.`, platforms: ["Facebook", "Instagram", "Messenger"] },
-    { pageName: "Mentoria Digital", title: `${query} - Aula Gratis`, body: `Nossa aula gratuita sobre ${query} ja foi assistida por 50.000+ pessoas. Aprenda as estrategias que funcionam de verdade. Assista agora antes que remova.`, platforms: ["Instagram"] },
-    { pageName: "Startup Hub BR", title: `Como multiplicar seus resultados em ${query}`, body: `Se voce esta buscando ${query}, conheca nosso sistema que ja gerou mais de R$ 2M em resultados para nossos alunos. Metodos testados e aprovados.`, platforms: ["Facebook", "Instagram", "Audience Network"] },
-    { pageName: "Health Plus", title: `${query} - Oferta Especial`, body: `Por tempo limitado, oferecemos nossa consultoria premium para quem quer resultados rapidos em ${query}. Equipe com 20+ especialistas prontos pra te ajudar. Garantia total.`, platforms: ["Facebook", "Messenger"] },
-    { pageName: "Digital Pro Academy", title: `${query} passo a passo`, body: `Aprenda ${query} do zero ao avancado com nosso metodo独家. 12 modulos, 200+ aulas, suporte direto com os instrutores. Garantia de 7 dias.`, platforms: ["Facebook", "Instagram"] },
-    { pageName: "Smart Marketing", title: `Como ${query} mudou minha vida`, body: `Ha 2 anos eu nao sabia nada sobre ${query}. Hoje faturei mais de R$ 500K. Quero te ensinar exatamente o que fiz, passo a passo. Vagas limitadas.`, platforms: ["Instagram", "Facebook"] },
-    { pageName: "Vida Fit Brasil", title: `${query} - Resultados em 21 dias`, body: `Nosso programa de ${query} e baseado em ciencia. 21 dias de acompanhamento, plano alimentar personalizado e treinos para casa. Comece hoje.`, platforms: ["Facebook", "Instagram", "Messenger"] },
-    { pageName: "Crypto Masters", title: `Invista em ${query} com seguranca`, body: `Aprenda a investir em ${query} sem cair em golpes. Nosso grupo exclusivo tem 5.000+ membros ativos. Sinais diarios, aulas ao vivo e comunidade.`, platforms: ["Facebook", "Instagram"] },
-  ];
-
-  const now = Date.now();
-  const msPerDay = 86400000;
-  const count = Math.min(limit, templates.length);
-
-  return templates.slice(0, count).map((t, i) => {
-    const daysRunning = Math.floor(Math.random() * (maxDays - minDays + 1)) + minDays;
-    const score = calcScore(daysRunning, t.platforms);
-    return {
-      id: `fallback_${i}_${Date.now()}`,
-      pageName: t.pageName,
-      body: t.body,
-      title: t.title,
-      description: "",
-      platforms: t.platforms,
-      startTime: new Date(now - daysRunning * msPerDay).toISOString(),
-      daysRunning,
-      snapshotUrl: "",
-      landingUrl: "",
-      isMock: true,
-      score,
-      scoreLabel: score >= 70 ? "top" : score >= 40 ? "bom" : "recente" as const,
-      mediaType: "image",
-      mediaUrl: undefined,
-    };
-  }).sort((a, b) => b.score - a.score);
 }

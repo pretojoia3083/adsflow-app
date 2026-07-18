@@ -24,7 +24,6 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     ads: result.ads,
     facebookAdLibraryUrl: result.facebookAdLibraryUrl,
-    note: result.error || "Dados extraidos do Facebook Ad Library",
-    error: result.error,
+    note: result.note,
   });
 }
