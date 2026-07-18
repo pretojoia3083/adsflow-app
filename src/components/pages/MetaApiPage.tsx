@@ -40,14 +40,30 @@ export default function MetaApiPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [tokenStatus, setTokenStatus] = useState<"idle" | "valid" | "invalid" | "checking">("idle");
+  const [tokenError, setTokenError] = useState("");
 
   useEffect(() => {
     fetch("/api/meta/config")
       .then((r) => r.json())
-      .then((d) => {
+      .then(async (d) => {
         if (d.connected) {
           setConnected(true);
           setSavedAccountId(d.accountId);
+          setTokenStatus("checking");
+          try {
+            const valRes = await fetch("/api/meta/config/validate");
+            const valData = await valRes.json();
+            if (valData.valid) {
+              setTokenStatus("valid");
+            } else {
+              setTokenStatus("invalid");
+              setTokenError(valData.error || "Token invalido ou expirado");
+            }
+          } catch {
+            setTokenStatus("invalid");
+            setTokenError("Nao foi possivel validar o token");
+          }
         }
         setLoading(false);
       })
@@ -107,17 +123,26 @@ export default function MetaApiPage() {
       </div>
 
       {connected && (
-        <div style={{ background: "rgba(63,203,146,0.06)", border: "1px solid rgba(63,203,146,0.2)", borderRadius: 14, padding: 24, marginBottom: 32, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(63,203,146,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>✅</div>
-            <div>
-              <p style={{ fontWeight: 700, fontSize: 17, color: "#3FCB92", margin: 0 }}>Conta Conectada</p>
-              <p style={{ color: "#8C93B8", fontSize: 14, margin: "4px 0 0" }}>Conta: {savedAccountId}</p>
+        <div style={{ background: tokenStatus === "invalid" ? "rgba(248,113,113,0.06)" : "rgba(63,203,146,0.06)", border: `1px solid ${tokenStatus === "invalid" ? "rgba(248,113,113,0.2)" : "rgba(63,203,146,0.2)"}`, borderRadius: 14, padding: 24, marginBottom: 32 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <div style={{ width: 48, height: 48, borderRadius: 12, background: tokenStatus === "invalid" ? "rgba(248,113,113,0.15)" : "rgba(63,203,146,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>
+                {tokenStatus === "checking" ? "⏳" : tokenStatus === "invalid" ? "❌" : "✅"}
+              </div>
+              <div>
+                <p style={{ fontWeight: 700, fontSize: 17, color: tokenStatus === "invalid" ? "#F87171" : "#3FCB92", margin: 0 }}>
+                  {tokenStatus === "checking" ? "Verificando token..." : tokenStatus === "invalid" ? "Token Invalido" : "Conta Conectada"}
+                </p>
+                <p style={{ color: "#8C93B8", fontSize: 14, margin: "4px 0 0" }}>Conta: {savedAccountId}</p>
+                {tokenStatus === "invalid" && tokenError && (
+                  <p style={{ color: "#F87171", fontSize: 13, margin: "6px 0 0", lineHeight: 1.5 }}>{tokenError}. Gere um novo token no Meta for Developers e atualize abaixo.</p>
+                )}
+              </div>
             </div>
+            <button onClick={handleDisconnect} style={{ padding: "10px 20px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)", borderRadius: 10, color: "#F87171", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
+              Desconectar
+            </button>
           </div>
-          <button onClick={handleDisconnect} style={{ padding: "10px 20px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)", borderRadius: 10, color: "#F87171", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
-            Desconectar
-          </button>
         </div>
       )}
 

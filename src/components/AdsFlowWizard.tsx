@@ -165,6 +165,8 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
   const [launchResult, setLaunchResult] = useState<{ id: string; productName: string; cpmEstimate?: string } | null>(null);
   const [currentProgress, setCurrentProgress] = useState(0);
   const [intelligence, setIntelligence] = useState<Record<string, unknown> | null>(null);
+  const [publishError, setPublishError] = useState("");
+  const [publishSuccess, setPublishSuccess] = useState(false);
 
   const progressSteps = [
     { title: "Salvando campanha no banco de dados", desc: "Registrando todas as configuracoes da sua campanha..." },
@@ -312,7 +314,13 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
 
   async function handlePublish() {
     if (!launchResult?.id || launchResult.id === "local") return;
+    if (!campaignConfig.pageId) {
+      setPublishError("Selecione uma Facebook Page na etapa Config antes de publicar.");
+      return;
+    }
     setLoading(true);
+    setPublishError("");
+    setPublishSuccess(false);
     try {
       const res = await fetch("/api/meta/create-campaign", {
         method: "POST",
@@ -326,11 +334,12 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
       const data = await res.json();
       if (data.success) {
         setLaunchResult({ ...launchResult, id: data.metaCampaignId, productName: launchResult.productName });
+        setPublishSuccess(true);
       } else {
-        alert(`Erro ao publicar: ${data.error}`);
+        setPublishError(data.error || "Erro ao publicar campanha no Meta.");
       }
-    } catch (e) {
-      alert("Erro ao conectar com Meta API");
+    } catch {
+      setPublishError("Erro ao conectar com a API do Meta. Verifique sua conexao e token.");
     } finally {
       setLoading(false);
     }
@@ -1132,6 +1141,19 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
                       : "Acesse o Meta Ads Manager (business.facebook.com), crie uma campanha com o objetivo de reconhecimento, cole a copy e configure a segmentacao."}
                   </div>
                 </div>
+
+                {publishError && (
+                  <div style={{ background: "rgba(248,113,113,0.08)", borderRadius: 12, padding: 16, border: `1px solid rgba(248,113,113,0.25)`, marginTop: 12 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: "#F87171", marginBottom: 4 }}>Erro ao publicar</div>
+                    <div style={{ fontSize: 13, color: "#F87171", opacity: 0.85, lineHeight: 1.5 }}>{publishError}</div>
+                  </div>
+                )}
+
+                {publishSuccess && (
+                  <div style={{ background: "rgba(34,176,125,0.12)", borderRadius: 12, padding: 16, border: `1px solid rgba(34,176,125,0.3)`, marginTop: 12 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: "#22B07D" }}>Campanha publicada no Meta com sucesso! Verifique no Ads Manager.</div>
+                  </div>
+                )}
               </div>
             )}
 
