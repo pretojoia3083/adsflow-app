@@ -14,6 +14,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Meta API nao configurada" }, { status: 400 });
   }
 
+  let accountId = config.accountId;
+  if (!accountId.startsWith("act_")) {
+    accountId = `act_${accountId}`;
+  }
+
   const body = await req.json();
   const { campaignId, pageId, startTime, endTime } = body;
 
@@ -45,7 +50,7 @@ export async function POST(req: NextRequest) {
 
     const result = await createMetaCampaign({
       accessToken: config.accessToken,
-      accountId: config.accountId,
+      accountId,
       pageId,
       campaignName: campaign.productName,
       dailyBudget: campaign.budgetDaily || 20,

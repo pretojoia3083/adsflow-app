@@ -13,9 +13,15 @@ export async function GET() {
     return NextResponse.json({ connected: false });
   }
 
+  let accountId = config.accountId;
+  if (!accountId.startsWith("act_")) {
+    accountId = `act_${accountId}`;
+    await saveMetaConfig(session.user.id, config.accessToken, accountId);
+  }
+
   return NextResponse.json({
     connected: true,
-    accountId: config.accountId,
+    accountId,
     createdAt: config.createdAt,
   });
 }
@@ -37,9 +43,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: validation.error || "Token invalido" }, { status: 400 });
   }
 
-  await saveMetaConfig(session.user.id, accessToken, accountId);
+  let normalizedAccountId = accountId.trim();
+  if (!normalizedAccountId.startsWith("act_")) {
+    normalizedAccountId = `act_${normalizedAccountId}`;
+  }
 
-  return NextResponse.json({ success: true, connected: true, accountId });
+  await saveMetaConfig(session.user.id, accessToken, normalizedAccountId);
+
+  return NextResponse.json({ success: true, connected: true, accountId: normalizedAccountId });
 }
 
 export async function DELETE() {
