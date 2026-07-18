@@ -65,6 +65,7 @@ export default function DashboardPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   const handleStepChange = useCallback((step: number) => {
     setCurrentStep(step);
@@ -80,6 +81,10 @@ export default function DashboardPage() {
         .then((r) => r.json())
         .then((d) => { setCampaigns(Array.isArray(d) ? d : []); setLoading(false); })
         .catch(() => setLoading(false));
+      fetch("/api/user/profile")
+        .then((r) => r.json())
+        .then((d) => { if (d.user?.avatarUrl) setAvatarUrl(d.user.avatarUrl); })
+        .catch(() => {});
     }
   }, [session]);
 
@@ -110,7 +115,7 @@ export default function DashboardPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#080B14", fontFamily: "'Inter', sans-serif", display: "flex" }}>
-      <Sidebar currentPage={currentPage} onNavigate={handleNavigate} userName={session.user?.name || session.user?.email || ""} avatarUrl={(session.user as any)?.image || null} />
+      <Sidebar currentPage={currentPage} onNavigate={handleNavigate} userName={session.user?.name || session.user?.email || ""} avatarUrl={avatarUrl} />
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
         <header style={{ borderBottom: "1px solid #1A2040", padding: "14px clamp(16px, 4vw, 32px)", display: "flex", alignItems: "center", gap: 24, background: "#0C1022" }}>
