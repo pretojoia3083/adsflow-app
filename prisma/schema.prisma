@@ -13,6 +13,8 @@ model User {
   name              String?
   passwordHash      String?
   image             String?
+  avatarUrl         String?
+  agencyLogo        String?
   plan              String         @default("FREE")
   stripeCustomerId  String?        @unique
   emailVerified     DateTime?
