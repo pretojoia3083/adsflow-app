@@ -4,13 +4,14 @@ import { auth } from "@/lib/auth";
 const META_TOKEN = process.env.META_AD_LIBRARY_TOKEN || "";
 
 function generateMockAds(query: string, country: string, minDays: number, maxDays: number) {
+  const slug = query.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
   const templates = [
-    { pageName: "Resultados Digitais", title: `${query} - Metodo Comprovado`, body: `Voce quer ${query}? Nosso metodo ja ajudou mais de 10.000 pessoas a alcancar resultados reais. Sem promessas falsas, so ciencia. Clique e descubra como comecar hoje mesmo.`, description: "Garanta sua vaga com desconto especial", platforms: ["Facebook", "Instagram"], pageId: "123456789012345", adId: "23849501234567890" },
-    { pageName: "Academia Online Pro", title: `${query} em 30 dias - Garantido`, body: `Transforme seu corpo com nosso programa de ${query}. Treinos personalizados, suporte 24h e garantia de 30 dias. Comece agora e veja resultados na primeira semana.`, description: "Primeira semana gratis", platforms: ["Instagram", "Facebook"], pageId: "234567890123456", adId: "34859612345678901" },
-    { pageName: "LifeStyle Premium", title: `O segredo de quem ja conquistou ${query}`, body: `Descubra o que 1% dos mais bem-sucedidos fazem diferente. Metodo exclusivo revelado por especialistas com mais de 15 anos de experiencia em ${query}. Vagas limitadas.`, description: "Acesso imediato", platforms: ["Facebook", "Instagram", "Messenger"], pageId: "345678901234567", adId: "45869723456789012" },
-    { pageName: "Mentoria Digital", title: `${query} - Aula Gratis`, body: `Nossa aula gratuita sobre ${query} ja foi assistida por 50.000+ pessoas. Aprenda as estrategias que funcionam de verdade. Assista agora antes que remova.`, description: "Aula gratuita por tempo limitado", platforms: ["Instagram"], pageId: "456789012345678", adId: "56879834567890123" },
-    { pageName: "Startup Hub BR", title: `Como multiplicar seus resultados em ${query}`, body: `Se voce esta buscando ${query}, conheca nosso sistema que ja gerou mais de R$ 2M em resultados para nossos alunos. Metodos testados e aprovados.`, description: "Depoimentos reais no site", platforms: ["Facebook", "Instagram", "Audience Network"], pageId: "567890123456789", adId: "67890945678901234" },
-    { pageName: "Health Plus", title: `${query} - Oferta Especial`, body: `Por tempo limitado, oferecemos nossa consultoria premium para quem quer resultados rapidos em ${query}. Equipe com 20+ especialistas prontos pra te ajudar. Garantia total.`, description: "Vagas limitadas", platforms: ["Facebook", "Messenger"], pageId: "678901234567890", adId: "78901056789012345" },
+    { pageName: "Resultados Digitais", title: `${query} - Metodo Comprovado`, body: `Voce quer ${query}? Nosso metodo ja ajudou mais de 10.000 pessoas a alcancar resultados reais. Sem promessas falsas, so ciencia. Clique e descubra como comecar hoje mesmo.`, description: "Garanta sua vaga com desconto especial", platforms: ["Facebook", "Instagram"], pageId: "123456789012345", adId: "23849501234567890", landingUrl: `https://resultadosdigitais.com.br/${slug}` },
+    { pageName: "Academia Online Pro", title: `${query} em 30 dias - Garantido`, body: `Transforme seu corpo com nosso programa de ${query}. Treinos personalizados, suporte 24h e garantia de 30 dias. Comece agora e veja resultados na primeira semana.`, description: "Primeira semana gratis", platforms: ["Instagram", "Facebook"], pageId: "234567890123456", adId: "34859612345678901", landingUrl: `https://academiaonlinepro.com.br/${slug}` },
+    { pageName: "LifeStyle Premium", title: `O segredo de quem ja conquistou ${query}`, body: `Descubra o que 1% dos mais bem-sucedidos fazem diferente. Metodo exclusivo revelado por especialistas com mais de 15 anos de experiencia em ${query}. Vagas limitadas.`, description: "Acesso imediato", platforms: ["Facebook", "Instagram", "Messenger"], pageId: "345678901234567", adId: "45869723456789012", landingUrl: `https://lifestylepremium.com.br/${slug}` },
+    { pageName: "Mentoria Digital", title: `${query} - Aula Gratis`, body: `Nossa aula gratuita sobre ${query} ja foi assistida por 50.000+ pessoas. Aprenda as estrategias que funcionam de verdade. Assista agora antes que remova.`, description: "Aula gratuita por tempo limitado", platforms: ["Instagram"], pageId: "456789012345678", adId: "56879834567890123", landingUrl: `https://mentoriadigital.com.br/aula-gratuita/${slug}` },
+    { pageName: "Startup Hub BR", title: `Como multiplicar seus resultados em ${query}`, body: `Se voce esta buscando ${query}, conheca nosso sistema que ja gerou mais de R$ 2M em resultados para nossos alunos. Metodos testados e aprovados.`, description: "Depoimentos reais no site", platforms: ["Facebook", "Instagram", "Audience Network"], pageId: "567890123456789", adId: "67890945678901234", landingUrl: `https://startuphub.com.br/${slug}` },
+    { pageName: "Health Plus", title: `${query} - Oferta Especial`, body: `Por tempo limitado, oferecemos nossa consultoria premium para quem quer resultados rapidos em ${query}. Equipe com 20+ especialistas prontos pra te ajudar. Garantia total.`, description: "Vagas limitadas", platforms: ["Facebook", "Messenger"], pageId: "678901234567890", adId: "78901056789012345", landingUrl: `https://healthplus.com.br/${slug}` },
   ];
 
   const now = Date.now();
@@ -19,16 +20,15 @@ function generateMockAds(query: string, country: string, minDays: number, maxDay
 
   return templates.slice(0, count).map((t, i) => {
     const daysAgo = Math.floor(Math.random() * (maxDays - minDays + 1)) + minDays;
-    const snapshotUrl = `https://www.facebook.com/ads/library/?id=${t.adId}`;
     return {
       id: t.adId,
       pageName: t.pageName,
       body: t.body,
       title: t.title,
       description: t.description,
-      snapshotUrl,
+      snapshotUrl: t.landingUrl,
       pageId: t.pageId,
-      pageUrl: `https://www.facebook.com/${t.pageId}`,
+      pageUrl: t.landingUrl,
       startTime: new Date(now - daysAgo * msPerDay).toISOString(),
       platforms: t.platforms,
       mediaType: i % 3 === 0 ? "video" : "image",
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
   try {
     const countryMap: Record<string, string> = { BR: "BR", US: "US", PT: "PT", ALL: "" };
     const reachedCountry = countryMap[country] || "BR";
-    const fields = "id,ad_creative_bodies,ad_creative_link_titles,ad_creative_link_captions,ad_creative_link_descriptions,ad_snapshot_url,page_name,page_id,ad_start_time,ad_stop_time";
+    const fields = "id,ad_creative_bodies,ad_creative_link_titles,ad_creative_link_captions,ad_creative_link_descriptions,ad_snapshot_url,ad_creative_link_urls,page_name,page_id,ad_start_time,ad_stop_time";
     let url = `https://graph.facebook.com/v19.0/ads_archive?access_token=${META_TOKEN}&search_terms=${encodeURIComponent(q)}&fields=${fields}&ad_reached_countries=["${reachedCountry}"]&search_type=KEYWORD_EXACT_PHRASE`;
     const res = await fetch(url);
     const data = await res.json();
@@ -101,12 +101,12 @@ export async function GET(request: NextRequest) {
           body: ad.ad_creative_bodies?.[0] || "",
           title: ad.ad_creative_link_titles?.[0] || "",
           description: ad.ad_creative_link_descriptions?.[0] || "",
-          snapshotUrl: ad.ad_snapshot_url || "",
-          pageUrl: ad.page_id ? `https://www.facebook.com/${ad.page_id}` : (ad.ad_snapshot_url || ""),
+          snapshotUrl: ad.ad_creative_link_urls?.[0] || ad.ad_snapshot_url || "",
+          pageUrl: ad.ad_creative_link_urls?.[0] || (ad.page_id ? `https://www.facebook.com/${ad.page_id}` : ""),
           startTime: ad.ad_start_time || "",
           platforms: ["Facebook", "Instagram"],
           mediaType: "image",
-          mediaUrl: ad.ad_snapshot_url || undefined,
+          mediaUrl: undefined,
         };
       })
       .filter(Boolean);
