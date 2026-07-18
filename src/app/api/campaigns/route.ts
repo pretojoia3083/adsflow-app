@@ -37,6 +37,8 @@ export async function GET() {
     placements: JSON.parse(c.placements),
     deviceSplit: JSON.parse(c.deviceSplit),
     adCopy: JSON.parse(c.adCopy),
+    targetCities: c.targetCities ? JSON.parse(c.targetCities) : [],
+    targetRegions: c.targetRegions ? JSON.parse(c.targetRegions) : [],
   }));
 
   return NextResponse.json(serialized);
@@ -74,6 +76,12 @@ export async function POST(req: NextRequest) {
       deviceSplit: JSON.stringify(data.deviceSplit ?? {}),
       adCopy: JSON.stringify(data.adCopy ?? {}),
       tone: data.tone ?? null,
+      targetCities: JSON.stringify(data.targetCities ?? []),
+      targetRegions: JSON.stringify(data.targetRegions ?? []),
+      startTime: data.startTime ?? null,
+      endTime: data.endTime ?? null,
+      pageId: data.pageId ?? null,
+      creativeUrl: data.creativeUrl ?? null,
     },
   });
 
@@ -184,6 +192,10 @@ export async function PATCH(req: NextRequest) {
         deviceSplit: campaign.deviceSplit,
         adCopy: campaign.adCopy,
         tone: campaign.tone,
+        targetCities: campaign.targetCities,
+        targetRegions: campaign.targetRegions,
+        pageId: campaign.pageId,
+        creativeUrl: campaign.creativeUrl,
         status: "DRAFT",
       },
     });

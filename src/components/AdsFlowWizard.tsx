@@ -153,7 +153,14 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
     budgetDaily: 30,
     budgetPref: "medio",
     deviceSplit: "70/30",
+    pageId: "",
+    startTime: "",
+    targetCities: "",
+    targetRegions: "",
   });
+
+  const [facebookPages, setFacebookPages] = useState<{ id: string; name: string }[]>([]);
+  const [pagesLoaded, setPagesLoaded] = useState(false);
 
   const [launchResult, setLaunchResult] = useState<{ id: string; productName: string; cpmEstimate?: string } | null>(null);
   const [currentProgress, setCurrentProgress] = useState(0);
@@ -275,6 +282,10 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
           ...payload,
           affiliateLink: presell.affiliateLink,
           presellSlug: presell.slug,
+          pageId: campaignConfig.pageId,
+          startTime: campaignConfig.startTime || null,
+          targetCities: campaignConfig.targetCities ? campaignConfig.targetCities.split(",").map((c) => c.trim()).filter(Boolean) : [],
+          targetRegions: campaignConfig.targetRegions ? campaignConfig.targetRegions.split(",").map((r) => r.trim()).filter(Boolean) : [],
         }),
       });
 
@@ -294,6 +305,32 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
         productName: product.productName,
         cpmEstimate: market?.cpmEstimate || "N/A",
       });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handlePublish() {
+    if (!launchResult?.id || launchResult.id === "local") return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/meta/create-campaign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          campaignId: launchResult.id,
+          pageId: campaignConfig.pageId,
+          startTime: campaignConfig.startTime || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setLaunchResult({ ...launchResult, id: data.metaCampaignId, productName: launchResult.productName });
+      } else {
+        alert(`Erro ao publicar: ${data.error}`);
+      }
+    } catch (e) {
+      alert("Erro ao conectar com Meta API");
     } finally {
       setLoading(false);
     }
@@ -328,6 +365,21 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
       //
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchFacebookPages() {
+    if (pagesLoaded) return;
+    try {
+      const res = await fetch("/api/meta/pages");
+      const data = await res.json();
+      setFacebookPages(data.pages || []);
+      setPagesLoaded(true);
+      if (data.pages?.length > 0 && !campaignConfig.pageId) {
+        setCampaignConfig((prev) => ({ ...prev, pageId: data.pages[0].id }));
+      }
+    } catch {
+      setFacebookPages([]);
     }
   }
 
@@ -441,17 +493,20 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <div>
                   <label style={labelStyle()}>Pais</label>
-                  <input
-                    style={inputStyle()}
-                    placeholder="Ex: Brasil, Portugal, EUA..."
+                  <select
+                    style={{ ...inputStyle(), cursor: "pointer", appearance: "none" as const, backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B739E' d='M6 8L1 3h10z'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 16px center" }}
                     value={product.country}
                     onChange={(e) => {
-                      const c = e.target.value;
-                      setProduct({ ...product, country: c });
-                      const lang = detectLanguage(c);
-                      if (lang) setProduct({ ...product, country: c, language: lang });
+                      const code = e.target.value;
+                      const countryData = COUNTRIES.find((c) => c.code === code);
+                      const lang = countryData?.language || "pt";
+                      setProduct({ ...product, country: code, language: lang });
                     }}
-                  />
+                  >
+                    {COUNTRIES.map((c) => (
+                      <option key={c.code} value={c.code}>{c.flag} {c.name}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label style={labelStyle()}>Idioma</label>
@@ -820,8 +875,34 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
         {step === 6 && (
           <div>
             <h2 style={sectionTitle()}></h2>
-            <p style={sectionSub()}>Defina orcamento e formato da campanha.</p>
+            <p style={sectionSub()}>Defina orcamento, publicacao e segmentacao avancada.</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+
+              {/* Facebook Page Selector */}
+              <div>
+                <label style={labelStyle()}>Facebook Page *</label>
+                <p style={{ fontSize: 12, color: C.dim, marginBottom: 8 }}>Selecione a pagina do Facebook onde o anuncio sera publicado</p>
+                {facebookPages.length > 0 ? (
+                  <select
+                    style={{ ...inputStyle(), cursor: "pointer", appearance: "none" as const, backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B739E' d='M6 8L1 3h10z'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 16px center" }}
+                    value={campaignConfig.pageId}
+                    onChange={(e) => setCampaignConfig({ ...campaignConfig, pageId: e.target.value })}
+                  >
+                    {facebookPages.map((p) => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <button
+                    onClick={fetchFacebookPages}
+                    style={{ ...inputStyle(), cursor: "pointer", textAlign: "left" as const }}
+                  >
+                    📄 Buscar minhas paginas do Facebook...
+                  </button>
+                )}
+              </div>
+
+              {/* Orcamento */}
               <div>
                 <label style={labelStyle()}>Orcamento Diario (R$)</label>
                 <input
@@ -859,6 +940,47 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
                   })}
                 </div>
               </div>
+
+              {/* Agendamento */}
+              <div>
+                <label style={labelStyle()}>Agendar Inicio (Opcional)</label>
+                <p style={{ fontSize: 12, color: C.dim, marginBottom: 8 }}>Deixe vazio para iniciar manualmente depois de criar</p>
+                <input
+                  type="datetime-local"
+                  style={inputStyle()}
+                  value={campaignConfig.startTime}
+                  onChange={(e) => setCampaignConfig({ ...campaignConfig, startTime: e.target.value })}
+                />
+              </div>
+
+              {/* Segmentacao Avancada */}
+              <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 22 }}>
+                <h3 style={{ fontSize: 16, fontWeight: 600, color: C.text, marginBottom: 16 }}>Segmentacao Avancada</h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  <div>
+                    <label style={labelStyle()}>Cidades (opcional)</label>
+                    <input
+                      style={inputStyle()}
+                      placeholder="Ex: Sao Paulo, Rio de Janeiro, Belo Horizonte"
+                      value={campaignConfig.targetCities}
+                      onChange={(e) => setCampaignConfig({ ...campaignConfig, targetCities: e.target.value })}
+                    />
+                    <p style={{ fontSize: 11, color: C.dim, marginTop: 4 }}>Separe por virgula. Se vazio, usa o pais inteiro.</p>
+                  </div>
+                  <div>
+                    <label style={labelStyle()}>Estados/Regioes (opcional)</label>
+                    <input
+                      style={inputStyle()}
+                      placeholder="Ex: Sao Paulo, Minas Gerais, Rio de Janeiro"
+                      value={campaignConfig.targetRegions}
+                      onChange={(e) => setCampaignConfig({ ...campaignConfig, targetRegions: e.target.value })}
+                    />
+                    <p style={{ fontSize: 11, color: C.dim, marginTop: 4 }}>Separe por virgula. Funciona junto com cidades.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Split de Dispositivos */}
               <div>
                 <label style={labelStyle()}>Split de Dispositivos</label>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
@@ -893,8 +1015,12 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
                 { label: "Presell", value: presellUrl },
                 { label: "Link Afiliado", value: presell.affiliateLink || "—" },
                 { label: "Orcamento", value: `R$ ${campaignConfig.budgetDaily}/dia` },
+                { label: "Facebook Page", value: facebookPages.find((p) => p.id === campaignConfig.pageId)?.name || campaignConfig.pageId || "Nao selecionada" },
+                { label: "Agendar para", value: campaignConfig.startTime ? new Date(campaignConfig.startTime).toLocaleString("pt-BR") : "Manual" },
+                ...(campaignConfig.targetCities ? [{ label: "Cidades", value: campaignConfig.targetCities }] : []),
+                ...(campaignConfig.targetRegions ? [{ label: "Regioes", value: campaignConfig.targetRegions }] : []),
               ].map((item, i) => (
-                <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "12px 0", borderBottom: i < 9 ? `1px solid ${C.border}` : "none", gap: 16 }}>
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "12px 0", borderBottom: `1px solid ${C.border}`, gap: 16 }}>
                   <span style={{ fontSize: 14, color: C.dim, flexShrink: 0 }}>{item.label}</span>
                   <span style={{ fontSize: 14, fontWeight: 600, color: C.text, textAlign: "right", wordBreak: "break-all" }}>{item.value}</span>
                 </div>
@@ -911,7 +1037,7 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
                 {launchResult ? "✅" : "🚀"}
               </div>
               <h2 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 32, fontWeight: 700, color: C.text, marginBottom: 10 }}>
-                {launchResult ? "Campanha Criada!" : "Criando sua Campanha..."}
+                {launchResult ? (launchResult.id && launchResult.id !== "local" ? "Campanha Criada!" : "Campanha Salva!") : "Criando sua Campanha..."}
               </h2>
               <p style={{ color: C.muted, fontSize: 16, maxWidth: 540, margin: "0 auto 36px", lineHeight: 1.6 }}>
                 {launchResult ? "Tudo pronto! Veja abaixo os detalhes da sua campanha." : "Aguarde enquanto preparamos tudo para voce."}
@@ -997,9 +1123,13 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
                 </div>
 
                 <div style={{ background: "rgba(34,176,125,0.08)", borderRadius: 12, padding: 16, border: `1px solid rgba(34,176,125,0.2)` }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: C.green1, marginBottom: 6 }}>Proximo passo</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: C.green1, marginBottom: 6 }}>
+                    {launchResult.id && launchResult.id !== "local" ? "Campanha criada no banco de dados" : "Campanha salva localmente"}
+                  </div>
                   <div style={{ fontSize: 14, color: C.muted, lineHeight: 1.6 }}>
-                    Acesse o <strong style={{ color: C.text }}>Meta Ads Manager</strong> (business.facebook.com), crie uma campanha com o objetivo {targeting.funnelStage === "topo" ? "Reconhecimento" : targeting.funnelStage === "fundo" ? "Conversao" : "Consideracao"}, cole a copy, configure a segmentacao e use o link da presell como destino.
+                    {launchResult.id && launchResult.id !== "local"
+                      ? "Clique em 'Publicar no Meta' para publicar automaticamente no Facebook/Instagram, ou fechar e publicar depois."
+                      : "Acesse o Meta Ads Manager (business.facebook.com), crie uma campanha com o objetivo de reconhecimento, cole a copy e configure a segmentacao."}
                   </div>
                 </div>
               </div>
@@ -1036,7 +1166,7 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
             &#8592; Voltar
           </button>
           <button
-            onClick={step === STEP_NAMES.length - 1 ? handleLaunch : step === 8 ? () => onClose?.() : next}
+            onClick={step === STEP_NAMES.length - 1 ? handleLaunch : step === 8 ? handlePublish : next}
             disabled={loading || (step === 1 && !product.productName)}
             style={{
               padding: "14px 36px",
@@ -1061,7 +1191,7 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
             ) : step === 7 ? (
               "Criar Campanha"
             ) : step === 8 ? (
-              "Publicar"
+              launchResult?.id && launchResult.id !== "local" ? "Publicar no Meta" : "Fechar"
             ) : (
               "Proximo"
             )}

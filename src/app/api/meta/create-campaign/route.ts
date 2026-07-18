@@ -14,7 +14,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Meta API nao configurada" }, { status: 400 });
   }
 
-  const { campaignId } = await req.json();
+  const body = await req.json();
+  const { campaignId, pageId, startTime, endTime } = body;
+
+  if (!campaignId) {
+    return NextResponse.json({ error: "campaignId obrigatorio" }, { status: 400 });
+  }
 
   const campaign = await prisma.campaign.findFirst({
     where: { id: campaignId, userId: session.user.id },
@@ -27,30 +32,44 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Campanha ja publicada no Meta", metaCampaignId: campaign.metaCampaignId }, { status: 400 });
   }
 
-  try {
-    const adCopy = JSON.parse(campaign.adCopy);
-    const interests = JSON.parse(campaign.interests);
-    const placements = JSON.parse(campaign.placements);
+  if (!pageId) {
+    return NextResponse.json({ error: "pageId obrigatorio - selecione uma Facebook Page" }, { status: 400 });
+  }
 
-    const result = await createMetaCampaign(
-      config.accessToken,
-      config.accountId,
-      campaign.productName,
-      campaign.budgetDaily || 20,
-      campaign.countryCode || "BR",
+  try {
+    const adCopy = JSON.parse(campaign.adCopy || "{}");
+    const interests = JSON.parse(campaign.interests || "[]");
+    const placements = JSON.parse(campaign.placements || "[]");
+    const targetCities = campaign.targetCities ? JSON.parse(campaign.targetCities) : [];
+    const targetRegions = campaign.targetRegions ? JSON.parse(campaign.targetRegions) : [];
+
+    const result = await createMetaCampaign({
+      accessToken: config.accessToken,
+      accountId: config.accountId,
+      pageId,
+      campaignName: campaign.productName,
+      dailyBudget: campaign.budgetDaily || 20,
+      country: campaign.countryCode || "BR",
+      cities: targetCities,
+      regions: targetRegions,
       interests,
       placements,
-      {
-        headline: campaign.productName,
-        primaryText: adCopy.headline || adCopy.primaryText || "",
+      adCopy: {
+        headline: adCopy.headline || campaign.productName,
+        primaryText: adCopy.primaryText || adCopy.headline || "",
         description: adCopy.description || "",
         cta: campaign.affiliateLink || campaign.affLink || "",
-      }
-    );
+      },
+      creativeUrl: campaign.creativeUrl || undefined,
+      funnelStage: campaign.funnelStage || "topo",
+      startTime: startTime || undefined,
+      endTime: endTime || undefined,
+      status: startTime ? "SCHEDULED" : "PAUSED",
+    });
 
     await prisma.campaign.update({
       where: { id: campaignId },
-      data: { metaCampaignId: result.id, status: "ACTIVE" },
+      data: { metaCampaignId: result.id, status: startTime ? "SCHEDULED" : "ACTIVE" },
     });
 
     return NextResponse.json({ success: true, metaCampaignId: result.id, name: result.name, status: result.status });
