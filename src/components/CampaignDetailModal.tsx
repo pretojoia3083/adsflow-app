@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface CampaignDetail {
   id: string;
@@ -86,6 +86,8 @@ export default function CampaignDetailModal({ campaign, onClose, onSaved }: Prop
   const [publishResult, setPublishResult] = useState("");
   const [actionLoading, setActionLoading] = useState("");
   const [adsManagerUrl, setAdsManagerUrl] = useState("");
+  const [facebookPages, setFacebookPages] = useState<{ id: string; name: string }[]>([]);
+  const [selectedPageId, setSelectedPageId] = useState(campaign.pageId || "");
   const [form, setForm] = useState({
     productName: campaign.productName,
     description: campaign.description || "",
@@ -109,6 +111,13 @@ export default function CampaignDetailModal({ campaign, onClose, onSaved }: Prop
     presellSlug: campaign.presellSlug || "",
     status: campaign.status,
   });
+
+  useEffect(() => {
+    fetch("/api/meta/pages")
+      .then((r) => r.json())
+      .then((d) => { if (d.pages?.length > 0) setFacebookPages(d.pages); })
+      .catch(() => {});
+  }, []);
 
   async function handleSave() {
     setSaving(true);
@@ -148,8 +157,9 @@ export default function CampaignDetailModal({ campaign, onClose, onSaved }: Prop
   }
 
   async function handlePublishToMeta() {
-    if (!campaign.pageId) {
-      setPublishResult("Erro: selecione uma Facebook Page na configuracao Meta antes de publicar.");
+    const pageIdToUse = selectedPageId || campaign.pageId;
+    if (!pageIdToUse) {
+      setPublishResult("Erro: selecione uma Facebook Page antes de publicar.");
       return;
     }
     if (campaign.metaCampaignId) {
@@ -162,7 +172,7 @@ export default function CampaignDetailModal({ campaign, onClose, onSaved }: Prop
       const res = await fetch("/api/meta/create-campaign", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ campaignId: campaign.id, pageId: campaign.pageId }),
+        body: JSON.stringify({ campaignId: campaign.id, pageId: pageIdToUse }),
       });
       const data = await res.json();
       if (data.success) {
@@ -475,6 +485,21 @@ export default function CampaignDetailModal({ campaign, onClose, onSaved }: Prop
 
               {/* Actions */}
               <Section title="Acoes">
+                {!campaign.metaCampaignId && !selectedPageId && facebookPages.length > 0 && (
+                  <div style={{ marginBottom: 10 }}>
+                    <label style={{ fontSize: 13, fontWeight: 600, color: DIM, display: "block", marginBottom: 4 }}>Selecione a Facebook Page:</label>
+                    <select
+                      value={selectedPageId}
+                      onChange={(e) => setSelectedPageId(e.target.value)}
+                      style={{ width: "100%", padding: "10px 14px", background: "#0C1022", border: `1px solid ${BORDER}`, borderRadius: 8, color: TEXT, fontSize: 14, outline: "none" }}
+                    >
+                      <option value="">Selecione uma Page...</option>
+                      {facebookPages.map((p) => (
+                        <option key={p.id} value={p.id}>{p.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 8 }}>
                   {!campaign.metaCampaignId && (
                     <button
