@@ -167,6 +167,7 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
   const [intelligence, setIntelligence] = useState<Record<string, unknown> | null>(null);
   const [publishError, setPublishError] = useState("");
   const [publishSuccess, setPublishSuccess] = useState(false);
+  const [adsManagerUrl, setAdsManagerUrl] = useState("");
 
   const progressSteps = [
     { title: "Salvando campanha no banco de dados", desc: "Registrando todas as configuracoes da sua campanha..." },
@@ -334,7 +335,13 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
       const data = await res.json();
       if (data.success) {
         setLaunchResult({ ...launchResult, id: data.metaCampaignId, productName: launchResult.productName });
-        setPublishSuccess(true);
+        if (data.partial) {
+          setPublishError("");
+          setPublishSuccess(true);
+          setAdsManagerUrl(data.adsManagerUrl);
+        } else {
+          setPublishSuccess(true);
+        }
       } else {
         setPublishError(data.error || "Erro ao publicar campanha no Meta.");
       }
@@ -1152,7 +1159,19 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
 
                 {publishSuccess && (
                   <div style={{ background: "rgba(34,176,125,0.12)", borderRadius: 12, padding: 16, border: `1px solid rgba(34,176,125,0.3)`, marginTop: 12 }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: "#22B07D" }}>Campanha publicada no Meta com sucesso! Verifique no Ads Manager.</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: "#22B07D" }}>
+                      {adsManagerUrl
+                        ? "Campanha e AdSet criados no Meta!"
+                        : "Campanha publicada no Meta com sucesso!"}
+                    </div>
+                    {adsManagerUrl && (
+                      <div style={{ fontSize: 13, color: "#8C93B8", marginTop: 6, lineHeight: 1.5 }}>
+                        Finalize o criativo (anuncio visual) no Ads Manager:
+                        <a href={adsManagerUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", marginLeft: 8, padding: "6px 14px", background: "#22B07D", color: "#fff", borderRadius: 8, textDecoration: "none", fontWeight: 600, fontSize: 13 }}>
+                          Abrir Ads Manager
+                        </a>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

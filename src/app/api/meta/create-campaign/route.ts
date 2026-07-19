@@ -77,6 +77,17 @@ export async function POST(req: NextRequest) {
       data: { metaCampaignId: result.id, status: "ACTIVE" },
     });
 
+    if (result.partial) {
+      return NextResponse.json({
+        success: true,
+        partial: true,
+        metaCampaignId: result.id,
+        adSetId: result.adSetId,
+        adsManagerUrl: result.adsManagerUrl,
+        message: result.message,
+      });
+    }
+
     return NextResponse.json({ success: true, metaCampaignId: result.id, name: result.name, status: result.status });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Erro ao criar campanha no Meta";

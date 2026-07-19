@@ -165,7 +165,12 @@ export default function CampaignDetailModal({ campaign, onClose, onSaved }: Prop
       });
       const data = await res.json();
       if (data.success) {
-        setPublishResult("Campanha publicada no Meta com sucesso!");
+        if (data.partial) {
+          setPublishResult(`✅ ${data.message} Clique abaixo para finalizar.`);
+          setAdsManagerUrl(data.adsManagerUrl || "");
+        } else {
+          setPublishResult("Campanha publicada no Meta com sucesso!");
+        }
         onSaved({ ...campaign, metaCampaignId: data.metaCampaignId, status: "ACTIVE" } as CampaignDetail);
       } else {
         setPublishResult(`Erro: ${data.error}`);

@@ -286,7 +286,20 @@ export async function createMetaCampaign(
     }),
   });
   const creativeData = await creativeRes.json();
-  if (creativeData.error) throw new Error(`Erro ao criar Criativo: ${creativeData.error.error_user_msg || creativeData.error.message}`);
+
+  if (creativeData.error) {
+    const adsManagerUrl = `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${accountId.replace("act_", "")}&selected_campaign_ids=${metaCampaignId}`;
+    return {
+      id: metaCampaignId,
+      name: campaignName,
+      status: campaignStatus,
+      metaCampaignId,
+      adSetId: adSetData.id,
+      partial: true,
+      adsManagerUrl,
+      message: "Campanha e AdSet criados no Meta. Finalize o criativo no Ads Manager.",
+    };
+  }
 
   const adRes = await fetch(`${META_BASE_URL}/${accountId}/ads`, {
     method: "POST",
@@ -300,7 +313,20 @@ export async function createMetaCampaign(
     }),
   });
   const adData = await adRes.json();
-  if (adData.error) throw new Error(`Erro ao criar Ad: ${adData.error.error_user_msg || adData.error.message}`);
+  if (adData.error) {
+    const adsManagerUrl = `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${accountId.replace("act_", "")}&selected_campaign_ids=${metaCampaignId}`;
+    return {
+      id: metaCampaignId,
+      name: campaignName,
+      status: campaignStatus,
+      metaCampaignId,
+      adSetId: adSetData.id,
+      creativeId: creativeData.id,
+      partial: true,
+      adsManagerUrl,
+      message: "Campanha, AdSet e Criativo criados. Finalize o anuncio no Ads Manager.",
+    };
+  }
 
   return { id: metaCampaignId, name: campaignName, status: campaignStatus, metaCampaignId };
 }
