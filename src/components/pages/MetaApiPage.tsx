@@ -42,6 +42,9 @@ export default function MetaApiPage() {
   const [loading, setLoading] = useState(true);
   const [tokenStatus, setTokenStatus] = useState<"idle" | "valid" | "invalid" | "checking">("idle");
   const [tokenError, setTokenError] = useState("");
+  const [adAccounts, setAdAccounts] = useState<{ id: string; name: string; account_status: number; currency: string }[]>([]);
+  const [fetchingAccounts, setFetchingAccounts] = useState(false);
+  const [fetchDone, setFetchDone] = useState(false);
 
   useEffect(() => {
     fetch("/api/meta/config")
@@ -105,6 +108,38 @@ export default function MetaApiPage() {
     await fetch("/api/meta/config", { method: "DELETE" });
     setConnected(false);
     setSavedAccountId("");
+    setTokenStatus("idle");
+  }
+
+  async function fetchAdAccounts() {
+    if (!token) {
+      setError("Cole o token primeiro");
+      return;
+    }
+    setFetchingAccounts(true);
+    setError("");
+    setAdAccounts([]);
+    setFetchDone(false);
+    try {
+      const res = await fetch("/api/meta/ad-accounts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accessToken: token }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Erro ao buscar contas");
+      } else {
+        setAdAccounts(data.accounts || []);
+        setFetchDone(true);
+        if (data.accounts?.length > 0) {
+          setAccountId(data.accounts[0].id);
+        }
+      }
+    } catch {
+      setError("Erro ao conectar com Meta API");
+    }
+    setFetchingAccounts(false);
   }
 
   if (loading) {
@@ -188,7 +223,40 @@ export default function MetaApiPage() {
               onChange={(e) => setToken(e.target.value)}
               style={{ width: "100%", padding: "13px 16px", background: "#0C1022", border: "1px solid #232C52", borderRadius: 10, color: "#F3F5FF", fontSize: 14, fontFamily: "monospace", outline: "none", boxSizing: "border-box" as const }}
             />
+            <button
+              onClick={fetchAdAccounts}
+              disabled={fetchingAccounts}
+              style={{ marginTop: 8, padding: "8px 16px", background: "rgba(96,165,250,0.12)", border: "1px solid rgba(96,165,250,0.25)", borderRadius: 8, color: "#60A5FA", fontSize: 13, fontWeight: 600, cursor: fetchingAccounts ? "wait" : "pointer" }}
+            >
+              {fetchingAccounts ? "Buscando contas..." : "🔍 Detectar minhas contas automaticamente"}
+            </button>
           </div>
+
+          {adAccounts.length > 0 && (
+            <div style={{ padding: 16, background: "rgba(96,165,250,0.06)", border: "1px solid rgba(96,165,250,0.15)", borderRadius: 10 }}>
+              <label style={{ display: "block", fontSize: 14, fontWeight: 500, color: "#A0A8CE", marginBottom: 8 }}>Contas de anuncios encontradas:</label>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {adAccounts.map((acc) => (
+                  <label key={acc.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: accountId === acc.id ? "rgba(34,176,125,0.08)" : "#0C1022", border: `1px solid ${accountId === acc.id ? "rgba(34,176,125,0.3)" : "#232C52"}`, borderRadius: 8, cursor: "pointer", transition: "all 0.15s" }}>
+                    <input type="radio" name="adAccount" checked={accountId === acc.id} onChange={() => setAccountId(acc.id)} style={{ accentColor: "#22B07D" }} />
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: "#F3F5FF" }}>{acc.name}</div>
+                      <div style={{ fontSize: 12, color: "#8C93B8", marginTop: 2 }}>ID: {acc.id} · Moeda: {acc.currency} · Status: {acc.account_status === 1 ? "Ativa" : `Codigo ${acc.account_status}`}</div>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {fetchDone && adAccounts.length === 0 && (
+            <div style={{ padding: 14, background: "rgba(248,113,113,0.06)", border: "1px solid rgba(248,113,113,0.15)", borderRadius: 10 }}>
+              <div style={{ fontSize: 14, color: "#F87171", fontWeight: 600, marginBottom: 4 }}>Nenhuma conta encontrada</div>
+              <div style={{ fontSize: 13, color: "#F87171", opacity: 0.8, lineHeight: 1.5 }}>
+                Verifique se: (1) O token tem permissoes ads_management, (2) O app esta em modo Live, (3) Sua conta de anuncios esta associada ao app em business.facebook.com.
+              </div>
+            </div>
+          )}
 
           <div>
             <label style={{ display: "block", fontSize: 14, fontWeight: 500, color: "#A0A8CE", marginBottom: 6 }}>ID da Conta de Anuncios</label>
