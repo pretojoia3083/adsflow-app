@@ -224,7 +224,22 @@ export async function createMetaCampaign(
   }
 
   if (interests.length > 0) {
-    targeting.detailed_targeting = interests.slice(0, 25).map((i) => ({ name: i }));
+    const resolvedInterests: { id: string; name: string }[] = [];
+    for (const interestName of interests.slice(0, 25)) {
+      try {
+        const searchUrl = `${META_BASE_URL}/${accountId}/targetingsearch?q=${encodeURIComponent(interestName)}&type=adinterest&limit=1&access_token=${accessToken}`;
+        const searchRes = await fetch(searchUrl);
+        const searchData = await searchRes.json();
+        if (searchData.data?.length > 0 && searchData.data[0].id) {
+          resolvedInterests.push({ id: searchData.data[0].id, name: searchData.data[0].name });
+        }
+      } catch {
+        // Skip unresolved interests
+      }
+    }
+    if (resolvedInterests.length > 0) {
+      targeting.flexible_spec = [{ interests: resolvedInterests }];
+    }
   }
 
   const adSetBody: Record<string, unknown> = {
