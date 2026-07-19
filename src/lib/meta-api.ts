@@ -227,11 +227,14 @@ export async function createMetaCampaign(
     const resolvedInterests: { id: string; name: string }[] = [];
     for (const interestName of interests.slice(0, 25)) {
       try {
-        const searchUrl = `${META_BASE_URL}/${accountId}/targetingsearch?q=${encodeURIComponent(interestName)}&type=adinterest&limit=1&access_token=${accessToken}`;
+        const searchUrl = `${META_BASE_URL}/${accountId}/targetingsearch?q=${encodeURIComponent(interestName)}&type=adinterest&limit=5&access_token=${accessToken}`;
         const searchRes = await fetch(searchUrl);
         const searchData = await searchRes.json();
-        if (searchData.data?.length > 0 && searchData.data[0].id) {
-          resolvedInterests.push({ id: searchData.data[0].id, name: searchData.data[0].name });
+        if (searchData.data?.length > 0) {
+          const match = searchData.data.find((d: { type: string; id: string }) => d.type === "interests");
+          if (match) {
+            resolvedInterests.push({ id: match.id, name: match.name });
+          }
         }
       } catch {
         // Skip unresolved interests
