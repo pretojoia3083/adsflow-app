@@ -123,10 +123,11 @@ export default function DashboardPage() {
     }
   }, [currentPage]);
 
-  async function handleDeleteCampaign(id: string) {
+  async function handleDeleteCampaign(id: string, metaCampaignId?: string | null) {
     setDeletingId(id);
     try {
-      await fetch(`/api/campaigns?id=${id}`, { method: "DELETE" });
+      const params = metaCampaignId ? `?id=${id}&deleteMeta=true` : `?id=${id}`;
+      await fetch(`/api/campaigns${params}`, { method: "DELETE" });
       setCampaigns((prev) => prev.filter((c) => c.id !== id));
     } catch {}
     setDeletingId(null);
@@ -240,7 +241,7 @@ export default function DashboardPage() {
                               Ver
                             </button>
                             <button
-                              onClick={(e) => { e.stopPropagation(); if (confirm(`Excluir "${c.productName}"?`)) handleDeleteCampaign(c.id); }}
+                              onClick={(e) => { e.stopPropagation(); if (confirm(`Excluir "${c.productName}"?${c.metaCampaignId ? " A campanha sera removida do Meta tambem." : ""}`)) handleDeleteCampaign(c.id, c.metaCampaignId); }}
                               disabled={deletingId === c.id}
                               title="Excluir campanha"
                               style={{ padding: "6px 10px", background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: 8, color: "#F87171", fontSize: 14, cursor: deletingId === c.id ? "wait" : "pointer" }}

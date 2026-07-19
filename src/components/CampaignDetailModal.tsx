@@ -85,6 +85,7 @@ export default function CampaignDetailModal({ campaign, onClose, onSaved }: Prop
   const [publishing, setPublishing] = useState(false);
   const [publishResult, setPublishResult] = useState("");
   const [actionLoading, setActionLoading] = useState("");
+  const [adsManagerUrl, setAdsManagerUrl] = useState("");
   const [form, setForm] = useState({
     productName: campaign.productName,
     description: campaign.description || "",
@@ -507,8 +508,13 @@ export default function CampaignDetailModal({ campaign, onClose, onSaved }: Prop
                   </button>
                 </div>
                 {publishResult && (
-                  <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600, background: publishResult.includes("sucesso") ? "rgba(34,176,125,0.1)" : "rgba(248,113,113,0.08)", color: publishResult.includes("sucesso") ? GREEN2 : "#F87171", border: `1px solid ${publishResult.includes("sucesso") ? "rgba(34,176,125,0.25)" : "rgba(248,113,113,0.2)"}` }}>
+                  <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600, background: publishResult.includes("sucesso") || publishResult.includes("Campanha") ? "rgba(34,176,125,0.1)" : "rgba(248,113,113,0.08)", color: publishResult.includes("sucesso") || publishResult.includes("Campanha") ? GREEN2 : "#F87171", border: `1px solid ${publishResult.includes("sucesso") || publishResult.includes("Campanha") ? "rgba(34,176,125,0.25)" : "rgba(248,113,113,0.2)"}` }}>
                     {publishResult}
+                    {adsManagerUrl && (
+                      <a href={adsManagerUrl} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", marginTop: 8, padding: "8px 16px", background: GREEN1, color: "#fff", borderRadius: 8, textDecoration: "none", fontWeight: 600, fontSize: 13 }}>
+                        Abrir no Ads Manager
+                      </a>
+                    )}
                   </div>
                 )}
               </Section>
