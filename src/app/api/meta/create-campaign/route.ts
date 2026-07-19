@@ -69,12 +69,12 @@ export async function POST(req: NextRequest) {
       funnelStage: campaign.funnelStage || "topo",
       startTime: startTime || undefined,
       endTime: endTime || undefined,
-      status: startTime ? "SCHEDULED" : "PAUSED",
+      status: startTime ? "PAUSED" : "PAUSED",
     });
 
     await prisma.campaign.update({
       where: { id: campaignId },
-      data: { metaCampaignId: result.id, status: startTime ? "SCHEDULED" : "ACTIVE" },
+      data: { metaCampaignId: result.id, status: "ACTIVE" },
     });
 
     return NextResponse.json({ success: true, metaCampaignId: result.id, name: result.name, status: result.status });
