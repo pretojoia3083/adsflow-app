@@ -203,16 +203,10 @@ export async function createMetaCampaign(
     body: JSON.stringify(campaignBody),
   });
   const campaignData = await campaignRes.json();
-  if (campaignData.error) throw new Error(campaignData.error.message);
+  if (campaignData.error) throw new Error(`Erro ao criar campanha: ${campaignData.error.message}`);
   const metaCampaignId = campaignData.id;
 
   const geoLocations: Record<string, unknown> = { countries: [country] };
-  if (cities && cities.length > 0) {
-    geoLocations.cities = cities.map((c) => ({ name: c, country }));
-  }
-  if (regions && regions.length > 0) {
-    geoLocations.regions = regions.map((r) => ({ name: r, country }));
-  }
 
   const { platforms, facebookPositions, instagramPositions } = mapPlacements(placements);
 
@@ -229,15 +223,13 @@ export async function createMetaCampaign(
   }
 
   if (interests.length > 0) {
-    targeting.detailed_targeting = {
-      interests: interests.map((i) => ({ name: i })),
-    };
+    targeting.detailed_targeting = interests.slice(0, 25).map((i) => ({ name: i }));
   }
 
   const adSetBody: Record<string, unknown> = {
     name: `${campaignName} - AdSet`,
     campaign_id: metaCampaignId,
-    daily_budget: Math.round(dailyBudget * 100),
+    daily_budget: Math.max(Math.round(dailyBudget * 100), 100),
     billing_event: "IMPRESSIONS",
     optimization_goal: "LINK_CLICKS",
     bid_strategy: "LOWEST_COST_WITHOUT_CAP",
@@ -255,14 +247,14 @@ export async function createMetaCampaign(
     body: JSON.stringify(adSetBody),
   });
   const adSetData = await adSetRes.json();
-  if (adSetData.error) throw new Error(adSetData.error.message);
+  if (adSetData.error) throw new Error(`Erro ao criar AdSet: ${adSetData.error.error_user_msg || adSetData.error.message}`);
 
   const linkData: Record<string, string> = {
     link: adCopy.cta || "https://example.com",
-    message: adCopy.primaryText || "",
+    message: adCopy.primaryText || campaignName,
     name: adCopy.headline || campaignName,
-    description: adCopy.description || "",
   };
+  if (adCopy.description) linkData.description = adCopy.description;
   if (creativeUrl) linkData.image_url = creativeUrl;
 
   const creativeRes = await fetch(`${META_BASE_URL}/${accountId}/adcreatives`, {
@@ -278,7 +270,7 @@ export async function createMetaCampaign(
     }),
   });
   const creativeData = await creativeRes.json();
-  if (creativeData.error) throw new Error(creativeData.error.message);
+  if (creativeData.error) throw new Error(`Erro ao criar Criativo: ${creativeData.error.error_user_msg || creativeData.error.message}`);
 
   const adRes = await fetch(`${META_BASE_URL}/${accountId}/ads`, {
     method: "POST",
@@ -292,7 +284,7 @@ export async function createMetaCampaign(
     }),
   });
   const adData = await adRes.json();
-  if (adData.error) throw new Error(adData.error.message);
+  if (adData.error) throw new Error(`Erro ao criar Ad: ${adData.error.error_user_msg || adData.error.message}`);
 
   return { id: metaCampaignId, name: campaignName, status: campaignStatus, metaCampaignId };
 }
