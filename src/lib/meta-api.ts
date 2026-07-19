@@ -259,6 +259,7 @@ export async function createMetaCampaign(
     daily_budget: Math.max(Math.round(dailyBudget * 100), 100),
     billing_event: "IMPRESSIONS",
     optimization_goal: optimizationGoal,
+    bid_strategy: "LOWEST_COST_WITHOUT_CAP",
     targeting,
     status: campaignStatus,
     access_token: accessToken,
