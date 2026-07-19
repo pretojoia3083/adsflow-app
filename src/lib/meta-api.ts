@@ -252,6 +252,7 @@ export async function createMetaCampaign(
     billing_event: "IMPRESSIONS",
     optimization_goal: "LINK_CLICKS",
     bid_strategy: "LOWEST_COST_WITHOUT_CAP",
+    promoted_object: { page_id: pageId },
     targeting,
     status: campaignStatus,
     access_token: accessToken,
