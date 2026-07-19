@@ -82,6 +82,9 @@ export default function CampaignDetailModal({ campaign, onClose, onSaved }: Prop
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [publishResult, setPublishResult] = useState("");
+  const [actionLoading, setActionLoading] = useState("");
   const [form, setForm] = useState({
     productName: campaign.productName,
     description: campaign.description || "",
@@ -141,6 +144,80 @@ export default function CampaignDetailModal({ campaign, onClose, onSaved }: Prop
       }
     } catch {}
     setSaving(false);
+  }
+
+  async function handlePublishToMeta() {
+    if (!campaign.pageId) {
+      setPublishResult("Erro: selecione uma Facebook Page na configuracao Meta antes de publicar.");
+      return;
+    }
+    if (campaign.metaCampaignId) {
+      setPublishResult("Esta campanha ja foi publicada no Meta.");
+      return;
+    }
+    setPublishing(true);
+    setPublishResult("");
+    try {
+      const res = await fetch("/api/meta/create-campaign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ campaignId: campaign.id, pageId: campaign.pageId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPublishResult("Campanha publicada no Meta com sucesso!");
+        onSaved({ ...campaign, metaCampaignId: data.metaCampaignId, status: "ACTIVE" } as CampaignDetail);
+      } else {
+        setPublishResult(`Erro: ${data.error}`);
+      }
+    } catch {
+      setPublishResult("Erro ao conectar com a API do Meta.");
+    }
+    setPublishing(false);
+  }
+
+  async function handleToggleStatus() {
+    const action = campaign.status === "ACTIVE" || campaign.status === "READY" ? "pause" : "resume";
+    setActionLoading("status");
+    try {
+      const res = await fetch("/api/campaigns", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: campaign.id, action }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const newStatus = action === "pause" ? "PAUSED" : "ACTIVE";
+        onSaved({ ...campaign, status: newStatus } as CampaignDetail);
+      }
+    } catch {}
+    setActionLoading("");
+  }
+
+  async function handleDuplicate() {
+    setActionLoading("duplicate");
+    try {
+      const res = await fetch("/api/campaigns", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: campaign.id, action: "duplicate" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        onSaved({ ...campaign } as CampaignDetail);
+      }
+    } catch {}
+    setActionLoading("");
+  }
+
+  async function handleDelete() {
+    if (!confirm(`Excluir "${campaign.productName}" permanentemente?`)) return;
+    setActionLoading("delete");
+    try {
+      await fetch(`/api/campaigns?id=${campaign.id}`, { method: "DELETE" });
+      onSaved({ ...campaign, id: "__deleted__" } as CampaignDetail);
+    } catch {}
+    setActionLoading("");
   }
 
   const adCopy = campaign.adCopy || {};
@@ -389,6 +466,47 @@ export default function CampaignDetailModal({ campaign, onClose, onSaved }: Prop
                   </div>
                 </Section>
               )}
+
+              {/* Actions */}
+              <Section title="Acoes">
+                <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 8 }}>
+                  {!campaign.metaCampaignId && (
+                    <button
+                      onClick={handlePublishToMeta}
+                      disabled={publishing}
+                      style={{ padding: "10px 18px", background: publishing ? "#1a7a55" : `linear-gradient(90deg,${GREEN1},${GREEN2})`, color: BG, border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: publishing ? "wait" : "pointer" }}
+                    >
+                      {publishing ? "⏳ Publicando..." : "🚀 Publicar no Meta"}
+                    </button>
+                  )}
+                  <button
+                    onClick={handleToggleStatus}
+                    disabled={actionLoading === "status"}
+                    style={{ padding: "10px 18px", background: "rgba(96,165,250,0.12)", border: "1px solid rgba(96,165,250,0.25)", borderRadius: 8, color: "#60A5FA", fontSize: 13, fontWeight: 600, cursor: actionLoading === "status" ? "wait" : "pointer" }}
+                  >
+                    {actionLoading === "status" ? "..." : campaign.status === "ACTIVE" ? "⏸ Pausar" : "▶ Ativar"}
+                  </button>
+                  <button
+                    onClick={handleDuplicate}
+                    disabled={actionLoading === "duplicate"}
+                    style={{ padding: "10px 18px", background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.25)", borderRadius: 8, color: "#A78BFA", fontSize: 13, fontWeight: 600, cursor: actionLoading === "duplicate" ? "wait" : "pointer" }}
+                  >
+                    {actionLoading === "duplicate" ? "..." : "📋 Duplicar"}
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    disabled={actionLoading === "delete"}
+                    style={{ padding: "10px 18px", background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: 8, color: "#F87171", fontSize: 13, fontWeight: 600, cursor: actionLoading === "delete" ? "wait" : "pointer" }}
+                  >
+                    {actionLoading === "delete" ? "..." : "🗑 Excluir"}
+                  </button>
+                </div>
+                {publishResult && (
+                  <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 8, fontSize: 13, fontWeight: 600, background: publishResult.includes("sucesso") ? "rgba(34,176,125,0.1)" : "rgba(248,113,113,0.08)", color: publishResult.includes("sucesso") ? GREEN2 : "#F87171", border: `1px solid ${publishResult.includes("sucesso") ? "rgba(34,176,125,0.25)" : "rgba(248,113,113,0.2)"}` }}>
+                    {publishResult}
+                  </div>
+                )}
+              </Section>
             </>
           )}
 
