@@ -245,14 +245,20 @@ export async function createMetaCampaign(
     }
   }
 
+  const optGoalMap: Record<string, string> = {
+    OUTCOME_TRAFFIC: "LINK_CLICKS",
+    OUTCOME_ENGAGEMENT: "POST_ENGAGEMENT",
+    OUTCOME_AWARENESS: "REACH",
+    OUTCOME_SALES: "OFFSITE_CONVERSIONS",
+  };
+  const optimizationGoal = optGoalMap[objective] || "LINK_CLICKS";
+
   const adSetBody: Record<string, unknown> = {
     name: `${campaignName} - AdSet`,
     campaign_id: metaCampaignId,
     daily_budget: Math.max(Math.round(dailyBudget * 100), 100),
     billing_event: "IMPRESSIONS",
-    optimization_goal: "LINK_CLICKS",
-    bid_strategy: "LOWEST_COST_WITHOUT_CAP",
-    promoted_object: { page_id: pageId },
+    optimization_goal: optimizationGoal,
     targeting,
     status: campaignStatus,
     access_token: accessToken,
