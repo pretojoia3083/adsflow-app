@@ -265,7 +265,7 @@ export async function createMetaCampaign(
     access_token: accessToken,
   };
 
-  if (objective === "OUTCOME_ENGAGEMENT" || objective === "OUTCOME_LEADS") {
+  if (["OUTCOME_ENGAGEMENT", "OUTCOME_LEADS", "OUTCOME_TRAFFIC"].includes(objective) && pageId) {
     adSetBody.promoted_object = { page_id: pageId };
   }
 
