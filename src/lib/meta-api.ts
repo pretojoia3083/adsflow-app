@@ -66,7 +66,7 @@ export async function getFacebookPages(accessToken: string): Promise<FacebookPag
 const PLACEMENT_MAP: Record<string, { platform: string; position?: string }> = {
   "Feed do Facebook": { platform: "facebook", position: "feed" },
   "Stories do Facebook": { platform: "facebook", position: "story" },
-  "Reels do Facebook": { platform: "facebook", position: "video_feeds" },
+  "Reels do Facebook": { platform: "facebook", position: "feed" },
   "Marketplace do Facebook": { platform: "facebook", position: "marketplace" },
   "Feed do Instagram": { platform: "instagram", position: "stream" },
   "Stories do Instagram": { platform: "instagram", position: "story" },
