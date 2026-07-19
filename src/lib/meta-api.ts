@@ -133,9 +133,9 @@ function mapCta(cta?: string): string {
 }
 
 const OBJECTIVE_MAP: Record<string, string> = {
-  topo: "OUTCOMES_TRAFFIC",
-  meio: "OUTCOMES_ENGAGEMENT",
-  fundo: "OUTCOMES_SALES",
+  topo: "OUTCOME_TRAFFIC",
+  meio: "OUTCOME_ENGAGEMENT",
+  fundo: "OUTCOME_SALES",
 };
 
 export interface CreateCampaignParams {
