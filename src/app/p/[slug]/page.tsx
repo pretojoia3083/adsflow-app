@@ -26,7 +26,7 @@ export default async function PresellPage({ params }: { params: Promise<{ slug: 
   await prisma.presell.update({ where: { slug }, data: { views: { increment: 1 } } }).catch(() => {});
 
   const bg = presell.bgColor || "#080B14";
-  const accent = presell.accentColor || "#22B07D";
+  const accent = presell.accentColor || "#8B5CF6";
   const text = presell.textColor || "#F3F5FF";
 
   const videoUrl = presell.customHtml?.match(/videoUrl["':\s]+([^"']+)/)?.[1] || "";

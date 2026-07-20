@@ -250,7 +250,7 @@ export default function CampaignDetailModal({ campaign, onClose, onSaved }: Prop
         {/* Header */}
         <div style={{ padding: "20px 28px", borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, background: CARD, zIndex: 1, borderRadius: "20px 20px 0 0" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(34,176,125,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(139,92,246,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
               {editing ? "✏️" : "📋"}
             </div>
             <div>
@@ -351,7 +351,7 @@ export default function CampaignDetailModal({ campaign, onClose, onSaved }: Prop
                   </div>
                   <div>
                     <div style={{ fontSize: 11, color: DIM, marginBottom: 3 }}>STATUS</div>
-                    <span style={{ padding: "4px 12px", borderRadius: 99, fontSize: 13, fontWeight: 600, color: campaign.status === "ACTIVE" ? GREEN2 : campaign.status === "PAUSED" ? "#F59E0B" : MUTED, background: campaign.status === "ACTIVE" ? "rgba(63,203,146,0.12)" : campaign.status === "PAUSED" ? "rgba(245,158,11,0.12)" : "rgba(140,147,184,0.12)" }}>
+                    <span style={{ padding: "4px 12px", borderRadius: 99, fontSize: 13, fontWeight: 600, color: campaign.status === "ACTIVE" ? GREEN2 : campaign.status === "PAUSED" ? "#F59E0B" : MUTED, background: campaign.status === "ACTIVE" ? "rgba(34,176,125,0.12)" : campaign.status === "PAUSED" ? "rgba(245,158,11,0.12)" : "rgba(140,147,184,0.12)" }}>
                       {campaign.status === "ACTIVE" ? "Ativa" : campaign.status === "PAUSED" ? "Pausada" : campaign.status === "READY" ? "Pronta" : campaign.status === "COMPLETED" ? "Concluida" : "Rascunho"}
                     </span>
                   </div>
@@ -476,7 +476,7 @@ export default function CampaignDetailModal({ campaign, onClose, onSaved }: Prop
 
               {campaign.metaCampaignId && (
                 <Section title="Meta">
-                  <div style={{ background: "rgba(34,176,125,0.06)", border: `1px solid rgba(34,176,125,0.2)`, borderRadius: 10, padding: 12 }}>
+                  <div style={{ background: "rgba(139,92,246,0.06)", border: `1px solid rgba(139,92,246,0.2)`, borderRadius: 10, padding: 12 }}>
                     <div style={{ fontSize: 11, color: GREEN1, marginBottom: 4 }}>CAMPAIGN ID META</div>
                     <div style={{ fontSize: 13, color: GREEN2, fontFamily: "monospace" }}>{campaign.metaCampaignId}</div>
                   </div>
@@ -505,7 +505,7 @@ export default function CampaignDetailModal({ campaign, onClose, onSaved }: Prop
                     <button
                       onClick={handlePublishToMeta}
                       disabled={publishing}
-                      style={{ padding: "10px 18px", background: publishing ? "#1a7a55" : `linear-gradient(90deg,${GREEN1},${GREEN2})`, color: BG, border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: publishing ? "wait" : "pointer" }}
+                      style={{ padding: "10px 18px", background: publishing ? "#6D28D9" : `linear-gradient(90deg,${GREEN1},${GREEN2})`, color: BG, border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: publishing ? "wait" : "pointer" }}
                     >
                       {publishing ? "⏳ Publicando..." : "🚀 Publicar no Meta"}
                     </button>

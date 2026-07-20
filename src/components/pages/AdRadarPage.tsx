@@ -249,10 +249,10 @@ export default function AdRadarPage() {
                   }}
                   style={{
                     padding: "6px 12px",
-                    background: countryMode === m.id ? "rgba(34,176,125,0.15)" : "#0C1022",
-                    border: countryMode === m.id ? "1px solid #22B07D" : "1px solid #232C52",
+                    background: countryMode === m.id ? "rgba(139,92,246,0.15)" : "#0C1022",
+                    border: countryMode === m.id ? "1px solid #8B5CF6" : "1px solid #232C52",
                     borderRadius: 6,
-                    color: countryMode === m.id ? "#3FCB92" : "#6B739E",
+                    color: countryMode === m.id ? "#A78BFA" : "#6B739E",
                     fontSize: 12,
                     fontWeight: 600,
                     cursor: "pointer",
@@ -293,9 +293,9 @@ export default function AdRadarPage() {
             )}
 
             {countryMode === "all" && (
-              <div style={{ padding: "10px 14px", background: "rgba(34,176,125,0.06)", border: "1px solid rgba(34,176,125,0.2)", borderRadius: 8, display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ padding: "10px 14px", background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.2)", borderRadius: 8, display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ fontSize: 18 }}>🌍</span>
-                <span style={{ color: "#3FCB92", fontSize: 14, fontWeight: 500 }}>Buscando em todos os paises</span>
+                <span style={{ color: "#A78BFA", fontSize: 14, fontWeight: 500 }}>Buscando em todos os paises</span>
               </div>
             )}
 
@@ -334,7 +334,7 @@ export default function AdRadarPage() {
             disabled={loading || !searchTerm.trim()}
             style={{
               padding: "12px 28px",
-              background: loading ? "#4A5178" : "linear-gradient(90deg,#22B07D,#3FCB92)",
+              background: loading ? "#4A5178" : "linear-gradient(90deg,#8B5CF6,#A78BFA)",
               color: "#080B14",
               border: "none",
               borderRadius: 10,
@@ -455,8 +455,8 @@ export default function AdRadarPage() {
               ].map((tab) => (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
                   padding: "12px 18px", background: "transparent", border: "none",
-                  borderBottom: activeTab === tab.id ? "2px solid #22B07D" : "2px solid transparent",
-                  color: activeTab === tab.id ? "#3FCB92" : "#6B739E",
+                  borderBottom: activeTab === tab.id ? "2px solid #8B5CF6" : "2px solid transparent",
+                  color: activeTab === tab.id ? "#A78BFA" : "#6B739E",
                   fontSize: 14, fontWeight: activeTab === tab.id ? 600 : 500, cursor: "pointer",
                 }}>{tab.label}</button>
               ))}
@@ -467,7 +467,7 @@ export default function AdRadarPage() {
                 <div>
                   <div style={{ marginBottom: 16 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-                      <p style={{ color: "#3FCB92", fontSize: 15, fontWeight: 600, margin: 0 }}>{selectedAd.pageName}</p>
+                      <p style={{ color: "#A78BFA", fontSize: 15, fontWeight: 600, margin: 0 }}>{selectedAd.pageName}</p>
                       {selectedAd.daysRunning !== undefined && (
                         <span style={{ color: "#6B739E", fontSize: 12 }}>ha {selectedAd.daysRunning} dias</span>
                       )}
@@ -491,7 +491,7 @@ export default function AdRadarPage() {
                     </div>
                   )}
                   <div style={{ display: "flex", gap: 10, marginTop: 24, flexWrap: "wrap" }}>
-                    <button onClick={() => downloadText(`Page: ${selectedAd.pageName}\nTitle: ${selectedAd.title}\nBody: ${selectedAd.body}\nDescription: ${selectedAd.description}\nPlatforms: ${selectedAd.platforms.join(", ")}\nDays Running: ${selectedAd.daysRunning}`, `ad-${selectedAd.pageName.replace(/\s+/g, "-")}-copy.txt`)} style={{ flex: 1, padding: "12px 16px", background: "rgba(34,176,125,0.1)", border: "1px solid rgba(34,176,125,0.3)", borderRadius: 10, color: "#3FCB92", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Baixar copy</button>
+                    <button onClick={() => downloadText(`Page: ${selectedAd.pageName}\nTitle: ${selectedAd.title}\nBody: ${selectedAd.body}\nDescription: ${selectedAd.description}\nPlatforms: ${selectedAd.platforms.join(", ")}\nDays Running: ${selectedAd.daysRunning}`, `ad-${selectedAd.pageName.replace(/\s+/g, "-")}-copy.txt`)} style={{ flex: 1, padding: "12px 16px", background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.3)", borderRadius: 10, color: "#A78BFA", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Baixar copy</button>
                     {selectedAd.snapshotUrl && (
                       <a href={selectedAd.snapshotUrl} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: "12px 16px", background: "rgba(24,119,242,0.1)", border: "1px solid rgba(24,119,242,0.3)", borderRadius: 10, color: "#1877F2", fontSize: 14, fontWeight: 600, cursor: "pointer", textDecoration: "none", textAlign: "center", display: "block" }}>Ver no Facebook ↗</a>
                     )}
@@ -533,21 +533,21 @@ export default function AdRadarPage() {
                       <p style={{ fontSize: 36, marginBottom: 12 }}>🤖</p>
                       <p style={{ color: "#F3F5FF", fontSize: 16, fontWeight: 600, marginBottom: 8 }}>Criar presell similar com IA</p>
                       <p style={{ color: "#8C93B8", fontSize: 14, marginBottom: 20 }}>A IA vai analisar esta copy e gerar uma presell similar.</p>
-                      <button onClick={handleGeneratePresell} style={{ padding: "14px 28px", background: "linear-gradient(90deg,#22B07D,#3FCB92)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer" }}>Gerar presell com IA</button>
+                      <button onClick={handleGeneratePresell} style={{ padding: "14px 28px", background: "linear-gradient(90deg,#8B5CF6,#A78BFA)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer" }}>Gerar presell com IA</button>
                     </div>
                   )}
                   {aiLoading && (
                     <div style={{ textAlign: "center", padding: "40px 0" }}>
-                      <div style={{ width: 40, height: 40, border: "3px solid #232C52", borderTopColor: "#22B07D", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 16px" }} />
+                      <div style={{ width: 40, height: 40, border: "3px solid #232C52", borderTopColor: "#8B5CF6", borderRadius: "50%", animation: "spin 1s linear infinite", margin: "0 auto 16px" }} />
                       <p style={{ color: "#F3F5FF", fontSize: 16, fontWeight: 600, marginBottom: 8 }}>IA analisando a copy...</p>
                       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
                     </div>
                   )}
                   {presellDraft && (
                     <div>
-                      <div style={{ background: "rgba(34,176,125,0.06)", border: "1px solid rgba(34,176,125,0.2)", borderRadius: 10, padding: 14, marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
+                      <div style={{ background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.2)", borderRadius: 10, padding: 14, marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
                         <span style={{ fontSize: 18 }}>✨</span>
-                        <p style={{ color: "#3FCB92", fontSize: 14, margin: 0 }}>Presell gerada por IA — Edite conforme necessario</p>
+                        <p style={{ color: "#A78BFA", fontSize: 14, margin: 0 }}>Presell gerada por IA — Edite conforme necessario</p>
                       </div>
                       <div style={{ marginBottom: 16 }}>
                         <p style={{ color: "#8C93B8", fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.8, margin: "0 0 6px" }}>Headline</p>
@@ -565,7 +565,7 @@ export default function AdRadarPage() {
                       </div>
                       <div style={{ marginBottom: 16 }}>
                         <p style={{ color: "#8C93B8", fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.8, margin: "0 0 6px" }}>CTA</p>
-                        <div style={{ padding: "12px 20px", background: "linear-gradient(90deg,#22B07D,#3FCB92)", borderRadius: 10, textAlign: "center" }}>
+                        <div style={{ padding: "12px 20px", background: "linear-gradient(90deg,#8B5CF6,#A78BFA)", borderRadius: 10, textAlign: "center" }}>
                           <span style={{ color: "#080B14", fontSize: 15, fontWeight: 700 }}>{presellDraft.ctaText}</span>
                         </div>
                       </div>
@@ -574,7 +574,7 @@ export default function AdRadarPage() {
                           <p style={{ color: "#8C93B8", fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.8, margin: "0 0 8px" }}>Pontos-chave</p>
                           {presellDraft.keyPoints.map((kp, i) => (
                             <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", background: "#0C1022", borderRadius: 8, marginBottom: 4 }}>
-                              <span style={{ color: "#22B07D" }}>✓</span>
+                              <span style={{ color: "#8B5CF6" }}>✓</span>
                               <span style={{ color: "#F3F5FF", fontSize: 14 }}>{kp}</span>
                             </div>
                           ))}
@@ -585,7 +585,7 @@ export default function AdRadarPage() {
                         <span style={{ padding: "4px 12px", background: "rgba(96,165,250,0.12)", borderRadius: 99, color: "#60A5FA", fontSize: 12, fontWeight: 600 }}>Estilo: {presellDraft.style}</span>
                       </div>
                       <div style={{ display: "flex", gap: 10 }}>
-                        <button onClick={() => downloadText(`PRESELL\n\nHEADLINE: ${presellDraft.headline}\nSUBHEADLINE: ${presellDraft.subheadline}\n\nTEXTO:\n${presellDraft.bodyText}\n\nCTA: ${presellDraft.ctaText}`, `presell-${selectedAd.pageName.replace(/\s+/g, "-").toLowerCase()}.txt`)} style={{ flex: 1, padding: "12px 16px", background: "rgba(34,176,125,0.1)", border: "1px solid rgba(34,176,125,0.3)", borderRadius: 10, color: "#3FCB92", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Baixar presell</button>
+                        <button onClick={() => downloadText(`PRESELL\n\nHEADLINE: ${presellDraft.headline}\nSUBHEADLINE: ${presellDraft.subheadline}\n\nTEXTO:\n${presellDraft.bodyText}\n\nCTA: ${presellDraft.ctaText}`, `presell-${selectedAd.pageName.replace(/\s+/g, "-").toLowerCase()}.txt`)} style={{ flex: 1, padding: "12px 16px", background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.3)", borderRadius: 10, color: "#A78BFA", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Baixar presell</button>
                         <button onClick={handleGeneratePresell} style={{ flex: 1, padding: "12px 16px", background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: 10, color: "#A78BFA", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Gerar outra versao</button>
                       </div>
                     </div>
@@ -604,13 +604,13 @@ function AdCard({ ad, onClick }: { ad: AdResult; onClick: () => void }) {
   return (
     <div
       style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 14, overflow: "hidden", cursor: "pointer", transition: "border-color 0.2s" }}
-      onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#22B07D")}
+      onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#8B5CF6")}
       onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#232C52")}
       onClick={onClick}
     >
       <div style={{ padding: "16px 18px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-          <span style={{ color: "#3FCB92", fontSize: 13, fontWeight: 600 }}>{ad.pageName}</span>
+          <span style={{ color: "#A78BFA", fontSize: 13, fontWeight: 600 }}>{ad.pageName}</span>
           <ScoreBadge label={ad.scoreLabel} />
         </div>
         {ad.title && <p style={{ color: "#F3F5FF", fontSize: 15, fontWeight: 600, margin: "0 0 6px", lineHeight: 1.4 }}>{ad.title}</p>}
@@ -624,7 +624,7 @@ function AdCard({ ad, onClick }: { ad: AdResult; onClick: () => void }) {
               ))}
             </div>
           </div>
-          <span style={{ color: "#22B07D", fontSize: 12, fontWeight: 600 }}>Ver copy →</span>
+          <span style={{ color: "#8B5CF6", fontSize: 12, fontWeight: 600 }}>Ver copy →</span>
         </div>
       </div>
     </div>

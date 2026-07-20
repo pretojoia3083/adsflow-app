@@ -25,8 +25,8 @@ export default function IaPage() {
         ))}
       </div>
 
-      <div style={{ marginTop: 28, padding: 24, background: "rgba(34,176,125,0.06)", border: "1px solid rgba(34,176,125,0.2)", borderRadius: 14 }}>
-        <div style={{ fontSize: 16, fontWeight: 600, color: "#22B07D", marginBottom: 8 }}>Como funciona</div>
+      <div style={{ marginTop: 28, padding: 24, background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.2)", borderRadius: 14 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, color: "#8B5CF6", marginBottom: 8 }}>Como funciona</div>
         <div style={{ fontSize: 14, color: "#8C93B8", lineHeight: 1.7 }}>
           A IA do AdsFlow analisa as informacoes do seu produto (nome, descricao, publico, pais) e utiliza modelos de linguagem para gerar automaticamente todo o conteudo da campanha — desde a segmentacao ate o copy do anuncio. Tudo em segundos, sem precisar de especialista em trafego pago.
         </div>

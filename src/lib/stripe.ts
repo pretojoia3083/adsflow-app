@@ -17,7 +17,6 @@ export function getStripe(): Stripe {
 }
 
 export const PLAN_PRICES = {
-  mensal: { amount: 5990, interval: "month" as const, intervalCount: 1, name: "AdsFlow Mensal" },
-  semestral: { amount: 29990, interval: "month" as const, intervalCount: 6, name: "AdsFlow 6 Meses" },
-  anual: { amount: 59990, interval: "year" as const, intervalCount: 1, name: "AdsFlow Anual" },
+  basico: { amount: 3000, interval: "month" as const, intervalCount: 1, name: "NOVEX Basico" },
+  pro: { amount: 5000, interval: "month" as const, intervalCount: 1, name: "NOVEX Pro" },
 } as const;

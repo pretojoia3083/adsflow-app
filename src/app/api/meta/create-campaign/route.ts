@@ -69,7 +69,8 @@ export async function POST(req: NextRequest) {
       funnelStage: campaign.funnelStage || "topo",
       startTime: startTime || undefined,
       endTime: endTime || undefined,
-      status: startTime ? "PAUSED" : "PAUSED",
+      status: startTime ? "PAUSED" : "ACTIVE",
+      pixelId: config.pixelId || undefined,
     });
 
     await prisma.campaign.update({

@@ -33,9 +33,9 @@ export default function InstallAppPage() {
       </div>
 
       {isInstalled || isStandalone ? (
-        <div style={{ background: "#121830", border: "1px solid #3FCB92", borderRadius: 16, padding: "48px 40px", textAlign: "center" }}>
+        <div style={{ background: "#121830", border: "1px solid #A78BFA", borderRadius: 16, padding: "48px 40px", textAlign: "center" }}>
           <p style={{ fontSize: 48, margin: "0 0 16px" }}>✅</p>
-          <p style={{ fontWeight: 700, fontSize: 22, color: "#3FCB92", margin: "0 0 10px" }}>App ja instalado!</p>
+          <p style={{ fontWeight: 700, fontSize: 22, color: "#A78BFA", margin: "0 0 10px" }}>App ja instalado!</p>
           <p style={{ color: "#8C93B8", fontSize: 15 }}>O AdsFlow esta instalado neste dispositivo.</p>
         </div>
       ) : (
@@ -47,7 +47,7 @@ export default function InstallAppPage() {
               <p style={{ color: "#8C93B8", fontSize: 15, marginBottom: 20 }}>Clique no botao abaixo para instalar o AdsFlow como um app no seu PC.</p>
               <button
                 onClick={handleInstall}
-                style={{ padding: "14px 32px", background: "linear-gradient(90deg,#22B07D,#3FCB92)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 16, fontWeight: 700, cursor: "pointer" }}
+                style={{ padding: "14px 32px", background: "linear-gradient(90deg,#8B5CF6,#A78BFA)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 16, fontWeight: 700, cursor: "pointer" }}
               >
                 Instalar agora
               </button>

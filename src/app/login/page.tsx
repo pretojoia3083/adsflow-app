@@ -55,14 +55,14 @@ export default function LoginPage() {
           <a href="/" style={{ display: "inline-flex", alignItems: "center", gap: 14, textDecoration: "none" }}>
             <svg width="64" height="64" viewBox="0 0 96 96" fill="none">
               <rect width="96" height="96" rx="20" fill="#171A21" stroke="#262B36" />
-              <path d="M24 32 L40 48 L52 38 L72 60" stroke="#22B07D" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M60 60 H72 V48" stroke="#22B07D" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx="24" cy="32" r="4" fill="#3FCB92" />
-              <circle cx="52" cy="38" r="4" fill="#3FCB92" />
+              <path d="M24 32 L40 48 L52 38 L72 60" stroke="#8B5CF6" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M60 60 H72 V48" stroke="#8B5CF6" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="24" cy="32" r="4" fill="#A78BFA" />
+              <circle cx="52" cy="38" r="4" fill="#A78BFA" />
             </svg>
             <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 36, display: "flex", alignItems: "baseline", gap: 1 }}>
               <span style={{ color: "#F3F5FF" }}>Ads</span>
-              <span style={{ background: "linear-gradient(90deg,#22B07D,#5FD9A4)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Flow</span>
+              <span style={{ background: "linear-gradient(90deg,#8B5CF6,#22B07D)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Flow</span>
             </span>
           </a>
           <p style={{ color: "#8C93B8", marginTop: 16, fontSize: 16 }}>
@@ -117,7 +117,7 @@ export default function LoginPage() {
                   boxSizing: "border-box",
                   transition: "border-color 0.2s",
                 }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = "#22B07D")}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "#8B5CF6")}
                 onBlur={(e) => (e.currentTarget.style.borderColor = "#232C52")}
               />
             </div>
@@ -145,7 +145,7 @@ export default function LoginPage() {
                     boxSizing: "border-box",
                     transition: "border-color 0.2s",
                   }}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = "#22B07D")}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "#8B5CF6")}
                   onBlur={(e) => (e.currentTarget.style.borderColor = "#232C52")}
                 />
                 <button
@@ -190,7 +190,7 @@ export default function LoginPage() {
               style={{
                 width: "100%",
                 padding: "14px 0",
-                background: loading ? "#1a7a55" : "linear-gradient(90deg,#22B07D,#3FCB92)",
+                background: loading ? "#6D28D9" : "linear-gradient(90deg,#8B5CF6,#A78BFA)",
                 color: "#080B14",
                 border: "none",
                 borderRadius: 10,
@@ -208,7 +208,7 @@ export default function LoginPage() {
 
         <p style={{ textAlign: "center", marginTop: 28, color: "#8C93B8", fontSize: 16 }}>
           Nao tem conta?{" "}
-          <Link href="/register" style={{ color: "#22B07D", fontWeight: 600, textDecoration: "none" }}>
+          <Link href="/register" style={{ color: "#8B5CF6", fontWeight: 600, textDecoration: "none" }}>
             Criar conta gratis
           </Link>
         </p>

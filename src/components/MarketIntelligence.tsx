@@ -42,7 +42,7 @@ interface Props {
 }
 
 const COMP_COLORS: Record<string, { color: string; bg: string }> = {
-  baixa: { color: "#3FCB92", bg: "rgba(63,203,146,0.12)" },
+  baixa: { color: "#A78BFA", bg: "rgba(167,139,250,0.12)" },
   media: { color: "#F59E0B", bg: "rgba(245,158,11,0.12)" },
   alta: { color: "#EF4444", bg: "rgba(239,68,68,0.12)" },
 };
@@ -132,7 +132,7 @@ export default function MarketIntelligence({ data, C }: Props) {
       </div>
 
       {/* Recomendacao de investimento */}
-      <div style={{ background: "rgba(34,176,125,0.06)", borderRadius: 14, padding: 24, border: `1px solid rgba(34,176,125,0.2)` }}>
+      <div style={{ background: "rgba(139,92,246,0.06)", borderRadius: 14, padding: 24, border: `1px solid rgba(139,92,246,0.2)` }}>
         <div style={{ fontSize: 16, fontWeight: 700, color: C.green1, marginBottom: 16 }}>Recomendacao de investimento</div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
           {[

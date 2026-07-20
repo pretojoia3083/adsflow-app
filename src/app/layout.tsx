@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     telephone: false,
   },
   other: {
-    "theme-color": "#22B07D",
+    "theme-color": "#8B5CF6",
     "mobile-web-app-capable": "yes",
   },
 };
@@ -24,7 +24,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#22B07D",
+  themeColor: "#8B5CF6",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -43,8 +43,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="AdsFlow" />
-        <meta name="theme-color" content="#22B07D" />
-        <meta name="msapplication-TileColor" content="#22B07D" />
+        <meta name="theme-color" content="#8B5CF6" />
+        <meta name="msapplication-TileColor" content="#8B5CF6" />
         <meta name="msapplication-TileImage" content="/icons/icon-192.png" />
       </head>
       <body>

@@ -6,7 +6,7 @@ export default function PaymentSuccessPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#080B14", fontFamily: "'Inter', sans-serif", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <div style={{ maxWidth: 480, width: "100%", textAlign: "center" as const }}>
-        <div style={{ width: 88, height: 88, borderRadius: "50%", background: "rgba(34,176,125,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 28px", fontSize: 44 }}>
+        <div style={{ width: 88, height: 88, borderRadius: "50%", background: "rgba(139,92,246,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 28px", fontSize: 44 }}>
           ✅
         </div>
         <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 32, fontWeight: 700, color: "#F3F5FF", marginBottom: 12 }}>
@@ -20,7 +20,7 @@ export default function PaymentSuccessPage() {
           style={{
             display: "inline-block",
             padding: "16px 40px",
-            background: "linear-gradient(90deg,#22B07D,#3FCB92)",
+            background: "linear-gradient(90deg,#8B5CF6,#A78BFA)",
             color: "#080B14",
             borderRadius: 12,
             fontSize: 16,

@@ -6,9 +6,9 @@ const s = {
   card: "#121830",
   border: "#232C52",
   green1: "#22B07D",
-  green2: "#5FD9A4",
-  green3: "#3FCB92",
-  pink: "#F72585",
+  green2: "#3FCB92",
+  green3: "#5FD9A4",
+  pink: "#F97316",
   text: "#F3F5FF",
   muted: "#8C93B8",
   dim: "#5B628A",
@@ -86,10 +86,10 @@ const LogoIcon = ({ size = 48 }: { size?: number }) => (
     style={{ flexShrink: 0 }}
   >
     <rect width="96" height="96" rx="20" fill="#171A21" stroke="#262B36" />
-    <path d="M24 32 L40 48 L52 38 L72 60" stroke="#22B07D" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M60 60 H72 V48" stroke="#22B07D" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-    <circle cx="24" cy="32" r="4" fill="#3FCB92" />
-    <circle cx="52" cy="38" r="4" fill="#3FCB92" />
+    <path d="M24 32 L40 48 L52 38 L72 60" stroke="#8B5CF6" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M60 60 H72 V48" stroke="#8B5CF6" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="24" cy="32" r="4" fill="#A78BFA" />
+    <circle cx="52" cy="38" r="4" fill="#A78BFA" />
   </svg>
 );
 
@@ -145,7 +145,7 @@ export default function Home() {
               <span style={{ color: "#F3F5FF" }}>Ads</span>
               <span
                 style={{
-                  background: "linear-gradient(90deg,#22B07D,#5FD9A4)",
+                  background: "linear-gradient(90deg,#8B5CF6,#22B07D)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
@@ -201,7 +201,7 @@ export default function Home() {
             <a
               href="/register"
               style={{
-                ...s.btn("linear-gradient(90deg,#22B07D,#3FCB92)", "#080B14", { padding: "10px 22px" }),
+                ...s.btn("linear-gradient(90deg,#8B5CF6,#A78BFA)", "#080B14", { padding: "10px 22px" }),
               }}
             >
               Criar conta grátis
@@ -228,12 +228,12 @@ export default function Home() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 8,
-                background: "rgba(34,176,125,.1)",
-                border: "1px solid rgba(34,176,125,.25)",
+                background: "rgba(139,92,246,.1)",
+                border: "1px solid rgba(139,92,246,.25)",
                 borderRadius: 999,
                 padding: "6px 16px",
                 fontSize: 13,
-                color: "#5FD9A4",
+                color: "#C4B5FD",
                 fontWeight: 500,
                 marginBottom: 24,
               }}
@@ -243,7 +243,7 @@ export default function Home() {
                   width: 8,
                   height: 8,
                   borderRadius: "50%",
-                  background: "#22B07D",
+                  background: "#8B5CF6",
                   animation: "pulse 2s infinite",
                 }}
               />
@@ -263,7 +263,7 @@ export default function Home() {
               Suas campanhas de{" "}
               <span
                 style={{
-                  background: "linear-gradient(90deg,#22B07D,#5FD9A4)",
+                  background: "linear-gradient(90deg,#8B5CF6,#22B07D)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
@@ -291,7 +291,7 @@ export default function Home() {
               <a
                 href="/register"
                 style={{
-                  ...s.btn("linear-gradient(90deg,#22B07D,#3FCB92)", "#080B14", {
+                  ...s.btn("linear-gradient(90deg,#8B5CF6,#A78BFA)", "#080B14", {
                     padding: "14px 32px",
                     fontSize: 16,
                   }),
@@ -336,9 +336,9 @@ export default function Home() {
                   background: "rgba(18,24,48,.6)",
                 }}
               >
-                <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#F72585" }} />
+                <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#F97316" }} />
                 <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#F0A500" }} />
-                <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#22B07D" }} />
+                <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#8B5CF6" }} />
                 <span style={{ fontSize: 12, color: "#5B628A", marginLeft: 12 }}>Painel de Campanhas</span>
               </div>
 
@@ -350,8 +350,8 @@ export default function Home() {
                     style={{
                       flex: 1,
                       minWidth: 120,
-                      background: "rgba(34,176,125,.08)",
-                      border: "1px solid rgba(34,176,125,.2)",
+                      background: "rgba(139,92,246,.08)",
+                      border: "1px solid rgba(139,92,246,.2)",
                       borderRadius: 12,
                       padding: 16,
                     }}
@@ -362,7 +362,7 @@ export default function Home() {
                         fontFamily: "'JetBrains Mono', monospace",
                         fontSize: 28,
                         fontWeight: 700,
-                        color: "#22B07D",
+                        color: "#8B5CF6",
                       }}
                     >
                       4.2x
@@ -373,8 +373,8 @@ export default function Home() {
                     style={{
                       flex: 1,
                       minWidth: 120,
-                      background: "rgba(34,176,125,.08)",
-                      border: "1px solid rgba(34,176,125,.2)",
+                      background: "rgba(139,92,246,.08)",
+                      border: "1px solid rgba(139,92,246,.2)",
                       borderRadius: 12,
                       padding: 16,
                     }}
@@ -385,7 +385,7 @@ export default function Home() {
                         fontFamily: "'JetBrains Mono', monospace",
                         fontSize: 28,
                         fontWeight: 700,
-                        color: "#5FD9A4",
+                        color: "#C4B5FD",
                       }}
                     >
                       R$6.80
@@ -402,7 +402,7 @@ export default function Home() {
                         flex: 1,
                         height: `${h}%`,
                         borderRadius: 6,
-                        background: `linear-gradient(180deg,${i === 4 ? "#F72585" : "#22B07D"},${i === 4 ? "rgba(247,37,133,.3)" : "rgba(34,176,125,.2)"})`,
+                        background: `linear-gradient(180deg,${i === 4 ? "#F97316" : "#8B5CF6"},${i === 4 ? "rgba(247,37,133,.3)" : "rgba(139,92,246,.2)"})`,
                         transition: "height .4s",
                       }}
                     />
@@ -474,7 +474,7 @@ export default function Home() {
                   fontFamily: "'Space Grotesk', sans-serif",
                   fontSize: "clamp(26px, 3.5vw, 40px)",
                   fontWeight: 700,
-                  background: "linear-gradient(90deg,#22B07D,#5FD9A4)",
+                  background: "linear-gradient(90deg,#8B5CF6,#22B07D)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   marginBottom: 4,
@@ -509,9 +509,9 @@ export default function Home() {
               background: "rgba(18,24,48,.7)",
             }}
           >
-            <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#F72585" }} />
+            <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#F97316" }} />
             <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#F0A500" }} />
-            <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#22B07D" }} />
+            <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#8B5CF6" }} />
             <div
               style={{
                 marginLeft: 12,
@@ -575,7 +575,7 @@ export default function Home() {
                 style={{
                   fontFamily: "'JetBrains Mono', monospace",
                   fontSize: 13,
-                  color: "#22B07D",
+                  color: "#8B5CF6",
                   fontWeight: 600,
                 }}
               >
@@ -585,7 +585,7 @@ export default function Home() {
                 style={{
                   textAlign: "right",
                   fontSize: 12,
-                  color: "#5FD9A4",
+                  color: "#C4B5FD",
                   cursor: "pointer",
                 }}
               >
@@ -639,7 +639,7 @@ export default function Home() {
                 ...s.card({ padding: "14px 28px", textAlign: "center", minWidth: 130 }),
                 fontSize: 15,
                 fontWeight: 600,
-                color: "#5FD9A4",
+                color: "#C4B5FD",
                 borderStyle: "dashed",
               }}
             >
@@ -676,7 +676,7 @@ export default function Home() {
                 cursor: "default",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "#22B07D";
+                e.currentTarget.style.borderColor = "#8B5CF6";
                 e.currentTarget.style.transform = "translateY(-2px)";
               }}
               onMouseLeave={(e) => {
@@ -689,7 +689,7 @@ export default function Home() {
                   width: 48,
                   height: 48,
                   borderRadius: 12,
-                  background: "rgba(34,176,125,.1)",
+                  background: "rgba(139,92,246,.1)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -758,7 +758,7 @@ export default function Home() {
                     fontFamily: "'Space Grotesk', sans-serif",
                     fontSize: 48,
                     fontWeight: 700,
-                    background: "linear-gradient(180deg,rgba(34,176,125,.25),transparent)",
+                    background: "linear-gradient(180deg,rgba(139,92,246,.25),transparent)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     marginBottom: 8,
@@ -826,7 +826,7 @@ export default function Home() {
               "Suporte via chat",
             ].map((feat, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                <span style={{ color: "#22B07D", fontWeight: 700 }}>✓</span>
+                <span style={{ color: "#8B5CF6", fontWeight: 700 }}>✓</span>
                 <span style={{ fontSize: 14, color: "#8C93B8" }}>{feat}</span>
               </div>
             ))}
@@ -854,7 +854,7 @@ export default function Home() {
                 maxWidth: 360,
                 display: "flex",
                 flexDirection: "column",
-                border: "2px solid #22B07D",
+                border: "2px solid #8B5CF6",
                 position: "relative",
               }),
             }}
@@ -865,7 +865,7 @@ export default function Home() {
                 top: -14,
                 left: "50%",
                 transform: "translateX(-50%)",
-                background: "linear-gradient(90deg,#22B07D,#3FCB92)",
+                background: "linear-gradient(90deg,#8B5CF6,#A78BFA)",
                 color: "#080B14",
                 fontSize: 11,
                 fontWeight: 700,
@@ -877,7 +877,7 @@ export default function Home() {
             >
               MAIS POPULAR
             </div>
-            <p style={{ fontSize: 14, fontWeight: 600, color: "#22B07D", textTransform: "uppercase" as const, letterSpacing: 1, marginBottom: 8, marginTop: 8 }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: "#8B5CF6", textTransform: "uppercase" as const, letterSpacing: 1, marginBottom: 8, marginTop: 8 }}>
               6 Meses
             </p>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
@@ -886,7 +886,7 @@ export default function Home() {
               </span>
             </div>
             <span style={{ fontSize: 14, color: "#5B628A", marginBottom: 4 }}>/6 meses</span>
-            <span style={{ fontSize: 13, color: "#22B07D", fontWeight: 600, marginBottom: 24 }}>R$ 49,98/mês</span>
+            <span style={{ fontSize: 13, color: "#8B5CF6", fontWeight: 600, marginBottom: 24 }}>R$ 49,98/mês</span>
             {[
               "Tudo do plano Mensal",
               "Economia de 17%",
@@ -896,7 +896,7 @@ export default function Home() {
               "Templates de presell premium",
             ].map((feat, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                <span style={{ color: "#22B07D", fontWeight: 700 }}>✓</span>
+                <span style={{ color: "#8B5CF6", fontWeight: 700 }}>✓</span>
                 <span style={{ fontSize: 14, color: "#8C93B8" }}>{feat}</span>
               </div>
             ))}
@@ -904,7 +904,7 @@ export default function Home() {
             <a
               href="/register"
               style={{
-                ...s.btn("linear-gradient(90deg,#22B07D,#3FCB92)", "#080B14", {
+                ...s.btn("linear-gradient(90deg,#8B5CF6,#A78BFA)", "#080B14", {
                   marginTop: 24,
                   padding: "14px 0",
                   width: "100%",
@@ -935,7 +935,7 @@ export default function Home() {
               </span>
             </div>
             <span style={{ fontSize: 14, color: "#5B628A", marginBottom: 4 }}>/ano</span>
-            <span style={{ fontSize: 13, color: "#22B07D", fontWeight: 600, marginBottom: 24 }}>R$ 49,99/mês</span>
+            <span style={{ fontSize: 13, color: "#8B5CF6", fontWeight: 600, marginBottom: 24 }}>R$ 49,99/mês</span>
             {[
               "Tudo do plano 6 Meses",
               "Acesso antecipado a novidades",
@@ -944,7 +944,7 @@ export default function Home() {
               "API completa para automação",
             ].map((feat, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                <span style={{ color: "#22B07D", fontWeight: 700 }}>✓</span>
+                <span style={{ color: "#8B5CF6", fontWeight: 700 }}>✓</span>
                 <span style={{ fontSize: 14, color: "#8C93B8" }}>{feat}</span>
               </div>
             ))}
@@ -1012,7 +1012,7 @@ export default function Home() {
                       width: 40,
                       height: 40,
                       borderRadius: "50%",
-                      background: "linear-gradient(135deg,#22B07D,#3FCB92)",
+                      background: "linear-gradient(135deg,#8B5CF6,#A78BFA)",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -1039,8 +1039,8 @@ export default function Home() {
       <section style={{ ...s.section, textAlign: "center" }}>
         <div
           style={{
-            background: "linear-gradient(135deg,rgba(34,176,125,.15),rgba(63,203,146,.08))",
-            border: "1px solid rgba(34,176,125,.2)",
+            background: "linear-gradient(135deg,rgba(139,92,246,.15),rgba(167,139,250,.08))",
+            border: "1px solid rgba(139,92,246,.2)",
             borderRadius: 20,
             padding: "clamp(40px, 6vw, 72px) clamp(24px, 4vw, 48px)",
           }}
@@ -1071,7 +1071,7 @@ export default function Home() {
           <a
             href="/register"
             style={{
-              ...s.btn("linear-gradient(90deg,#22B07D,#3FCB92)", "#080B14", {
+              ...s.btn("linear-gradient(90deg,#8B5CF6,#A78BFA)", "#080B14", {
                 padding: "16px 40px",
                 fontSize: 17,
               }),
@@ -1111,7 +1111,7 @@ export default function Home() {
                 <span style={{ color: "#F3F5FF" }}>Ads</span>
                 <span
                   style={{
-                    background: "linear-gradient(90deg,#22B07D,#5FD9A4)",
+                    background: "linear-gradient(90deg,#8B5CF6,#22B07D)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                   }}
@@ -1214,11 +1214,11 @@ export default function Home() {
           width: 56,
           height: 56,
           borderRadius: "50%",
-          background: "linear-gradient(135deg,#22B07D,#3FCB92)",
+          background: "linear-gradient(135deg,#8B5CF6,#A78BFA)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          boxShadow: "0 4px 24px rgba(34,176,125,.4)",
+          boxShadow: "0 4px 24px rgba(139,92,246,.4)",
           zIndex: 999,
           transition: "transform .2s",
         }}

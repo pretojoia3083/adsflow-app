@@ -63,7 +63,7 @@ export default function InstallBanner() {
         right: 0,
         zIndex: 99999,
         background: "linear-gradient(135deg, #0f1728 0%, #162040 100%)",
-        borderTop: "2px solid #22B07D",
+        borderTop: "2px solid #8B5CF6",
         padding: "14px 16px",
         display: "flex",
         alignItems: "center",
@@ -79,7 +79,7 @@ export default function InstallBanner() {
             width: 48,
             height: 48,
             borderRadius: 14,
-            background: "linear-gradient(135deg, #22B07D, #3FCB92)",
+            background: "linear-gradient(135deg, #8B5CF6, #A78BFA)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -121,7 +121,7 @@ export default function InstallBanner() {
           onClick={handleInstall}
           style={{
             padding: "10px 20px",
-            background: "linear-gradient(90deg, #22B07D, #3FCB92)",
+            background: "linear-gradient(90deg, #8B5CF6, #A78BFA)",
             border: "none",
             borderRadius: 8,
             color: "#080B14",

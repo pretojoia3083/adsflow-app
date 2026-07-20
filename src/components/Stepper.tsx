@@ -18,7 +18,7 @@ export default function Stepper({ labels, currentStep }: StepperProps) {
                 fontSize: 19,
                 fontWeight: 600,
                 whiteSpace: "nowrap",
-                color: isActive ? "#3FCB92" : isCompleted ? "#22B07D" : "#4A5078",
+                color: isActive ? "#A78BFA" : isCompleted ? "#8B5CF6" : "#4A5078",
                 transition: "color 0.2s",
               }}
             >

@@ -126,7 +126,7 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
     keywords: "",
     interests: "",
     placements: ["Feed do Facebook", "Feed do Instagram"],
-    funnelStage: "meio",
+    funnelStage: "topo",
   });
 
   const [adCopy, setAdCopy] = useState<AdCopy>({
@@ -145,7 +145,7 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
     affiliateLink: "",
     videoUrl: "",
     bgColor: "#080B14",
-    accentColor: "#22B07D",
+    accentColor: "#8B5CF6",
     textColor: "#F3F5FF",
   });
 
@@ -374,7 +374,7 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
         ctaText: data.ctaText || "Saiba Mais",
         affiliateLink: presell.affiliateLink,
         bgColor: data.bgColor || "#080B14",
-        accentColor: data.accentColor || "#22B07D",
+        accentColor: data.accentColor || "#8B5CF6",
         textColor: data.textColor || "#F3F5FF",
       });
     } catch {
@@ -820,7 +820,7 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
                       <div style={{ background: "#1A2333", padding: "8px 16px", display: "flex", alignItems: "center", gap: 6 }}>
                         <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#EF4444" }} />
                         <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F59E0B" }} />
-                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#22B07D" }} />
+                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#8B5CF6" }} />
                         <span style={{ marginLeft: 12, fontSize: 12, color: "#5B628A" }}>{presellUrl}</span>
                       </div>
                       <div style={{ background: presell.bgColor, color: presell.textColor, padding: "clamp(32px, 5vw, 56px) clamp(24px, 4vw, 40px)", textAlign: "center" as const }}>
@@ -1111,7 +1111,7 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
             {launchResult && (
               <div style={{ background: C.bg, borderRadius: 16, padding: 28, border: `1px solid ${C.border}`, animation: "fadeUp 0.5s ease" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-                  <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(34,176,125,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(139,92,246,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>
                     🎯
                   </div>
                   <div>
@@ -1212,7 +1212,7 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
             disabled={loading || (step === 1 && !product.productName)}
             style={{
               padding: "14px 36px",
-              background: loading ? "#1a7a55" : `linear-gradient(90deg,${C.green1},${C.green2})`,
+              background: loading ? "#6D28D9" : `linear-gradient(90deg,${C.green1},${C.green2})`,
               color: C.bg,
               border: "none",
               borderRadius: 12,

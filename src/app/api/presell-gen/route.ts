@@ -25,7 +25,7 @@ const NICHE_COLORS: Record<string, { bg: string; accent: string; text: string; m
   marketing: { bg: "#0C0F1A", accent: "#6366F1", text: "#EEF2FF", mood: "inovacao e resultado" },
   tecnologia: { bg: "#0A0E1A", accent: "#3B82F6", text: "#EFF6FF", mood: "modernidade e eficiencia" },
   educacao: { bg: "#0F172A", accent: "#8B5CF6", text: "#F5F3FF", mood: "conhecimento e evolucao" },
- default: { bg: "#080B14", accent: "#22B07D", text: "#F3F5FF", mood: "confianca e resultado" },
+ default: { bg: "#080B14", accent: "#8B5CF6", text: "#F3F5FF", mood: "confianca e resultado" },
 };
 
 function detectNiche(productName: string, description: string): string {

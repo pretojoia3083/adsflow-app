@@ -34,8 +34,10 @@ const steps = [
 export default function MetaApiPage() {
   const [token, setToken] = useState("");
   const [accountId, setAccountId] = useState("");
+  const [pixelId, setPixelId] = useState("");
   const [connected, setConnected] = useState(false);
   const [savedAccountId, setSavedAccountId] = useState("");
+  const [savedPixelId, setSavedPixelId] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -53,6 +55,9 @@ export default function MetaApiPage() {
         if (d.connected) {
           setConnected(true);
           setSavedAccountId(d.accountId);
+          setSavedPixelId(d.pixelId || "");
+          setPixelId(d.pixelId || "");
+          setAccountId(d.accountId);
           setTokenStatus("checking");
           try {
             const valRes = await fetch("/api/meta/config/validate");
@@ -74,8 +79,12 @@ export default function MetaApiPage() {
   }, []);
 
   async function handleSave() {
-    if (!token || !accountId) {
-      setError("Preencha o token e o ID da conta");
+    if (!token && !connected) {
+      setError("Preencha o token de acesso");
+      return;
+    }
+    if (!accountId && !connected) {
+      setError("Preencha o ID da conta");
       return;
     }
     setSaving(true);
@@ -84,7 +93,7 @@ export default function MetaApiPage() {
       const res = await fetch("/api/meta/config", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accessToken: token, accountId }),
+        body: JSON.stringify({ accessToken: token || undefined, accountId: accountId || undefined, pixelId: pixelId || undefined }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -93,10 +102,10 @@ export default function MetaApiPage() {
         return;
       }
       setConnected(true);
-      setSavedAccountId(accountId);
+      setSavedAccountId(accountId || savedAccountId);
+      setSavedPixelId(pixelId);
       setSuccess(true);
       setToken("");
-      setAccountId("");
       setTimeout(() => setSuccess(false), 3000);
     } catch {
       setError("Erro de conexao");
@@ -108,6 +117,7 @@ export default function MetaApiPage() {
     await fetch("/api/meta/config", { method: "DELETE" });
     setConnected(false);
     setSavedAccountId("");
+    setSavedPixelId("");
     setTokenStatus("idle");
   }
 
@@ -158,17 +168,17 @@ export default function MetaApiPage() {
       </div>
 
       {connected && (
-        <div style={{ background: tokenStatus === "invalid" ? "rgba(248,113,113,0.06)" : "rgba(63,203,146,0.06)", border: `1px solid ${tokenStatus === "invalid" ? "rgba(248,113,113,0.2)" : "rgba(63,203,146,0.2)"}`, borderRadius: 14, padding: 24, marginBottom: 32 }}>
+        <div style={{ background: tokenStatus === "invalid" ? "rgba(248,113,113,0.06)" : "rgba(167,139,250,0.06)", border: `1px solid ${tokenStatus === "invalid" ? "rgba(248,113,113,0.2)" : "rgba(167,139,250,0.2)"}`, borderRadius: 14, padding: 24, marginBottom: 32 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 12, background: tokenStatus === "invalid" ? "rgba(248,113,113,0.15)" : "rgba(63,203,146,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>
+              <div style={{ width: 48, height: 48, borderRadius: 12, background: tokenStatus === "invalid" ? "rgba(248,113,113,0.15)" : "rgba(167,139,250,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>
                 {tokenStatus === "checking" ? "⏳" : tokenStatus === "invalid" ? "❌" : "✅"}
               </div>
               <div>
-                <p style={{ fontWeight: 700, fontSize: 17, color: tokenStatus === "invalid" ? "#F87171" : "#3FCB92", margin: 0 }}>
+                <p style={{ fontWeight: 700, fontSize: 17, color: tokenStatus === "invalid" ? "#F87171" : "#A78BFA", margin: 0 }}>
                   {tokenStatus === "checking" ? "Verificando token..." : tokenStatus === "invalid" ? "Token Invalido" : "Conta Conectada"}
                 </p>
-                <p style={{ color: "#8C93B8", fontSize: 14, margin: "4px 0 0" }}>Conta: {savedAccountId}</p>
+                <p style={{ color: "#8C93B8", fontSize: 14, margin: "4px 0 0" }}>Conta: {savedAccountId}{savedPixelId ? ` · Pixel: ${savedPixelId}` : ""}</p>
                 {tokenStatus === "invalid" && tokenError && (
                   <p style={{ color: "#F87171", fontSize: 13, margin: "6px 0 0", lineHeight: 1.5 }}>{tokenError}. Gere um novo token no Meta for Developers e atualize abaixo.</p>
                 )}
@@ -187,21 +197,21 @@ export default function MetaApiPage() {
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 40 }}>
               <div style={{
                 width: 36, height: 36, borderRadius: 10,
-                background: "rgba(34,176,125,0.15)",
+                background: "rgba(139,92,246,0.15)",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                flexShrink: 0, fontSize: 15, fontWeight: 700, color: "#22B07D",
+                flexShrink: 0, fontSize: 15, fontWeight: 700, color: "#8B5CF6",
               }}>
                 {step.num}
               </div>
               {i < steps.length - 1 && (
-                <div style={{ width: 2, flex: 1, minHeight: 24, background: "rgba(34,176,125,0.2)" }} />
+                <div style={{ width: 2, flex: 1, minHeight: 24, background: "rgba(139,92,246,0.2)" }} />
               )}
             </div>
             <div style={{ paddingBottom: i < steps.length - 1 ? 24 : 0 }}>
               <div style={{ fontSize: 16, fontWeight: 600, color: "#F3F5FF", marginBottom: 6 }}>{step.title}</div>
               <div style={{ fontSize: 14, color: "#8C93B8", lineHeight: 1.6 }}>{step.desc}</div>
               {step.url && (
-                <a href={step.url} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", marginTop: 8, fontSize: 13, color: "#3FCB92", textDecoration: "none" }}>
+                <a href={step.url} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", marginTop: 8, fontSize: 13, color: "#A78BFA", textDecoration: "none" }}>
                   {step.url} →
                 </a>
               )}
@@ -237,8 +247,8 @@ export default function MetaApiPage() {
               <label style={{ display: "block", fontSize: 14, fontWeight: 500, color: "#A0A8CE", marginBottom: 8 }}>Contas de anuncios encontradas:</label>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {adAccounts.map((acc) => (
-                  <label key={acc.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: accountId === acc.id ? "rgba(34,176,125,0.08)" : "#0C1022", border: `1px solid ${accountId === acc.id ? "rgba(34,176,125,0.3)" : "#232C52"}`, borderRadius: 8, cursor: "pointer", transition: "all 0.15s" }}>
-                    <input type="radio" name="adAccount" checked={accountId === acc.id} onChange={() => setAccountId(acc.id)} style={{ accentColor: "#22B07D" }} />
+                  <label key={acc.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: accountId === acc.id ? "rgba(139,92,246,0.08)" : "#0C1022", border: `1px solid ${accountId === acc.id ? "rgba(139,92,246,0.3)" : "#232C52"}`, borderRadius: 8, cursor: "pointer", transition: "all 0.15s" }}>
+                    <input type="radio" name="adAccount" checked={accountId === acc.id} onChange={() => setAccountId(acc.id)} style={{ accentColor: "#8B5CF6" }} />
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 600, color: "#F3F5FF" }}>{acc.name}</div>
                       <div style={{ fontSize: 12, color: "#8C93B8", marginTop: 2 }}>ID: {acc.id} · Moeda: {acc.currency} · Status: {acc.account_status === 1 ? "Ativa" : `Codigo ${acc.account_status}`}</div>
@@ -268,6 +278,21 @@ export default function MetaApiPage() {
             />
           </div>
 
+          <div>
+            <label style={{ display: "block", fontSize: 14, fontWeight: 500, color: "#A0A8CE", marginBottom: 6 }}>Pixel do Meta (opcional)</label>
+            <input
+              placeholder="Ex: 1234567890 (necessario para campanhas de venda - fundo de funil)"
+              value={pixelId}
+              onChange={(e) => setPixelId(e.target.value)}
+              style={{ width: "100%", padding: "13px 16px", background: "#0C1022", border: "1px solid #232C52", borderRadius: 10, color: "#F3F5FF", fontSize: 14, fontFamily: "monospace", outline: "none", boxSizing: "border-box" as const }}
+            />
+            {!pixelId && (
+              <div style={{ marginTop: 6, fontSize: 12, color: "#FBBF24", lineHeight: 1.5 }}>
+                ⚠ Se nao preencher, o funil "Fundo (Vendas)" nao podera criar o conjunto de anuncios — voce precisara finalizar no Ads Manager.
+              </div>
+            )}
+          </div>
+
           {error && (
             <div style={{ padding: "12px 16px", background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: 10, color: "#F87171", fontSize: 14 }}>{error}</div>
           )}
@@ -277,7 +302,7 @@ export default function MetaApiPage() {
             disabled={saving}
             style={{
               padding: "14px 0",
-              background: success ? "#22B07D" : "linear-gradient(90deg,#22B07D,#3FCB92)",
+              background: success ? "#8B5CF6" : "linear-gradient(90deg,#8B5CF6,#A78BFA)",
               color: "#080B14",
               border: "none",
               borderRadius: 12,

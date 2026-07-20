@@ -1,6 +1,6 @@
 import { prisma } from "./prisma";
 
-const META_API_VERSION = "v21.0";
+const META_API_VERSION = "v25.0";
 const META_BASE_URL = `https://graph.facebook.com/${META_API_VERSION}`;
 
 export interface MetaCampaignResult {
@@ -8,6 +8,11 @@ export interface MetaCampaignResult {
   name: string;
   status: string;
   metaCampaignId?: string;
+  partial?: boolean;
+  adSetId?: string;
+  creativeId?: string;
+  adsManagerUrl?: string;
+  message?: string;
 }
 
 export interface FacebookPage {
@@ -20,11 +25,11 @@ export async function getMetaConfig(userId: string) {
   return prisma.metaConfig.findUnique({ where: { userId } });
 }
 
-export async function saveMetaConfig(userId: string, accessToken: string, accountId: string) {
+export async function saveMetaConfig(userId: string, accessToken: string, accountId: string, pixelId?: string) {
   return prisma.metaConfig.upsert({
     where: { userId },
-    update: { accessToken, accountId },
-    create: { userId, accessToken, accountId },
+    update: { accessToken, accountId, pixelId },
+    create: { userId, accessToken, accountId, pixelId },
   });
 }
 
@@ -133,9 +138,9 @@ function mapCta(cta?: string): string {
 }
 
 const OBJECTIVE_MAP: Record<string, string> = {
-  topo: "OUTCOME_TRAFFIC",
-  meio: "OUTCOME_ENGAGEMENT",
-  fundo: "OUTCOME_SALES",
+    topo: "OUTCOME_TRAFFIC",
+    meio: "OUTCOME_ENGAGEMENT",
+    fundo: "OUTCOME_SALES",
 };
 
 export interface CreateCampaignParams {
@@ -160,6 +165,7 @@ export interface CreateCampaignParams {
   startTime?: string;
   endTime?: string;
   status?: string;
+  pixelId?: string;
 }
 
 export async function createMetaCampaign(
@@ -182,9 +188,16 @@ export async function createMetaCampaign(
     startTime,
     endTime,
     status: campaignStatus = "PAUSED",
+    pixelId,
   } = params;
 
-  const objective = OBJECTIVE_MAP[funnelStage || "topo"] || "OUTCOMES_TRAFFIC";
+  const objective = OBJECTIVE_MAP[funnelStage || "topo"] || "OUTCOME_TRAFFIC";
+
+  function toMetaDatetime(isoOrDate: string): string {
+    const d = new Date(isoOrDate)
+    if (isNaN(d.getTime())) return isoOrDate
+    return d.toISOString().replace(/\.\d{3}Z$/, '+0000')
+  }
 
   const campaignBody: Record<string, unknown> = {
     name: campaignName,
@@ -195,8 +208,8 @@ export async function createMetaCampaign(
     access_token: accessToken,
   };
 
-  if (startTime) campaignBody.start_time = startTime;
-  if (endTime) campaignBody.end_time = endTime;
+  if (startTime) campaignBody.start_time = toMetaDatetime(startTime);
+  if (endTime) campaignBody.end_time = toMetaDatetime(endTime);
 
   const campaignRes = await fetch(`${META_BASE_URL}/${accountId}/campaigns`, {
     method: "POST",
@@ -214,6 +227,7 @@ export async function createMetaCampaign(
   const targeting: Record<string, unknown> = {
     geo_locations: geoLocations,
     publisher_platforms: platforms,
+    targeting_automation: { advantage_audience: 0 },
   };
 
   if (platforms.includes("facebook")) {
@@ -265,12 +279,35 @@ export async function createMetaCampaign(
     access_token: accessToken,
   };
 
-  if (["OUTCOME_ENGAGEMENT", "OUTCOME_LEADS", "OUTCOME_TRAFFIC"].includes(objective) && pageId) {
+  // EU Digital Services Act — required when targeting EU countries
+  const EU_COUNTRIES = ["AT","BE","BG","HR","CY","CZ","DK","EE","FI","FR","DE","GR","HU","IE","IT","LV","LT","LU","MT","NL","PL","PT","RO","SK","SI","ES","SE"];
+  if (pageId && EU_COUNTRIES.includes(country.toUpperCase())) {
+    adSetBody.dsa_beneficiary = { page_id: pageId };
+    adSetBody.dsa_payor = { page_id: pageId };
+  }
+
+  if (objective === "OUTCOME_SALES" && pixelId) {
+    adSetBody.promoted_object = {
+      pixel_id: pixelId,
+      custom_event_type: "PURCHASE",
+    };
+    if (pageId) {
+      (adSetBody.promoted_object as Record<string, unknown>).page_id = pageId;
+    }
+  }
+  if (objective === "OUTCOME_TRAFFIC" && pageId) {
     adSetBody.promoted_object = { page_id: pageId };
   }
 
-  if (startTime) adSetBody.start_time = startTime;
-  if (endTime) adSetBody.end_time = endTime;
+  if (objective === "OUTCOME_ENGAGEMENT" && pageId) {
+    adSetBody.promoted_object = {
+      page_id: pageId,
+      engagement_type: "POST_ENGAGEMENT",
+    };
+  }
+
+  if (startTime) adSetBody.start_time = toMetaDatetime(startTime);
+  if (endTime) adSetBody.end_time = toMetaDatetime(endTime);
 
   const adSetRes = await fetch(`${META_BASE_URL}/${accountId}/adsets`, {
     method: "POST",
@@ -280,10 +317,16 @@ export async function createMetaCampaign(
   const adSetData = await adSetRes.json();
   if (adSetData.error) throw new Error(`Erro ao criar AdSet: ${adSetData.error.error_user_msg || adSetData.error.message}`);
 
-  const linkData: Record<string, string> = {
+  const ctaType = mapCta(adCopy.headline);
+
+  const linkData: Record<string, unknown> = {
     link: adCopy.cta || "https://example.com",
     message: adCopy.primaryText || campaignName,
     name: adCopy.headline || campaignName,
+    call_to_action: {
+      type: ctaType,
+      value: { link: adCopy.cta || "https://example.com" },
+    },
   };
   if (adCopy.description) linkData.description = adCopy.description;
   if (creativeUrl) linkData.image_url = creativeUrl;

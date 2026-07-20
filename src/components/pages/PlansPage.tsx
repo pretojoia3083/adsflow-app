@@ -4,54 +4,37 @@ import { useState } from "react";
 
 const plans = [
   {
-    id: "mensal",
-    name: "Mensal",
-    price: "R$ 59,90",
+    id: "basico",
+    name: "Basico",
+    price: "R$ 30",
     period: "/mes",
     highlight: false,
     features: [
       "Campanhas ilimitadas",
-      "IA para copy e segmentacao",
+      "IA para copy e segmentacao (use sua API key)",
       "Presell hospedada",
       "Analise de mercado",
       "Suporte via chat",
+      "Meta Ads API",
     ],
     cta: "Comecar agora",
   },
   {
-    id: "semestral",
-    name: "6 Meses",
-    price: "R$ 299,90",
-    period: "/6 meses",
-    perMonth: "R$ 49,98/mes",
+    id: "pro",
+    name: "Pro",
+    price: "R$ 50",
+    period: "/mes",
     highlight: true,
     badge: "Mais popular",
     features: [
-      "Tudo do plano Mensal",
-      "Economia de 17%",
+      "Tudo do plano Basico",
+      "IA incluida (sem precisar de API key)",
+      "Templates de presell premium",
       "Relatorios avancados",
       "Prioridade no suporte",
-      "Integracao Meta Ads API",
-      "Templates de presell premium",
+      "Integracao completa Meta Ads",
     ],
-    cta: "Assinar 6 meses",
-  },
-  {
-    id: "anual",
-    name: "Anual",
-    price: "R$ 599,90",
-    period: "/ano",
-    perMonth: "R$ 49,99/mes",
-    highlight: false,
-    features: [
-      "Tudo do plano 6 Meses",
-      "Economia de 17%",
-      "Acesso antecipado a novidades",
-      "Suporte prioritario VIP",
-      "Consultoria mensal (1h)",
-      "API completa para automacao",
-    ],
-    cta: "Assinar anual",
+    cta: "Assinar Pro",
   },
 ];
 
@@ -94,19 +77,19 @@ export default function PlansPage() {
   }
 
   return (
-    <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+    <div style={{ maxWidth: 900, margin: "0 auto" }}>
       <div style={{ marginBottom: 36 }}>
         <h2 style={{ fontSize: 28, fontWeight: 700, color: "#F3F5FF", margin: 0 }}>Planos</h2>
         <p style={{ color: "#8C93B8", fontSize: 15, marginTop: 6 }}>Escolha o plano ideal para escalar seus anuncios</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 24, alignItems: "start" }}>
         {plans.map((plan) => (
           <div
             key={plan.id}
             style={{
-              background: plan.highlight ? "rgba(34,176,125,0.06)" : "#121830",
-              border: plan.highlight ? "2px solid #22B07D" : "1px solid #232C52",
+              background: plan.highlight ? "rgba(139,92,246,0.06)" : "#121830",
+              border: plan.highlight ? "2px solid #8B5CF6" : "1px solid #232C52",
               borderRadius: 18,
               padding: 0,
               position: "relative",
@@ -114,23 +97,19 @@ export default function PlansPage() {
             }}
           >
             {plan.badge && (
-              <div style={{ background: "linear-gradient(90deg,#22B07D,#3FCB92)", color: "#080B14", fontSize: 12, fontWeight: 700, textAlign: "center" as const, padding: "8px 0", textTransform: "uppercase" as const, letterSpacing: 1 }}>
+              <div style={{ background: "linear-gradient(90deg,#8B5CF6,#A78BFA)", color: "#080B14", fontSize: 12, fontWeight: 700, textAlign: "center" as const, padding: "8px 0", textTransform: "uppercase" as const, letterSpacing: 1 }}>
                 {plan.badge}
               </div>
             )}
 
             <div style={{ padding: "32px 28px" }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: plan.highlight ? "#3FCB92" : "#8C93B8", marginBottom: 12, textTransform: "uppercase" as const, letterSpacing: 1 }}>
+              <div style={{ fontSize: 15, fontWeight: 600, color: plan.highlight ? "#A78BFA" : "#8C93B8", marginBottom: 12, textTransform: "uppercase" as const, letterSpacing: 1 }}>
                 {plan.name}
               </div>
 
               <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 6 }}>
                 <span style={{ fontSize: 40, fontWeight: 800, color: "#F3F5FF", fontFamily: "'Space Grotesk', sans-serif" }}>{plan.price}</span>
               </div>
-
-              {plan.perMonth && (
-                <div style={{ fontSize: 14, color: "#8C93B8", marginBottom: 4 }}>{plan.perMonth}</div>
-              )}
 
               <div style={{ fontSize: 14, color: "#6B739E", marginBottom: 28 }}>{plan.period}</div>
 
@@ -140,8 +119,8 @@ export default function PlansPage() {
                 style={{
                   width: "100%",
                   padding: "14px 0",
-                  background: loadingPlan === plan.id ? "#1a7a55" : plan.highlight ? "linear-gradient(90deg,#22B07D,#3FCB92)" : "transparent",
-                  color: plan.highlight ? "#080B14" : "#3FCB92",
+                  background: loadingPlan === plan.id ? "#6D28D9" : plan.highlight ? "linear-gradient(90deg,#8B5CF6,#A78BFA)" : "transparent",
+                  color: plan.highlight ? "#080B14" : "#A78BFA",
                   border: plan.highlight ? "none" : "1px solid #232C52",
                   borderRadius: 12,
                   fontSize: 15,
@@ -158,7 +137,7 @@ export default function PlansPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {plan.features.map((f, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <span style={{ color: "#22B07D", fontSize: 16, flexShrink: 0 }}>✓</span>
+                    <span style={{ color: "#8B5CF6", fontSize: 16, flexShrink: 0 }}>&#10003;</span>
                     <span style={{ color: "#C0C6E0", fontSize: 14 }}>{f}</span>
                   </div>
                 ))}
@@ -168,7 +147,6 @@ export default function PlansPage() {
         ))}
       </div>
 
-      {/* Gerenciar assinatura */}
       <div style={{ marginTop: 32, textAlign: "center" as const }}>
         <button
           onClick={handleManageSubscription}

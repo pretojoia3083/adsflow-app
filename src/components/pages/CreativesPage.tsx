@@ -48,8 +48,8 @@ export default function CreativesPage() {
         onDrop={handleDrop}
         onClick={() => fileRef.current?.click()}
         style={{
-          border: `2px dashed ${dragOver ? "#22B07D" : "#232C52"}`,
-          background: dragOver ? "rgba(34,176,125,0.05)" : "#121830",
+          border: `2px dashed ${dragOver ? "#8B5CF6" : "#232C52"}`,
+          background: dragOver ? "rgba(139,92,246,0.05)" : "#121830",
           borderRadius: 16,
           padding: "48px 40px",
           textAlign: "center",
@@ -86,7 +86,7 @@ export default function CreativesPage() {
                 <a
                   href={c.url}
                   download={c.name}
-                  style={{ flex: 1, padding: "8px 0", background: "rgba(34,176,125,0.1)", border: "1px solid rgba(34,176,125,0.3)", borderRadius: 8, color: "#3FCB92", fontSize: 13, fontWeight: 600, textAlign: "center", textDecoration: "none", cursor: "pointer" }}
+                  style={{ flex: 1, padding: "8px 0", background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.3)", borderRadius: 8, color: "#A78BFA", fontSize: 13, fontWeight: 600, textAlign: "center", textDecoration: "none", cursor: "pointer" }}
                 >
                   Baixar
                 </a>

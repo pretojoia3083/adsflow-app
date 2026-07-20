@@ -12,9 +12,9 @@ interface TrendingTopic {
 }
 
 const NICHE_COLORS: Record<string, { color: string; bg: string; icon: string }> = {
-  saude: { color: "#3FCB92", bg: "rgba(63,203,146,0.1)", icon: "💊" },
+  saude: { color: "#A78BFA", bg: "rgba(167,139,250,0.1)", icon: "💊" },
   financeiro: { color: "#F7C948", bg: "rgba(247,201,72,0.1)", icon: "💰" },
-  fitness: { color: "#F72585", bg: "rgba(247,37,133,0.1)", icon: "💪" },
+  fitness: { color: "#F97316", bg: "rgba(247,37,133,0.1)", icon: "💪" },
   educacao: { color: "#60A5FA", bg: "rgba(96,165,250,0.1)", icon: "📚" },
   tecnologia: { color: "#A78BFA", bg: "rgba(167,139,250,0.1)", icon: "💻" },
   geral: { color: "#8C93B8", bg: "rgba(140,147,184,0.1)", icon: "🔥" },
@@ -157,7 +157,7 @@ export default function AdsShopPage() {
           productName: product.name,
           description: product.description,
           audience: product.tags.join(", "),
-          funnelStage: "meio",
+          funnelStage: "topo",
           budgetPref: "medio",
           country: product.country,
           countryCode: product.country,
@@ -221,9 +221,9 @@ export default function AdsShopPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 28 }}>
         {[
           { label: "Produtos", value: stats.total.toString(), icon: "📦", color: "#60A5FA" },
-          { label: "Em alta", value: stats.trending.toString(), icon: "📈", color: "#F72585" },
+          { label: "Em alta", value: stats.trending.toString(), icon: "📈", color: "#F97316" },
           { label: "Comissao media", value: `${stats.avgCommission}%`, icon: "💰", color: "#F7C948" },
-          { label: "Gravity medio", value: stats.avgGravity, icon: "🚀", color: "#3FCB92" },
+          { label: "Gravity medio", value: stats.avgGravity, icon: "🚀", color: "#A78BFA" },
         ].map((stat) => (
           <div key={stat.label} style={{
             background: "#121830", border: "1px solid #232C52", borderRadius: 12,
@@ -338,7 +338,7 @@ export default function AdsShopPage() {
                         {topic.suggestedProducts.slice(0, 2).map((p) => (
                           <span key={p.id} style={{
                             fontSize: 10, fontWeight: 600,
-                            background: "rgba(63,203,146,0.1)", color: "#3FCB92",
+                            background: "rgba(167,139,250,0.1)", color: "#A78BFA",
                             padding: "2px 8px", borderRadius: 6,
                           }}>
                             ${p.commission} · {p.match}% match
@@ -573,9 +573,9 @@ export default function AdsShopPage() {
                     {product.recurring && (
                       <span style={{
                         padding: "3px 10px", borderRadius: 99,
-                        background: "rgba(63,203,146,0.08)",
-                        border: "1px solid rgba(63,203,146,0.15)",
-                        color: "#3FCB92", fontSize: 11, fontWeight: 600,
+                        background: "rgba(167,139,250,0.08)",
+                        border: "1px solid rgba(167,139,250,0.15)",
+                        color: "#A78BFA", fontSize: 11, fontWeight: 600,
                       }}>
                         Recorrente
                       </span>
@@ -607,7 +607,7 @@ export default function AdsShopPage() {
                       borderRadius: 8, padding: "10px 12px", textAlign: "center",
                     }}>
                       <p style={{ fontSize: 11, color: "#6B739E", margin: 0 }}>Gravity</p>
-                      <p style={{ fontSize: 16, fontWeight: 700, color: "#F72585", margin: "4px 0 0 0" }}>
+                      <p style={{ fontSize: 16, fontWeight: 700, color: "#F97316", margin: "4px 0 0 0" }}>
                         {product.gravity.toFixed(0)}
                       </p>
                     </div>
@@ -633,12 +633,12 @@ export default function AdsShopPage() {
                     <span style={{ fontSize: 12, color: "#6B739E" }}>Taxa de reembolso:</span>
                     <span style={{
                       fontSize: 12, fontWeight: 600,
-                      color: product.refundRate < 5 ? "#3FCB92" : product.refundRate < 8 ? "#F59E0B" : "#F87171",
+                      color: product.refundRate < 5 ? "#22B07D" : product.refundRate < 8 ? "#F59E0B" : "#F87171",
                     }}>
                       {product.refundRate}%
                     </span>
                     {product.refundRate < 5 && (
-                      <span style={{ fontSize: 11, color: "#3FCB92" }}>✓ Baixa</span>
+                      <span style={{ fontSize: 11, color: "#22B07D" }}>✓ Baixa</span>
                     )}
                   </div>
 
@@ -709,7 +709,7 @@ export default function AdsShopPage() {
                   {selectedProduct.recurring && (
                     <span style={{
                       padding: "4px 12px", borderRadius: 99,
-                      background: "rgba(63,203,146,0.12)", color: "#3FCB92",
+                      background: "rgba(167,139,250,0.12)", color: "#A78BFA",
                       fontSize: 12, fontWeight: 600,
                     }}>
                       🔄 Recorrente
@@ -747,8 +747,8 @@ export default function AdsShopPage() {
                 {[
                   { label: "Preco", value: `$${selectedProduct.price.toFixed(2)}`, color: "#F3F5FF" },
                   { label: "Comissao por venda", value: `$${selectedProduct.commission.toFixed(2)}`, color: "#F7C948" },
-                  { label: "Gravity Score", value: selectedProduct.gravity.toFixed(0), color: "#F72585" },
-                  { label: "Taxa de reembolso", value: `${selectedProduct.refundRate}%`, color: selectedProduct.refundRate < 5 ? "#3FCB92" : "#F59E0B" },
+                  { label: "Gravity Score", value: selectedProduct.gravity.toFixed(0), color: "#F97316" },
+                  { label: "Taxa de reembolso", value: `${selectedProduct.refundRate}%`, color: selectedProduct.refundRate < 5 ? "#22B07D" : "#F59E0B" },
                 ].map((m) => (
                   <div key={m.label} style={{
                     background: "#0C1022", borderRadius: 10, padding: "14px 16px",
@@ -786,7 +786,7 @@ export default function AdsShopPage() {
                   style={{
                     flex: 1, padding: "14px",
                     background: creatingCampaign
-                      ? (campaignCreated ? "#3FCB92" : "#232C52")
+                      ? (campaignCreated ? "#A78BFA" : "#232C52")
                       : "linear-gradient(90deg, #FF6B35, #F7C948)",
                     color: "#080B14", border: "none", borderRadius: 12,
                     fontSize: 15, fontWeight: 700, cursor: creatingCampaign ? "default" : "pointer",

@@ -21,7 +21,7 @@ export default function PaymentCancelPage() {
             display: "inline-block",
             padding: "16px 40px",
             background: "transparent",
-            color: "#3FCB92",
+            color: "#A78BFA",
             border: "1px solid #232C52",
             borderRadius: 12,
             fontSize: 16,

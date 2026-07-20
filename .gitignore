@@ -13,3 +13,4 @@ prisma/dev.db
 .vercel
 .env*
 deploy.ps1
+vercel.json

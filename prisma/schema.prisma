@@ -143,6 +143,7 @@ model MetaConfig {
   userId        String   @unique
   accessToken   String
   accountId     String
+  pixelId       String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

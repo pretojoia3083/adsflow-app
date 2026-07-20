@@ -52,7 +52,7 @@ function renderBars(values: number[], maxVal: number) {
     const heightPct = maxVal > 0 ? Math.max((v / maxVal) * 100, 3) : 3;
     return (
       <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-        <div style={{ width: "100%", height: heightPct + "%", background: "linear-gradient(180deg, #22B07D, #3FCB92)", borderRadius: 4, minHeight: 4 }} />
+        <div style={{ width: "100%", height: heightPct + "%", background: "linear-gradient(180deg, #8B5CF6, #A78BFA)", borderRadius: 4, minHeight: 4 }} />
       </div>
     );
   });
@@ -197,7 +197,7 @@ export default function MetricsPage() {
           <div key={m.label} style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 12, padding: "20px 18px" }}>
             <p style={{ color: "#8C93B8", fontSize: 13, margin: 0, fontWeight: 500 }}>{m.label}</p>
             <p style={{ color: "#F3F5FF", fontSize: 26, fontWeight: 700, margin: "8px 0 4px" }}>{m.value}</p>
-            <p style={{ color: m.up ? "#3FCB92" : "#F87171", fontSize: 13, margin: 0, fontWeight: 600 }}>{m.change}</p>
+            <p style={{ color: m.up ? "#22B07D" : "#F87171", fontSize: 13, margin: 0, fontWeight: 600 }}>{m.change}</p>
           </div>
         ))}
       </div>
@@ -230,7 +230,7 @@ export default function MetricsPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {campaigns.map((c) => {
               const platform = c.metaCampaignId ? "Meta Ads" : "Nao conectada";
-              const platformColor = c.metaCampaignId ? "#3FCB92" : "#8C93B8";
+              const platformColor = c.metaCampaignId ? "#22B07D" : "#8C93B8";
               return (
                 <div key={c.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "#0C1022", borderRadius: 10, border: "1px solid #1A2040" }}>
                   <div>

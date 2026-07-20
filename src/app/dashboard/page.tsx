@@ -68,7 +68,7 @@ interface Campaign {
 const STATUS_COLORS: Record<string, { color: string; bg: string }> = {
   DRAFT: { color: "#8C93B8", bg: "rgba(140,147,184,0.12)" },
   READY: { color: "#60A5FA", bg: "rgba(96,165,250,0.12)" },
-  ACTIVE: { color: "#3FCB92", bg: "rgba(63,203,146,0.12)" },
+  ACTIVE: { color: "#22B07D", bg: "rgba(34,176,125,0.12)" },
   PAUSED: { color: "#F59E0B", bg: "rgba(245,158,11,0.12)" },
   COMPLETED: { color: "#A78BFA", bg: "rgba(167,139,250,0.12)" },
 };
@@ -167,7 +167,7 @@ export default function DashboardPage() {
             <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => handleNavigate("settings")}>
               <div style={{
                 width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
-                background: avatarUrl ? "none" : "linear-gradient(135deg, #22B07D, #3FCB92)",
+                background: avatarUrl ? "none" : "linear-gradient(135deg, #8B5CF6, #A78BFA)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 overflow: "hidden", border: "2px solid #232C52",
               }}>
@@ -199,7 +199,7 @@ export default function DashboardPage() {
                   </div>
                   <button
                     onClick={() => setShowWizard(true)}
-                    style={{ padding: "12px 24px", background: "linear-gradient(90deg,#22B07D,#3FCB92)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer" }}
+                    style={{ padding: "12px 24px", background: "linear-gradient(90deg,#8B5CF6,#A78BFA)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer" }}
                   >
                     + Nova campanha
                   </button>
@@ -214,7 +214,7 @@ export default function DashboardPage() {
                     <p style={{ color: "#8C93B8", fontSize: 15, marginBottom: 28 }}>Crie sua primeira campanha em poucos passos com ajuda da IA.</p>
                     <button
                       onClick={() => setShowWizard(true)}
-                      style={{ padding: "14px 28px", background: "linear-gradient(90deg,#22B07D,#3FCB92)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer" }}
+                      style={{ padding: "14px 28px", background: "linear-gradient(90deg,#8B5CF6,#A78BFA)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer" }}
                     >
                       Criar primeira campanha
                     </button>

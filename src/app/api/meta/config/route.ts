@@ -22,6 +22,7 @@ export async function GET() {
   return NextResponse.json({
     connected: true,
     accountId,
+    pixelId: config.pixelId || null,
     createdAt: config.createdAt,
   });
 }
@@ -32,25 +33,32 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { accessToken, accountId } = await req.json();
+  const { accessToken, accountId, pixelId } = await req.json();
 
-  if (!accessToken || !accountId) {
+  const existing = await getMetaConfig(session.user.id);
+
+  const effectiveToken = accessToken || existing?.accessToken;
+  const effectiveAccountId = accountId || existing?.accountId;
+
+  if (!effectiveToken || !effectiveAccountId) {
     return NextResponse.json({ error: "Token e ID da conta sao obrigatorios" }, { status: 400 });
   }
 
-  const validation = await validateMetaToken(accessToken);
-  if (!validation.valid) {
-    return NextResponse.json({ error: validation.error || "Token invalido" }, { status: 400 });
+  if (accessToken) {
+    const validation = await validateMetaToken(accessToken);
+    if (!validation.valid) {
+      return NextResponse.json({ error: validation.error || "Token invalido" }, { status: 400 });
+    }
   }
 
-  let normalizedAccountId = accountId.trim();
+  let normalizedAccountId = effectiveAccountId.trim();
   if (!normalizedAccountId.startsWith("act_")) {
     normalizedAccountId = `act_${normalizedAccountId}`;
   }
 
-  await saveMetaConfig(session.user.id, accessToken, normalizedAccountId);
+  await saveMetaConfig(session.user.id, effectiveToken, normalizedAccountId, pixelId);
 
-  return NextResponse.json({ success: true, connected: true, accountId: normalizedAccountId });
+  return NextResponse.json({ success: true, connected: true, accountId: normalizedAccountId, pixelId });
 }
 
 export async function DELETE() {

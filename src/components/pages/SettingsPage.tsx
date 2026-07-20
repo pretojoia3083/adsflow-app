@@ -94,7 +94,7 @@ export default function SettingsPage() {
                 backgroundImage: avatarBg ? `url(${avatarBg})` : "none",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
-                backgroundColor: avatarBg ? "transparent" : "#22B07D",
+                backgroundColor: avatarBg ? "transparent" : "#8B5CF6",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: "pointer", border: "3px solid #232C52",
                 flexShrink: 0,
@@ -114,7 +114,7 @@ export default function SettingsPage() {
               <p style={{ color: "#8C93B8", fontSize: 13, margin: 0, lineHeight: 1.5 }}>Clique na foto para alterar. Maximo 2MB.</p>
               <button
                 onClick={() => { if (avatarInputRef.current) avatarInputRef.current.click(); }}
-                style={{ marginTop: 8, padding: "6px 14px", background: "rgba(34,176,125,0.1)", border: "1px solid rgba(34,176,125,0.3)", borderRadius: 8, color: "#3FCB92", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+                style={{ marginTop: 8, padding: "6px 14px", background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.3)", borderRadius: 8, color: "#A78BFA", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
               >
                 Alterar foto
               </button>
@@ -187,7 +187,7 @@ export default function SettingsPage() {
           <button
             onClick={handleSave}
             disabled={uploading}
-            style={{ padding: "12px 24px", background: saved ? "#3FCB92" : "linear-gradient(90deg,#22B07D,#3FCB92)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: uploading ? "wait" : "pointer" }}
+            style={{ padding: "12px 24px", background: saved ? "#A78BFA" : "linear-gradient(90deg,#8B5CF6,#A78BFA)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: uploading ? "wait" : "pointer" }}
           >
             {uploading ? "Salvando..." : saved ? "Salvo!" : "Salvar alteracoes"}
           </button>

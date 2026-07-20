@@ -16,14 +16,14 @@ export default function SupportPage() {
           { icon: "🎥", title: "Videoaulas", desc: "Assista nossos videos explicativos sobre cada funcionalidade.", action: "Ver videos" },
         ].map((item) => (
           <div key={item.title} style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 14, padding: "22px 24px", display: "flex", alignItems: "center", gap: 18 }}>
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(34,176,125,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(139,92,246,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, flexShrink: 0 }}>
               {item.icon}
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 16, fontWeight: 600, color: "#F3F5FF", marginBottom: 4 }}>{item.title}</div>
               <div style={{ fontSize: 14, color: "#8C93B8", lineHeight: 1.5 }}>{item.desc}</div>
             </div>
-            <button style={{ padding: "10px 20px", background: "transparent", border: "1px solid #232C52", borderRadius: 10, color: "#3FCB92", fontSize: 14, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>
+            <button style={{ padding: "10px 20px", background: "transparent", border: "1px solid #232C52", borderRadius: 10, color: "#A78BFA", fontSize: 14, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>
               {item.action}
             </button>
           </div>

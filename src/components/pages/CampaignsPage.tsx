@@ -18,7 +18,7 @@ interface Campaign {
 const STATUS_COLORS: Record<string, { color: string; bg: string }> = {
   DRAFT: { color: "#8C93B8", bg: "rgba(140,147,184,0.12)" },
   READY: { color: "#60A5FA", bg: "rgba(96,165,250,0.12)" },
-  ACTIVE: { color: "#3FCB92", bg: "rgba(63,203,146,0.12)" },
+  ACTIVE: { color: "#22B07D", bg: "rgba(34,176,125,0.12)" },
   PAUSED: { color: "#F59E0B", bg: "rgba(245,158,11,0.12)" },
   COMPLETED: { color: "#A78BFA", bg: "rgba(167,139,250,0.12)" },
 };
@@ -113,10 +113,10 @@ export default function CampaignsPage() {
             onClick={() => setFilter(f)}
             style={{
               padding: "8px 16px",
-              background: filter === f ? "rgba(34,176,125,0.15)" : "#121830",
-              border: filter === f ? "1px solid #22B07D" : "1px solid #232C52",
+              background: filter === f ? "rgba(139,92,246,0.15)" : "#121830",
+              border: filter === f ? "1px solid #8B5CF6" : "1px solid #232C52",
               borderRadius: 8,
-              color: filter === f ? "#3FCB92" : "#8C93B8",
+              color: filter === f ? "#A78BFA" : "#8C93B8",
               fontSize: 13,
               fontWeight: 600,
               cursor: "pointer",
@@ -149,7 +149,7 @@ export default function CampaignsPage() {
                     {c.budgetDaily && <span> · R${c.budgetDaily}/dia</span>}
                   </p>
                   {c.metaCampaignId && (
-                    <p style={{ color: "#3FCB92", fontSize: 12, margin: "4px 0 0 0" }}>🔗 Conectada ao Meta Ads</p>
+                    <p style={{ color: "#22B07D", fontSize: 12, margin: "4px 0 0 0" }}>🔗 Conectada ao Meta Ads</p>
                   )}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
@@ -162,7 +162,7 @@ export default function CampaignsPage() {
                       onClick={() => handleToggleStatus(c)}
                       disabled={!!isLoading}
                       title={c.status === "ACTIVE" ? "Pausar campanha" : "Ativar/Retomar campanha"}
-                      style={{ padding: "7px 12px", background: c.status === "ACTIVE" ? "rgba(245,158,11,0.08)" : "rgba(63,203,146,0.08)", border: `1px solid ${c.status === "ACTIVE" ? "rgba(245,158,11,0.25)" : "rgba(63,203,146,0.25)"}`, borderRadius: 8, color: c.status === "ACTIVE" ? "#F59E0B" : "#3FCB92", fontSize: 14, cursor: isLoading ? "wait" : "pointer" }}
+                      style={{ padding: "7px 12px", background: c.status === "ACTIVE" ? "rgba(245,158,11,0.08)" : "rgba(34,176,125,0.08)", border: `1px solid ${c.status === "ACTIVE" ? "rgba(245,158,11,0.25)" : "rgba(34,176,125,0.25)"}`, borderRadius: 8, color: c.status === "ACTIVE" ? "#F59E0B" : "#22B07D", fontSize: 14, cursor: isLoading ? "wait" : "pointer" }}
                     >
                       {c.status === "ACTIVE" ? "⏸️" : "▶️"}
                     </button>
@@ -173,7 +173,7 @@ export default function CampaignsPage() {
                       onClick={() => handleToggleStatus(c)}
                       disabled={!!isLoading}
                       title="Ativar campanha"
-                      style={{ padding: "7px 12px", background: "rgba(63,203,146,0.08)", border: "1px solid rgba(63,203,146,0.25)", borderRadius: 8, color: "#3FCB92", fontSize: 14, cursor: isLoading ? "wait" : "pointer" }}
+                      style={{ padding: "7px 12px", background: "rgba(34,176,125,0.08)", border: "1px solid rgba(34,176,125,0.25)", borderRadius: 8, color: "#22B07D", fontSize: 14, cursor: isLoading ? "wait" : "pointer" }}
                     >
                       ▶️
                     </button>

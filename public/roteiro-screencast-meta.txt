@@ -1,0 +1,141 @@
+ROTEIRO PARA SCREENCAST - REVISAO DO APP META
+App: ADSFLOW PLATAFORMA (ID: 27907898765564872)
+Permissao: ads_management
+
+========================================
+CENA 1 - LOGIN E DASHBOARD (15 segundos)
+========================================
+Tela: Navegador aberto em https://adsflow-app-ten.vercel.app
+Acao: Fazer login (mostrar email/senha sendo digitados)
+Narracao: "Abrindo o AdsFlow e fazendo login na plataforma."
+Apos login: mostrar o Dashboard com a lista de campanhas
+
+========================================
+CENA 2 - CONFIGURACAO META ADS API (20 segundos)
+========================================
+Tela: Clicar em "Meta Ads API" na sidebar
+Acao: Mostrar que ja esta conectado
+- Token valido (verde)
+- Conta: act_2397686837400396
+- Pixel: 4393004204300659
+Narracao: "Aqui mostramos que o AdsFlow esta conectado a conta de anuncios
+IMPACTO MKT. O token, ID da conta e pixel estao configurados."
+
+========================================
+CENA 3 - CRIAR CAMPANHA PELO WIZARD (60 segundos)
+========================================
+Tela: Clicar em "Campanhas" na sidebar → "Nova Campanha"
+Acao: Preencher o Wizard passo a passo:
+
+PASSO 1 - PRODUTO:
+- Nome: "CardioBalance"
+- Descricao: "Suplemento cardiovascular"
+- Publico-alvo: "Homens 35-55"
+- Link de afiliado: "https://example.com"
+- Clicar "Proximo"
+
+PASSO 2 - CONTEUDO:
+- Headline: "CardioBalance: resultados em 7 dias"
+- Texto principal: "Metodo comprovado que ja ajudou milhares"
+- CTA: "Compre Agora"
+- Clicar "Proximo"
+
+PASSO 3 - SEGMENTACAO:
+- Pais: "Italia"
+- Idioma: "Italiano"
+- Funil: "Fundo de funil (Conversao)"
+- Interesses: "Marketing digital"
+- Orcamento: "R$30/dia"
+- Clicar "Proximo"
+
+PASSO 4 - REVISAO:
+- Mostrar resumo com todos os dados
+- Clicar "Salvar Campanha"
+
+Narracao: "Preenchendo os dados da campanha no Wizard.
+Selecionamos Italia como pais, fundo de funil para conversao,
+e definimos o orcamento diario."
+
+========================================
+CENA 4 - PUBLICAR NO META (30 segundos)
+========================================
+Tela: Modal de detalhes da campanha (recem-criada)
+Acao:
+1. Selecionar a Facebook Page "IMPACTO MKT" no dropdown
+2. Clicar em "Publicar no Meta"
+3. Aguardar a mensagem de sucesso
+4. Mostrar o link "Abrir no Ads Manager"
+
+Narracao: "Publicando a campanha no Meta Ads.
+O AdsFlow cria a campanha e o conjunto de anuncios
+automaticamente via API. Apos publicado, mostramos
+o link para o Ads Manager."
+
+========================================
+CENA 5 - VERIFICAR NO ADS MANAGER (20 segundos)
+========================================
+Tela: Abrir o Ads Manager em outra aba (https://adsmanager.facebook.com)
+Acao:
+1. Mostrar que a campanha "CardioBalance" aparece na lista
+2. Mostrar que o status esta "Pausada" (ou "Ativa")
+3. Clicar na campanha para mostrar detalhes
+
+Narracao: "Aqui vemos a campanha criada pelo AdsFlow
+aparecendo no Gerenciador de Anuncios do Meta.
+O nome, orcamento e segmentacao foram aplicados."
+
+========================================
+CENA 6 - GERENCIAR CAMPANHA (20 segundos)
+========================================
+Tela: Voltar ao AdsFlow, Dashboard
+Acao:
+1. Mostrar a campanha na lista do Dashboard
+2. Clicar em "Ver" para abrir detalhes
+3. Mostrar botoes: Pausar/Ativar
+4. Clicar em "Pausar" → mostrar confirmacao
+
+Narracao: "De volta ao AdsFlow, podemos gerenciar a campanha:
+pausar, ativar ou excluir diretamente da plataforma."
+
+========================================
+CENA 7 - EXCLUIR CAMPANHA (15 segundos)
+========================================
+Tela: Detalhes da campanha
+Acao:
+1. Clicar em "Excluir"
+2. Confirmar exclusao
+3. Mostrar que a campanha sumiu da lista
+
+Narracao: "Tambem podemos excluir campanhas.
+A exclusao e sincronizada com o Meta Ads Manager."
+
+========================================
+DICAS DE GRAVACAO
+========================================
+- Resolucao: 1920x1080 (full HD)
+- Formato: MP4
+- Duracao total: ~3 minutos
+- Pode usar OBS Studio (gratuito) para gravar
+- Narracao pode ser em portugues (Meta aceita)
+- Nao precisa aparecer o rosto
+- Garanta que o texto da tela esteja legivel
+
+========================================
+SUBMISSAO NO META DEVELOPERS
+========================================
+1. Acesse: https://developers.facebook.com
+2. Va em "Meus Apps" > "ADSFLOW PLATAFORMA"
+3. Sidebar: "Revisao do Aplicativo" > "Permissoes e Recursos"
+4. Clique em "Enviar para Analise" ao lado de ads_management
+5. Faca upload do video gravado
+6. Preencha as instrucoes:
+   - "Como seu aplicativo usa essa permissao?"
+     "O AdsFlow cria e gerencia campanhas de anuncio
+     no Meta Ads automaticamente via Marketing API."
+   - "Forneca instrucoes para testar"
+     "1. Faca login em adsflow-app-ten.vercel.app
+      2. Va em Campanhas > Nova Campanha
+      3. Preencha o Wizard e publique no Meta
+      4. A campanha aparece no Gerenciador de Anuncios"
+7. Enviar para revisao
+8. Aguardar (pode levar de 2 a 7 dias uteis)
