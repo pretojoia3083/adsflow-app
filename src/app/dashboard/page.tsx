@@ -95,6 +95,7 @@ export default function DashboardPage() {
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [userPlan, setUserPlan] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string>("USER");
+  const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
 
   const handleStepChange = useCallback((step: number) => {
     setCurrentStep(step);
@@ -116,6 +117,7 @@ export default function DashboardPage() {
           if (d.user?.avatarUrl) setAvatarUrl(d.user.avatarUrl);
           if (d.user?.plan) setUserPlan(d.user.plan);
           if (d.user?.role) setUserRole(d.user.role);
+          if (d.user?.subscription?.currentPeriod) setSubscriptionEnd(d.user.subscription.currentPeriod);
         })
         .catch(() => {});
     }
@@ -184,6 +186,11 @@ export default function DashboardPage() {
             {isPaid && (
               <span style={{ padding: "4px 10px", borderRadius: 8, fontSize: 12, fontWeight: 700, color: userPlan === "PRO" ? "#8B5CF6" : "#22B07D", background: userPlan === "PRO" ? "rgba(139,92,246,0.12)" : "rgba(34,176,125,0.12)" }}>
                 {userPlan === "PRO" ? "Pro" : "Basico"}
+              </span>
+            )}
+            {isPaid && subscriptionEnd && (
+              <span style={{ fontSize: 12, color: "#6B739E" }}>
+                Expira: {new Date(subscriptionEnd).toLocaleDateString("pt-BR")}
               </span>
             )}
             <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => handleNavigate("settings")}>
