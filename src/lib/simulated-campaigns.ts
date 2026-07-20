@@ -1,9 +1,7 @@
 export interface SimulatedCampaign {
   id: string;
   name: string;
-  product: string;
   niche: string;
-  country: string;
   countryCode: string;
   funnelStage: "topo" | "meio" | "fundo";
   status: "ACTIVE" | "PAUSED" | "COMPLETED";
@@ -18,277 +16,111 @@ export interface SimulatedCampaign {
   revenue: number;
   roas: number;
   link: string;
-  startDate: string;
-  createdAt: string;
 }
 
-const BASE_CAMPAIGNS: SimulatedCampaign[] = [
+interface SimBase {
+  id: string;
+  name: string;
+  niche: string;
+  countryCode: string;
+  funnelStage: "topo" | "meio" | "fundo";
+  status: "ACTIVE" | "PAUSED" | "COMPLETED";
+  budgetDaily: number;
+  baseImpressions: number;
+  baseClicks: number;
+  baseConversions: number;
+  baseSpent: number;
+  baseRevenue: number;
+  link: string;
+  impPerSec: number;
+  clickPerSec: number;
+  convPerSec: number;
+  spendPerSec: number;
+  revPerSec: number;
+}
+
+const CAMPAIGNS: SimBase[] = [
   {
-    id: "sim_01",
-    name: "Suplemento Keto Gold",
-    product: "Keto Gold Brasil",
-    niche: "Saude & Fitness",
-    country: "Brasil",
-    countryCode: "BR",
-    funnelStage: "fundo",
-    status: "ACTIVE",
-    budgetDaily: 150,
-    spent: 4230,
-    impressions: 584200,
-    clicks: 18700,
-    ctr: 3.2,
-    cpc: 0.23,
-    cpm: 7.24,
-    conversions: 892,
-    revenue: 26760,
-    roas: 6.33,
-    link: "https://adsflow-app-ten.vercel.app/p/keto-gold",
-    startDate: "2026-06-15",
-    createdAt: "2026-06-15T10:30:00Z",
+    id: "sim_01", name: "Suplemento Keto Gold", niche: "Saude & Fitness", countryCode: "BR",
+    funnelStage: "fundo", status: "ACTIVE", budgetDaily: 150, link: "/p/keto-gold",
+    baseImpressions: 584200, baseClicks: 18700, baseConversions: 892, baseSpent: 4230, baseRevenue: 26760,
+    impPerSec: 8, clickPerSec: 0.3, convPerSec: 0.015, spendPerSec: 0.06, revPerSec: 0.35,
   },
   {
-    id: "sim_02",
-    name: "Curso Dropshipping PRO",
-    product: "Dropshipping PRO 2026",
-    niche: "Educacao",
-    country: "Brasil",
-    countryCode: "BR",
-    funnelStage: "meio",
-    status: "ACTIVE",
-    budgetDaily: 200,
-    spent: 5890,
-    impressions: 823500,
-    clicks: 24100,
-    ctr: 2.93,
-    cpc: 0.24,
-    cpm: 7.15,
-    conversions: 634,
-    revenue: 19020,
-    roas: 3.23,
-    link: "https://adsflow-app-ten.vercel.app/p/drop-pro",
-    startDate: "2026-06-20",
-    createdAt: "2026-06-20T14:15:00Z",
+    id: "sim_02", name: "Curso Dropshipping PRO", niche: "Educacao", countryCode: "BR",
+    funnelStage: "meio", status: "ACTIVE", budgetDaily: 200, link: "/p/drop-pro",
+    baseImpressions: 823500, baseClicks: 24100, baseConversions: 634, baseSpent: 5890, baseRevenue: 19020,
+    impPerSec: 11, clickPerSec: 0.4, convPerSec: 0.01, spendPerSec: 0.08, revPerSec: 0.25,
   },
   {
-    id: "sim_03",
-    name: "E-book Emagrecimento",
-    product: "12 Semanas para Emagrecer",
-    niche: "Saude",
-    country: "Brasil",
-    countryCode: "BR",
-    funnelStage: "topo",
-    status: "ACTIVE",
-    budgetDaily: 80,
-    spent: 2160,
-    impressions: 412800,
-    clicks: 14900,
-    ctr: 3.61,
-    cpc: 0.15,
-    cpm: 5.23,
-    conversions: 1247,
-    revenue: 6235,
-    roas: 2.89,
-    link: "https://adsflow-app-ten.vercel.app/p/emagrecer-12s",
-    startDate: "2026-07-01",
-    createdAt: "2026-07-01T08:00:00Z",
+    id: "sim_03", name: "E-book Emagrecimento", niche: "Saude", countryCode: "BR",
+    funnelStage: "topo", status: "ACTIVE", budgetDaily: 80, link: "/p/emagrecer-12s",
+    baseImpressions: 412800, baseClicks: 14900, baseConversions: 1247, baseSpent: 2160, baseRevenue: 6235,
+    impPerSec: 6, clickPerSec: 0.25, convPerSec: 0.02, spendPerSec: 0.03, revPerSec: 0.08,
   },
   {
-    id: "sim_04",
-    name: "Cadeira Gamer Titan",
-    product: "Titan Chair Pro",
-    niche: "Gaming",
-    country: "Mexico",
-    countryCode: "MX",
-    funnelStage: "fundo",
-    status: "ACTIVE",
-    budgetDaily: 120,
-    spent: 3840,
-    impressions: 498200,
-    clicks: 11200,
-    ctr: 2.25,
-    cpc: 0.34,
-    cpm: 7.71,
-    conversions: 247,
-    revenue: 17290,
-    roas: 4.50,
-    link: "https://adsflow-app-ten.vercel.app/p/titan-chair",
-    startDate: "2026-06-10",
-    createdAt: "2026-06-10T16:45:00Z",
+    id: "sim_04", name: "Cadeira Gamer Titan", niche: "Gaming", countryCode: "MX",
+    funnelStage: "fundo", status: "ACTIVE", budgetDaily: 120, link: "/p/titan-chair",
+    baseImpressions: 498200, baseClicks: 11200, baseConversions: 247, baseSpent: 3840, baseRevenue: 17290,
+    impPerSec: 7, clickPerSec: 0.2, convPerSec: 0.005, spendPerSec: 0.05, revPerSec: 0.22,
   },
   {
-    id: "sim_05",
-    name: "Skin Care Coreana",
-    product: "7 Steps K-Beauty Kit",
-    niche: "Beleza",
-    country: "Estados Unidos",
-    countryCode: "US",
-    funnelStage: "fundo",
-    status: "PAUSED",
-    budgetDaily: 180,
-    spent: 6120,
-    impressions: 934500,
-    clicks: 27800,
-    ctr: 2.97,
-    cpc: 0.22,
-    cpm: 6.55,
-    conversions: 892,
-    revenue: 22300,
-    roas: 3.64,
-    link: "https://adsflow-app-ten.vercel.app/p/kbeauty",
-    startDate: "2026-05-28",
-    createdAt: "2026-05-28T09:20:00Z",
+    id: "sim_05", name: "Skin Care Coreana", niche: "Beleza", countryCode: "US",
+    funnelStage: "fundo", status: "PAUSED", budgetDaily: 180, link: "/p/kbeauty",
+    baseImpressions: 934500, baseClicks: 27800, baseConversions: 892, baseSpent: 6120, baseRevenue: 22300,
+    impPerSec: 0, clickPerSec: 0, convPerSec: 0, spendPerSec: 0, revPerSec: 0,
   },
   {
-    id: "sim_06",
-    name: "App Meditacao Zen",
-    product: "ZenApp Premium",
-    niche: "Saude Mental",
-    country: "Portugal",
-    countryCode: "PT",
-    funnelStage: "meio",
-    status: "ACTIVE",
-    budgetDaily: 60,
-    spent: 1680,
-    impressions: 234500,
-    clicks: 8900,
-    ctr: 3.8,
-    cpc: 0.19,
-    cpm: 7.16,
-    conversions: 534,
-    revenue: 2670,
-    roas: 1.59,
-    link: "https://adsflow-app-ten.vercel.app/p/zenapp",
-    startDate: "2026-07-05",
-    createdAt: "2026-07-05T11:30:00Z",
+    id: "sim_06", name: "App Meditacao Zen", niche: "Saude Mental", countryCode: "PT",
+    funnelStage: "meio", status: "ACTIVE", budgetDaily: 60, link: "/p/zenapp",
+    baseImpressions: 234500, baseClicks: 8900, baseConversions: 534, baseSpent: 1680, baseRevenue: 2670,
+    impPerSec: 4, clickPerSec: 0.15, convPerSec: 0.008, spendPerSec: 0.025, revPerSec: 0.04,
   },
   {
-    id: "sim_07",
-    name: "Fone Bluetooth Air",
-    product: "AirSound Pro Max",
-    niche: "Eletronicos",
-    country: "Brasil",
-    countryCode: "BR",
-    funnelStage: "topo",
-    status: "COMPLETED",
-    budgetDaily: 100,
-    spent: 3000,
-    impressions: 456700,
-    clicks: 13200,
-    ctr: 2.89,
-    cpc: 0.23,
-    cpm: 6.57,
-    conversions: 423,
-    revenue: 8460,
-    roas: 2.82,
-    link: "https://adsflow-app-ten.vercel.app/p/airsound",
-    startDate: "2026-06-01",
-    createdAt: "2026-06-01T07:00:00Z",
+    id: "sim_07", name: "Fone Bluetooth Air", niche: "Eletronicos", countryCode: "BR",
+    funnelStage: "topo", status: "COMPLETED", budgetDaily: 100, link: "/p/airsound",
+    baseImpressions: 456700, baseClicks: 13200, baseConversions: 423, baseSpent: 3000, baseRevenue: 8460,
+    impPerSec: 0, clickPerSec: 0, convPerSec: 0, spendPerSec: 0, revPerSec: 0,
   },
   {
-    id: "sim_08",
-    name: "Plano Financas VIP",
-    product: "Financas 360",
-    niche: "Financeiro",
-    country: "Brasil",
-    countryCode: "BR",
-    funnelStage: "meio",
-    status: "ACTIVE",
-    budgetDaily: 250,
-    spent: 7500,
-    impressions: 1023400,
-    clicks: 31200,
-    ctr: 3.05,
-    cpc: 0.24,
-    cpm: 7.33,
-    conversions: 789,
-    revenue: 23670,
-    roas: 3.16,
-    link: "https://adsflow-app-ten.vercel.app/p/financas360",
-    startDate: "2026-06-22",
-    createdAt: "2026-06-22T13:00:00Z",
+    id: "sim_08", name: "Plano Financas VIP", niche: "Financeiro", countryCode: "BR",
+    funnelStage: "meio", status: "ACTIVE", budgetDaily: 250, link: "/p/financas360",
+    baseImpressions: 1023400, baseClicks: 31200, baseConversions: 789, baseSpent: 7500, baseRevenue: 23670,
+    impPerSec: 14, clickPerSec: 0.5, convPerSec: 0.012, spendPerSec: 0.1, revPerSec: 0.32,
   },
   {
-    id: "sim_09",
-    name: "Kit Ferramentas DIY",
-    product: "ToolMaster 200pcs",
-    niche: "Casa & Jardim",
-    country: "Colombia",
-    countryCode: "CO",
-    funnelStage: "fundo",
-    status: "PAUSED",
-    budgetDaily: 90,
-    spent: 2700,
-    impressions: 345600,
-    clicks: 8700,
-    ctr: 2.52,
-    cpc: 0.31,
-    cpm: 7.81,
-    conversions: 198,
-    revenue: 5940,
-    roas: 2.20,
-    link: "https://adsflow-app-ten.vercel.app/p/toolmaster",
-    startDate: "2026-06-05",
-    createdAt: "2026-06-05T15:30:00Z",
+    id: "sim_09", name: "Kit Ferramentas DIY", niche: "Casa & Jardim", countryCode: "CO",
+    funnelStage: "fundo", status: "PAUSED", budgetDaily: 90, link: "/p/toolmaster",
+    baseImpressions: 345600, baseClicks: 8700, baseConversions: 198, baseSpent: 2700, baseRevenue: 5940,
+    impPerSec: 0, clickPerSec: 0, convPerSec: 0, spendPerSec: 0, revPerSec: 0,
   },
   {
-    id: "sim_10",
-    name: "Consulta Online Nutri",
-    product: "NutriOnline Express",
-    niche: "Saude",
-    country: "Brasil",
-    countryCode: "BR",
-    funnelStage: "topo",
-    status: "ACTIVE",
-    budgetDaily: 70,
-    spent: 1890,
-    impressions: 278900,
-    clicks: 10100,
-    ctr: 3.62,
-    cpc: 0.19,
-    cpm: 6.78,
-    conversions: 612,
-    revenue: 3060,
-    roas: 1.62,
-    link: "https://adsflow-app-ten.vercel.app/p/nutriexpress",
-    startDate: "2026-07-10",
-    createdAt: "2026-07-10T10:00:00Z",
+    id: "sim_10", name: "Consulta Online Nutri", niche: "Saude", countryCode: "BR",
+    funnelStage: "topo", status: "ACTIVE", budgetDaily: 70, link: "/p/nutriexpress",
+    baseImpressions: 278900, baseClicks: 10100, baseConversions: 612, baseSpent: 1890, baseRevenue: 3060,
+    impPerSec: 5, clickPerSec: 0.18, convPerSec: 0.01, spendPerSec: 0.02, revPerSec: 0.05,
   },
 ];
 
-function jitter(value: number, percent: number): number {
-  const delta = value * (percent / 100);
-  return Math.round(value + (Math.random() * 2 - 1) * delta);
+let tickSeconds = 0;
+
+export function tickSimulation(): void {
+  tickSeconds++;
 }
 
 export function getSimulatedCampaigns(): SimulatedCampaign[] {
-  const now = Date.now();
-  return BASE_CAMPAIGNS.map((base) => {
-    const elapsed = (now - new Date(base.startDate).getTime()) / (1000 * 60 * 60 * 24);
-    const timeFactor = Math.min(elapsed / 30, 1);
-
-    const impressions = jitter(base.impressions * (0.5 + timeFactor * 0.5), 3);
-    const clicks = jitter(base.clicks * (0.5 + timeFactor * 0.5), 4);
-    const conversions = jitter(base.conversions * (0.5 + timeFactor * 0.5), 5);
-    const spent = jitter(base.spent * (0.5 + timeFactor * 0.5), 3);
-    const revenue = jitter(base.revenue * (0.5 + timeFactor * 0.5), 5);
-
+  const t = tickSeconds;
+  return CAMPAIGNS.map((b) => {
+    const impressions = Math.round(b.baseImpressions + b.impPerSec * t + Math.sin(t * 0.1) * b.impPerSec * 2);
+    const clicks = Math.round(b.baseClicks + b.clickPerSec * t + Math.sin(t * 0.15) * 3);
+    const conversions = Math.round(b.baseConversions + b.convPerSec * t);
+    const spent = +(b.baseSpent + b.spendPerSec * t).toFixed(2);
+    const revenue = +(b.baseRevenue + b.revPerSec * t).toFixed(2);
     const ctr = impressions > 0 ? +((clicks / impressions) * 100).toFixed(2) : 0;
     const cpc = clicks > 0 ? +(spent / clicks).toFixed(2) : 0;
     const cpm = impressions > 0 ? +((spent / impressions) * 1000).toFixed(2) : 0;
     const roas = spent > 0 ? +(revenue / spent).toFixed(2) : 0;
-
-    return {
-      ...base,
-      impressions,
-      clicks,
-      conversions,
-      spent,
-      revenue,
-      ctr,
-      cpc,
-      cpm,
-      roas,
-    };
+    return { ...b, impressions, clicks, conversions, spent, revenue, ctr, cpc, cpm, roas };
   });
 }
 
@@ -299,8 +131,6 @@ export function getOverallStats(campaigns: SimulatedCampaign[]) {
   const totalImpressions = campaigns.reduce((s, c) => s + c.impressions, 0);
   const totalClicks = campaigns.reduce((s, c) => s + c.clicks, 0);
   const totalConversions = campaigns.reduce((s, c) => s + c.conversions, 0);
-  const totalBudget = campaigns.reduce((s, c) => s + c.budgetDaily, 0);
-
   return {
     totalCampaigns: campaigns.length,
     activeCampaigns: active.length,
@@ -314,6 +144,5 @@ export function getOverallStats(campaigns: SimulatedCampaign[]) {
     avgCpc: totalClicks > 0 ? +(totalSpent / totalClicks).toFixed(2) : 0,
     avgCpm: totalImpressions > 0 ? +((totalSpent / totalImpressions) * 1000).toFixed(2) : 0,
     avgRoas: totalSpent > 0 ? +(totalRevenue / totalSpent).toFixed(2) : 0,
-    dailyBudget: totalBudget,
   };
 }

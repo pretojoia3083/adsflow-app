@@ -19,7 +19,7 @@ import SettingsPage from "@/components/pages/SettingsPage";
 import AdRadarPage from "@/components/pages/AdRadarPage";
 import AdsShopPage from "@/components/pages/AdsShopPage";
 import InstallBanner from "@/components/InstallBanner";
-import { getSimulatedCampaigns, getOverallStats, SimulatedCampaign } from "@/lib/simulated-campaigns";
+import { getSimulatedCampaigns, getOverallStats, tickSimulation, SimulatedCampaign } from "@/lib/simulated-campaigns";
 
 const STEP_NAMES = [
   "Produto",
@@ -129,12 +129,13 @@ export default function DashboardPage() {
 
   useEffect(() => {
     function updateSim() {
+      tickSimulation();
       const c = getSimulatedCampaigns();
       setSimCampaigns(c);
       setSimStats(getOverallStats(c));
     }
     updateSim();
-    const interval = setInterval(updateSim, 4000);
+    const interval = setInterval(updateSim, 2000);
     return () => clearInterval(interval);
   }, []);
 
@@ -208,8 +209,12 @@ export default function DashboardPage() {
             !showWizard ? (
               <>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
-                  <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                     <h2 style={{ fontSize: 26, fontWeight: 700, color: "#F3F5FF", margin: 0 }}>Painel de Campanhas</h2>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(34,176,125,0.1)", border: "1px solid rgba(34,176,125,0.25)", borderRadius: 99, padding: "5px 12px" }}>
+                      <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#22B07D", animation: "pulse 1.5s ease-in-out infinite" }} />
+                      <span style={{ fontSize: 11, fontWeight: 700, color: "#22B07D", textTransform: "uppercase" as const, letterSpacing: 1 }}>Ao vivo</span>
+                    </div>
                   </div>
                   <button
                     onClick={() => setShowWizard(true)}
@@ -240,13 +245,14 @@ export default function DashboardPage() {
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {simCampaigns.map((c) => {
                     const st = STATUS_COLORS[c.status] || STATUS_COLORS.DRAFT;
+                    const isLive = c.status === "ACTIVE";
                     return (
                       <div
                         key={c.id}
                         onClick={() => setSelectedSimCampaign(c)}
                         style={{
                           background: "#121830",
-                          border: "1px solid #232C52",
+                          border: isLive ? "1px solid rgba(34,176,125,0.2)" : "1px solid #232C52",
                           borderRadius: 12,
                           padding: "16px 20px",
                           display: "flex",
@@ -255,20 +261,29 @@ export default function DashboardPage() {
                           cursor: "pointer",
                           transition: "border-color 0.15s",
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#3B4570")}
-                        onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#232C52")}
+                        onMouseEnter={(e) => (e.currentTarget.style.borderColor = isLive ? "#22B07D" : "#3B4570")}
+                        onMouseLeave={(e) => (e.currentTarget.style.borderColor = isLive ? "rgba(34,176,125,0.2)" : "#232C52")}
                       >
                         <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
-                          <div style={{ width: 38, height: 38, borderRadius: 10, background: st.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          <div style={{ width: 38, height: 38, borderRadius: 10, background: st.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, position: "relative" as const }}>
                             <span style={{ fontSize: 18, fontWeight: 700, color: st.color }}>{c.name.charAt(0)}</span>
+                            {isLive && <div style={{ position: "absolute", top: -2, right: -2, width: 8, height: 8, borderRadius: "50%", background: "#22B07D", border: "2px solid #121830" }} />}
                           </div>
                           <div style={{ minWidth: 0 }}>
                             <p style={{ fontWeight: 600, color: "#F3F5FF", fontSize: 15, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</p>
+                            <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 3 }}>
+                              <span style={{ fontSize: 11, color: "#6B739E" }}>{c.impressions.toLocaleString("pt-BR")} imp.</span>
+                              <span style={{ fontSize: 11, color: "#6B739E" }}>{c.clicks.toLocaleString("pt-BR")} cliques</span>
+                              <span style={{ fontSize: 11, color: "#F97316" }}>R$ {c.spent.toLocaleString("pt-BR")}</span>
+                            </div>
                           </div>
                         </div>
-                        <span style={{ padding: "5px 14px", borderRadius: 99, fontSize: 12, fontWeight: 600, color: st.color, background: st.bg, whiteSpace: "nowrap", flexShrink: 0 }}>
-                          {STATUS_LABELS[c.status] || c.status}
-                        </span>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: c.roas >= 3 ? "#22B07D" : c.roas >= 2 ? "#F59E0B" : "#F87171", fontFamily: "monospace" }}>{c.roas.toFixed(1)}x</span>
+                          <span style={{ padding: "5px 14px", borderRadius: 99, fontSize: 12, fontWeight: 600, color: st.color, background: st.bg, whiteSpace: "nowrap" }}>
+                            {STATUS_LABELS[c.status] || c.status}
+                          </span>
+                        </div>
                       </div>
                     );
                   })}
