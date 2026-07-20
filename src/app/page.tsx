@@ -798,35 +798,36 @@ export default function Home() {
             alignItems: "stretch",
           }}
         >
-          {/* Mensal */}
+          {/* Básico */}
           <div
             style={{
               ...s.card({
                 flex: "1 1 300px",
-                maxWidth: 360,
+                maxWidth: 400,
                 display: "flex",
                 flexDirection: "column",
               }),
             }}
           >
             <p style={{ fontSize: 14, fontWeight: 600, color: "#5B628A", textTransform: "uppercase" as const, letterSpacing: 1, marginBottom: 8 }}>
-              Mensal
+              Básico
             </p>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
               <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 44, fontWeight: 700, color: "#F3F5FF" }}>
-                R$59,90
+                R$30
               </span>
             </div>
             <span style={{ fontSize: 14, color: "#5B628A", marginBottom: 24 }}>/mês</span>
             {[
               "Campanhas ilimitadas",
-              "IA para copy e segmentação",
+              "IA para copy e segmentação (use sua API key)",
               "Presell hospedada",
               "Análise de mercado",
               "Suporte via chat",
+              "Meta Ads API",
             ].map((feat, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                <span style={{ color: "#8B5CF6", fontWeight: 700 }}>✓</span>
+                <span style={{ color: "#22B07D", fontWeight: 700 }}>✓</span>
                 <span style={{ fontSize: 14, color: "#8C93B8" }}>{feat}</span>
               </div>
             ))}
@@ -846,12 +847,12 @@ export default function Home() {
             </a>
           </div>
 
-          {/* 6 Meses */}
+          {/* Pro */}
           <div
             style={{
               ...s.card({
                 flex: "1 1 300px",
-                maxWidth: 360,
+                maxWidth: 400,
                 display: "flex",
                 flexDirection: "column",
                 border: "2px solid #8B5CF6",
@@ -865,7 +866,7 @@ export default function Home() {
                 top: -14,
                 left: "50%",
                 transform: "translateX(-50%)",
-                background: "linear-gradient(90deg,#8B5CF6,#A78BFA)",
+                background: "linear-gradient(90deg,#8B5CF6,#22B07D)",
                 color: "#080B14",
                 fontSize: 11,
                 fontWeight: 700,
@@ -878,25 +879,24 @@ export default function Home() {
               MAIS POPULAR
             </div>
             <p style={{ fontSize: 14, fontWeight: 600, color: "#8B5CF6", textTransform: "uppercase" as const, letterSpacing: 1, marginBottom: 8, marginTop: 8 }}>
-              6 Meses
+              Pro
             </p>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
               <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 44, fontWeight: 700, color: "#F3F5FF" }}>
-                R$299,90
+                R$50
               </span>
             </div>
-            <span style={{ fontSize: 14, color: "#5B628A", marginBottom: 4 }}>/6 meses</span>
-            <span style={{ fontSize: 13, color: "#8B5CF6", fontWeight: 600, marginBottom: 24 }}>R$ 49,98/mês</span>
+            <span style={{ fontSize: 14, color: "#5B628A", marginBottom: 24 }}>/mês</span>
             {[
-              "Tudo do plano Mensal",
-              "Economia de 17%",
+              "Tudo do plano Básico",
+              "IA incluída (sem precisar de API key)",
+              "Templates de presell premium",
               "Relatórios avançados",
               "Prioridade no suporte",
-              "Integração Meta Ads API",
-              "Templates de presell premium",
+              "Integração completa Meta Ads",
             ].map((feat, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                <span style={{ color: "#8B5CF6", fontWeight: 700 }}>✓</span>
+                <span style={{ color: "#22B07D", fontWeight: 700 }}>✓</span>
                 <span style={{ fontSize: 14, color: "#8C93B8" }}>{feat}</span>
               </div>
             ))}
@@ -904,63 +904,14 @@ export default function Home() {
             <a
               href="/register"
               style={{
-                ...s.btn("linear-gradient(90deg,#8B5CF6,#A78BFA)", "#080B14", {
+                ...s.btn("linear-gradient(90deg,#8B5CF6,#22B07D)", "#080B14", {
                   marginTop: 24,
                   padding: "14px 0",
                   width: "100%",
                 }),
               }}
             >
-              Assinar 6 meses
-            </a>
-          </div>
-
-          {/* Anual */}
-          <div
-            style={{
-              ...s.card({
-                flex: "1 1 300px",
-                maxWidth: 360,
-                display: "flex",
-                flexDirection: "column",
-              }),
-            }}
-          >
-            <p style={{ fontSize: 14, fontWeight: 600, color: "#5B628A", textTransform: "uppercase" as const, letterSpacing: 1, marginBottom: 8 }}>
-              Anual
-            </p>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
-              <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 44, fontWeight: 700, color: "#F3F5FF" }}>
-                R$599,90
-              </span>
-            </div>
-            <span style={{ fontSize: 14, color: "#5B628A", marginBottom: 4 }}>/ano</span>
-            <span style={{ fontSize: 13, color: "#8B5CF6", fontWeight: 600, marginBottom: 24 }}>R$ 49,99/mês</span>
-            {[
-              "Tudo do plano 6 Meses",
-              "Acesso antecipado a novidades",
-              "Suporte prioritário VIP",
-              "Consultoria mensal (1h)",
-              "API completa para automação",
-            ].map((feat, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                <span style={{ color: "#8B5CF6", fontWeight: 700 }}>✓</span>
-                <span style={{ fontSize: 14, color: "#8C93B8" }}>{feat}</span>
-              </div>
-            ))}
-            <div style={{ flex: 1 }} />
-            <a
-              href="/register"
-              style={{
-                ...s.btn("transparent", "#F3F5FF", {
-                  border: "1px solid #232C52",
-                  marginTop: 24,
-                  padding: "14px 0",
-                  width: "100%",
-                }),
-              }}
-            >
-              Assinar anual
+              Assinar Pro
             </a>
           </div>
         </div>
