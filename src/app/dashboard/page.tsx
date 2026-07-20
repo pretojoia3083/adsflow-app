@@ -207,10 +207,9 @@ export default function DashboardPage() {
           {currentPage === "dashboard" && (
             !showWizard ? (
               <>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
                   <div>
-                    <h2 style={{ fontSize: 28, fontWeight: 700, color: "#F3F5FF", margin: 0 }}>Campanhas</h2>
-                    <p style={{ color: "#8C93B8", fontSize: 15, marginTop: 6 }}>Visao geral das suas campanhas de anuncios</p>
+                    <h2 style={{ fontSize: 26, fontWeight: 700, color: "#F3F5FF", margin: 0 }}>Painel de Campanhas</h2>
                   </div>
                   <button
                     onClick={() => setShowWizard(true)}
@@ -221,31 +220,24 @@ export default function DashboardPage() {
                 </div>
 
                 {simStats && (
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14, marginBottom: 24 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14, marginBottom: 32 }}>
                     {[
-                      { label: "Campanhas", value: simStats.totalCampaigns.toString(), sub: `${simStats.activeCampaigns} ativas`, color: "#8B5CF6" },
-                      { label: "Gasto Total", value: `R$ ${simStats.totalSpent.toLocaleString("pt-BR")}`, sub: `R$ ${simStats.dailyBudget}/dia`, color: "#F97316" },
-                      { label: "Receita", value: `R$ ${simStats.totalRevenue.toLocaleString("pt-BR")}`, sub: `Lucro R$ ${simStats.totalProfit.toLocaleString("pt-BR")}`, color: "#22B07D" },
-                      { label: "Impressoes", value: simStats.totalImpressions >= 1000000 ? `${(simStats.totalImpressions / 1000000).toFixed(1)}M` : `${(simStats.totalImpressions / 1000).toFixed(0)}K`, sub: `${simStats.avgCpm.toFixed(2)} CPM`, color: "#60A5FA" },
-                      { label: "Cliques", value: simStats.totalClicks >= 1000 ? `${(simStats.totalClicks / 1000).toFixed(1)}K` : simStats.totalClicks.toString(), sub: `${simStats.avgCtr.toFixed(1)}% CTR`, color: "#A78BFA" },
-                      { label: "Conversoes", value: simStats.totalConversions.toLocaleString("pt-BR"), sub: `${simStats.avgCpc.toFixed(2)} CPC`, color: "#22B07D" },
-                      { label: "ROAS", value: `${simStats.avgRoas.toFixed(1)}x`, sub: "Retorno medio", color: simStats.avgRoas >= 3 ? "#22B07D" : "#F59E0B" },
+                      { label: "ROAS", value: `${simStats.avgRoas.toFixed(1)}x`, color: "#22B07D" },
+                      { label: "Custo por lead", value: `R$ ${simStats.avgCpc.toFixed(2)}`, color: "#8B5CF6" },
+                      { label: "Gasto total", value: `R$ ${simStats.totalSpent.toLocaleString("pt-BR")}`, color: "#F97316" },
+                      { label: "Receita", value: `R$ ${simStats.totalRevenue.toLocaleString("pt-BR")}`, color: "#22B07D" },
+                      { label: "Cliques", value: `${(simStats.totalClicks / 1000).toFixed(1)}K`, color: "#60A5FA" },
+                      { label: "CTR", value: `${simStats.avgCtr.toFixed(1)}%`, color: "#A78BFA" },
                     ].map((kpi, i) => (
-                      <div key={i} style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 14, padding: "18px 16px" }}>
+                      <div key={i} style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 14, padding: "18px 16px", textAlign: "center" as const }}>
                         <p style={{ fontSize: 12, color: "#8C93B8", margin: 0, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>{kpi.label}</p>
-                        <p style={{ fontSize: 24, fontWeight: 800, color: kpi.color, margin: "6px 0 2px", fontFamily: "'Space Grotesk', sans-serif" }}>{kpi.value}</p>
-                        <p style={{ fontSize: 12, color: "#6B739E", margin: 0 }}>{kpi.sub}</p>
+                        <p style={{ fontSize: 26, fontWeight: 800, color: kpi.color, margin: "8px 0 0", fontFamily: "'Space Grotesk', sans-serif" }}>{kpi.value}</p>
                       </div>
                     ))}
                   </div>
                 )}
 
-                <div style={{ marginBottom: 16 }}>
-                  <h3 style={{ fontSize: 18, fontWeight: 700, color: "#F3F5FF", margin: 0 }}>Campanhas ativas</h3>
-                  <p style={{ color: "#8C93B8", fontSize: 13, marginTop: 4 }}>Metricas atualizadas em tempo real</p>
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {simCampaigns.map((c) => {
                     const st = STATUS_COLORS[c.status] || STATUS_COLORS.DRAFT;
                     return (
@@ -256,86 +248,66 @@ export default function DashboardPage() {
                           background: "#121830",
                           border: "1px solid #232C52",
                           borderRadius: 12,
-                          padding: "14px 18px",
-                          display: "grid",
-                          gridTemplateColumns: "1fr auto auto auto auto auto",
+                          padding: "16px 20px",
+                          display: "flex",
                           alignItems: "center",
-                          gap: 16,
+                          justifyContent: "space-between",
                           cursor: "pointer",
                           transition: "border-color 0.15s",
                         }}
                         onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#3B4570")}
                         onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#232C52")}
                       >
-                        <div style={{ minWidth: 0 }}>
-                          <p style={{ fontWeight: 600, color: "#F3F5FF", fontSize: 15, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</p>
-                          <p style={{ color: "#6B739E", fontSize: 12, margin: "3px 0 0 0" }}>{c.niche} · {c.countryCode}</p>
+                        <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
+                          <div style={{ width: 38, height: 38, borderRadius: 10, background: st.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <span style={{ fontSize: 18, fontWeight: 700, color: st.color }}>{c.name.charAt(0)}</span>
+                          </div>
+                          <div style={{ minWidth: 0 }}>
+                            <p style={{ fontWeight: 600, color: "#F3F5FF", fontSize: 15, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</p>
+                          </div>
                         </div>
-                        <div style={{ textAlign: "right" as const }}>
-                          <p style={{ fontSize: 11, color: "#8C93B8", margin: 0 }}>Gasto</p>
-                          <p style={{ fontSize: 14, fontWeight: 700, color: "#F97316", margin: 0, fontFamily: "monospace" }}>R$ {c.spent.toLocaleString("pt-BR")}</p>
+                        <span style={{ padding: "5px 14px", borderRadius: 99, fontSize: 12, fontWeight: 600, color: st.color, background: st.bg, whiteSpace: "nowrap", flexShrink: 0 }}>
+                          {STATUS_LABELS[c.status] || c.status}
+                        </span>
+                      </div>
+                    );
+                  })}
+
+                  {campaigns.length > 0 && campaigns.map((c) => {
+                    const st = STATUS_COLORS[c.status] || STATUS_COLORS.DRAFT;
+                    return (
+                      <div
+                        key={c.id}
+                        onClick={() => setSelectedCampaign(c)}
+                        style={{
+                          background: "#121830",
+                          border: "1px solid #232C52",
+                          borderRadius: 12,
+                          padding: "16px 20px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          cursor: "pointer",
+                          transition: "border-color 0.15s",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#3B4570")}
+                        onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#232C52")}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
+                          <div style={{ width: 38, height: 38, borderRadius: 10, background: st.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                            <span style={{ fontSize: 18, fontWeight: 700, color: st.color }}>{c.productName.charAt(0)}</span>
+                          </div>
+                          <div style={{ minWidth: 0 }}>
+                            <p style={{ fontWeight: 600, color: "#F3F5FF", fontSize: 15, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.productName}</p>
+                          </div>
                         </div>
-                        <div style={{ textAlign: "right" as const }}>
-                          <p style={{ fontSize: 11, color: "#8C93B8", margin: 0 }}>Receita</p>
-                          <p style={{ fontSize: 14, fontWeight: 700, color: "#22B07D", margin: 0, fontFamily: "monospace" }}>R$ {c.revenue.toLocaleString("pt-BR")}</p>
-                        </div>
-                        <div style={{ textAlign: "right" as const }}>
-                          <p style={{ fontSize: 11, color: "#8C93B8", margin: 0 }}>CTR</p>
-                          <p style={{ fontSize: 14, fontWeight: 700, color: "#60A5FA", margin: 0, fontFamily: "monospace" }}>{c.ctr.toFixed(1)}%</p>
-                        </div>
-                        <div style={{ textAlign: "right" as const }}>
-                          <p style={{ fontSize: 11, color: "#8C93B8", margin: 0 }}>ROAS</p>
-                          <p style={{ fontSize: 14, fontWeight: 700, color: c.roas >= 3 ? "#22B07D" : c.roas >= 2 ? "#F59E0B" : "#F87171", margin: 0, fontFamily: "monospace" }}>{c.roas.toFixed(1)}x</p>
-                        </div>
-                        <span style={{ padding: "4px 12px", borderRadius: 99, fontSize: 12, fontWeight: 600, color: st.color, background: st.bg, whiteSpace: "nowrap" }}>
+                        <span style={{ padding: "5px 14px", borderRadius: 99, fontSize: 12, fontWeight: 600, color: st.color, background: st.bg, whiteSpace: "nowrap", flexShrink: 0 }}>
                           {STATUS_LABELS[c.status] || c.status}
                         </span>
                       </div>
                     );
                   })}
                 </div>
-
-                {campaigns.length > 0 && (
-                  <>
-                    <div style={{ marginTop: 32, marginBottom: 16 }}>
-                      <h3 style={{ fontSize: 18, fontWeight: 700, color: "#F3F5FF", margin: 0 }}>Suas campanhas</h3>
-                      <p style={{ color: "#8C93B8", fontSize: 13, marginTop: 4 }}>Campanhas criadas por voce</p>
-                    </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {campaigns.map((c) => {
-                        const st = STATUS_COLORS[c.status] || STATUS_COLORS.DRAFT;
-                        return (
-                          <div key={c.id} style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 12, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-                            <div style={{ minWidth: 0 }}>
-                              <p style={{ fontWeight: 600, color: "#F3F5FF", fontSize: 16, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.productName}</p>
-                              <p style={{ color: "#8C93B8", fontSize: 14, margin: "4px 0 0 0" }}>{c.countryCode} · {new Date(c.createdAt).toLocaleDateString("pt-BR")}</p>
-                            </div>
-                            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                              <span style={{ padding: "5px 14px", borderRadius: 99, fontSize: 13, fontWeight: 600, color: st.color, background: st.bg, whiteSpace: "nowrap" }}>
-                                {STATUS_LABELS[c.status] || c.status}
-                              </span>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); setSelectedCampaign(c); }}
-                                title="Ver detalhes"
-                                style={{ padding: "6px 12px", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.2)", borderRadius: 8, color: "#60A5FA", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
-                              >
-                                Ver
-                              </button>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); if (confirm(`Excluir "${c.productName}"?${c.metaCampaignId ? " A campanha sera removida do Meta tambem." : ""}`)) handleDeleteCampaign(c.id, c.metaCampaignId); }}
-                                disabled={deletingId === c.id}
-                                title="Excluir campanha"
-                                style={{ padding: "6px 10px", background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: 8, color: "#F87171", fontSize: 14, cursor: deletingId === c.id ? "wait" : "pointer" }}
-                              >
-                                🗑️
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </>
-                )}
               </>
             ) : (
               <>
