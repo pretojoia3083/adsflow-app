@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 
-export type SidebarPage = "dashboard" | "campaigns" | "metrics" | "creatives" | "radar" | "ads-shop" | "install" | "settings" | "plans" | "ia" | "meta-api" | "support";
+export type SidebarPage = "dashboard" | "campaigns" | "metrics" | "creatives" | "radar" | "ads-shop" | "install" | "settings" | "plans" | "ia" | "meta-api" | "support" | "admin";
 
 interface SidebarProps {
   currentPage: SidebarPage;
   onNavigate: (page: SidebarPage) => void;
   userName?: string;
   avatarUrl?: string | null;
+  isAdmin?: boolean;
 }
 
 const MENU_SECTIONS = [
@@ -46,8 +47,12 @@ const MENU_SECTIONS = [
   },
 ];
 
-export default function Sidebar({ currentPage, onNavigate, userName, avatarUrl }: SidebarProps) {
+export default function Sidebar({ currentPage, onNavigate, userName, avatarUrl, isAdmin }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+
+  const sections = isAdmin
+    ? [...MENU_SECTIONS, { title: "Administracao", items: [{ id: "admin" as SidebarPage, label: "Painel ADM", icon: "🛡️" }] }]
+    : MENU_SECTIONS;
 
   return (
     <aside
@@ -81,7 +86,7 @@ export default function Sidebar({ currentPage, onNavigate, userName, avatarUrl }
       </div>
 
       <nav style={{ flex: 1, padding: "12px 8px", display: "flex", flexDirection: "column", gap: 4, overflowY: "auto" }}>
-        {MENU_SECTIONS.map((section) => (
+        {sections.map((section) => (
           <div key={section.title} style={{ marginBottom: 8 }}>
             {!collapsed && (
               <div style={{ fontSize: 11, fontWeight: 600, color: "#4A5178", textTransform: "uppercase", letterSpacing: 1.2, padding: "8px 16px 4px" }}>

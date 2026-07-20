@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStripe, PLAN_PRICES } from "@/lib/stripe";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { plan: true },
+  });
+
+  if (user?.plan === "BASICO" || user?.plan === "PRO") {
+    return NextResponse.json({ error: "Voce ja possui um plano ativo. Acesse o portal de gerenciamento para alterar." }, { status: 400 });
   }
 
   const { plan } = await req.json();
@@ -25,7 +35,7 @@ export async function POST(req: NextRequest) {
     const stripeSession = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer_email: userEmail,
-      metadata: { userId },
+      metadata: { userId, plan: selected.plan },
       payment_method_types: ["card", "boleto", "pix"],
       line_items: [
         {

@@ -18,6 +18,7 @@ import InstallAppPage from "@/components/pages/InstallAppPage";
 import SettingsPage from "@/components/pages/SettingsPage";
 import AdRadarPage from "@/components/pages/AdRadarPage";
 import AdsShopPage from "@/components/pages/AdsShopPage";
+import AdminPanel from "@/components/pages/AdminPanel";
 import InstallBanner from "@/components/InstallBanner";
 
 const STEP_NAMES = [
@@ -92,6 +93,8 @@ export default function DashboardPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
+  const [userPlan, setUserPlan] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string>("USER");
 
   const handleStepChange = useCallback((step: number) => {
     setCurrentStep(step);
@@ -109,7 +112,11 @@ export default function DashboardPage() {
         .catch(() => setLoading(false));
       fetch("/api/user/profile?t=" + Date.now())
         .then((r) => r.json())
-        .then((d) => { if (d.user?.avatarUrl) setAvatarUrl(d.user.avatarUrl); })
+        .then((d) => {
+          if (d.user?.avatarUrl) setAvatarUrl(d.user.avatarUrl);
+          if (d.user?.plan) setUserPlan(d.user.plan);
+          if (d.user?.role) setUserRole(d.user.role);
+        })
         .catch(() => {});
     }
   }, [session]);
@@ -149,9 +156,56 @@ export default function DashboardPage() {
 
   if (!session) return null;
 
+  const isPaid = userPlan === "BASICO" || userPlan === "PRO";
+  const isAdmin = userRole === "ADMIN";
+  const showPaywall = userPlan !== null && !isPaid && !isAdmin;
+
+  if (showPaywall) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#080B14", fontFamily: "'Inter', sans-serif" }}>
+        <header style={{ borderBottom: "1px solid #1A2040", padding: "14px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#0C1022" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <svg width="36" height="36" viewBox="0 0 96 96" fill="none">
+              <rect width="96" height="96" rx="20" fill="#171A21" stroke="#262B36" />
+              <path d="M24 32 L40 48 L52 38 L72 60" stroke="#8B5CF6" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M60 60 H72 V48" stroke="#8B5CF6" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="24" cy="32" r="4" fill="#A78BFA" />
+              <circle cx="52" cy="38" r="4" fill="#A78BFA" />
+            </svg>
+            <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20 }}>
+              <span style={{ color: "#F3F5FF" }}>Ads</span>
+              <span style={{ background: "linear-gradient(90deg,#8B5CF6,#22B07D)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Flow</span>
+            </span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{ color: "#8C93B8", fontSize: 14 }}>{session.user?.email}</span>
+            <button
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              style={{ padding: "10px 20px", background: "transparent", border: "1px solid #232C52", borderRadius: 10, color: "#8C93B8", fontSize: 14, fontWeight: 500, cursor: "pointer" }}
+            >
+              Sair
+            </button>
+          </div>
+        </header>
+
+        <main style={{ padding: "40px 32px", maxWidth: 900, margin: "0 auto" }}>
+          <div style={{ background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.2)", borderRadius: 14, padding: "28px 32px", marginBottom: 32, textAlign: "center" }}>
+            <p style={{ fontSize: 40, marginBottom: 12 }}>&#128274;</p>
+            <h2 style={{ fontSize: 24, fontWeight: 700, color: "#F3F5FF", margin: "0 0 8px" }}>Acesso bloqueado</h2>
+            <p style={{ color: "#8C93B8", fontSize: 15, marginBottom: 0, lineHeight: 1.6 }}>
+              Escolha um plano para acessar o sistema.<br />
+              Basico (R$30/mes) ou Pro (R$50/mes).
+            </p>
+          </div>
+          <PlansPage />
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div style={{ minHeight: "100vh", background: "#080B14", fontFamily: "'Inter', sans-serif", display: "flex" }}>
-      <Sidebar currentPage={currentPage} onNavigate={handleNavigate} userName={session.user?.name || session.user?.email || ""} avatarUrl={avatarUrl} />
+      <Sidebar currentPage={currentPage} onNavigate={handleNavigate} userName={session.user?.name || session.user?.email || ""} avatarUrl={avatarUrl} isAdmin={isAdmin} />
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
         <header style={{ borderBottom: "1px solid #1A2040", padding: "14px clamp(16px, 4vw, 32px)", display: "flex", alignItems: "center", gap: 24, background: "#0C1022" }}>
@@ -163,7 +217,12 @@ export default function DashboardPage() {
 
           {!showWizard && <div style={{ flex: 1 }} />}
 
-          <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            {isPaid && (
+              <span style={{ padding: "4px 10px", borderRadius: 8, fontSize: 12, fontWeight: 700, color: userPlan === "PRO" ? "#8B5CF6" : "#22B07D", background: userPlan === "PRO" ? "rgba(139,92,246,0.12)" : "rgba(34,176,125,0.12)" }}>
+                {userPlan === "PRO" ? "Pro" : "Basico"}
+              </span>
+            )}
             <div style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => handleNavigate("settings")}>
               <div style={{
                 width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
@@ -279,6 +338,7 @@ export default function DashboardPage() {
           {currentPage === "ia" && <IaPage />}
           {currentPage === "meta-api" && <MetaApiPage />}
           {currentPage === "support" && <SupportPage />}
+          {currentPage === "admin" && isAdmin && <AdminPanel />}
         </main>
       </div>
       <InstallBanner />

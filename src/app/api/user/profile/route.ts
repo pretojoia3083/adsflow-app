@@ -31,6 +31,8 @@ export async function POST(req: NextRequest) {
         avatarUrl: updated.avatarUrl,
         agencyLogo: updated.agencyLogo,
         hasOpenaiKey: !!updated.openaiApiKey,
+        plan: updated.plan,
+        role: updated.role,
       },
     });
   } catch (e) {
@@ -47,7 +49,11 @@ export async function GET() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { id: true, name: true, email: true, avatarUrl: true, agencyLogo: true, openaiApiKey: true },
+    select: {
+      id: true, name: true, email: true, avatarUrl: true,
+      agencyLogo: true, openaiApiKey: true, plan: true, role: true,
+      subscription: { select: { status: true, currentPeriod: true, cancelAt: true } },
+    },
   });
 
   return NextResponse.json({
@@ -58,6 +64,9 @@ export async function GET() {
       avatarUrl: user.avatarUrl,
       agencyLogo: user.agencyLogo,
       hasOpenaiKey: !!user.openaiApiKey,
+      plan: user.plan,
+      role: user.role,
+      subscription: user.subscription,
     } : null,
   });
 }

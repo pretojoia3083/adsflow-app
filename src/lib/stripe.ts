@@ -17,6 +17,11 @@ export function getStripe(): Stripe {
 }
 
 export const PLAN_PRICES = {
-  basico: { amount: 3000, interval: "month" as const, intervalCount: 1, name: "NOVEX Basico" },
-  pro: { amount: 5000, interval: "month" as const, intervalCount: 1, name: "NOVEX Pro" },
+  basico: { amount: 3000, interval: "month" as const, intervalCount: 1, name: "AdsFlow Basico", plan: "BASICO" },
+  pro: { amount: 5000, interval: "month" as const, intervalCount: 1, name: "AdsFlow Pro", plan: "PRO" },
 } as const;
+
+export function getPlanFromAmount(amount: number): string {
+  if (amount === 5000) return "PRO";
+  return "BASICO";
+}

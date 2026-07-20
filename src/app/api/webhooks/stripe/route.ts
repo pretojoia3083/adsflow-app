@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, getPlanFromAmount } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 
@@ -31,16 +31,18 @@ export async function POST(req: NextRequest) {
         const subscriptionId = session.subscription as string;
 
         if (userId) {
+          const stripe = getStripe();
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+          const amount = subscription.items.data[0]?.price?.unit_amount || 3000;
+          const planName = getPlanFromAmount(amount);
+
           await prisma.user.update({
             where: { id: userId },
             data: {
               stripeCustomerId: customerId,
-              plan: "ACTIVE",
+              plan: planName,
             },
           });
-
-          const stripe = getStripe();
-          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
           await prisma.subscription.upsert({
             where: { userId },
@@ -69,6 +71,16 @@ export async function POST(req: NextRequest) {
         if (subscriptionId) {
           const stripe = getStripe();
           const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+          const amount = subscription.items.data[0]?.price?.unit_amount || 3000;
+          const planName = getPlanFromAmount(amount);
+
+          const sub = await prisma.subscription.findFirst({ where: { stripeId: subscriptionId } });
+          if (sub) {
+            await prisma.user.update({
+              where: { id: sub.userId },
+              data: { plan: planName },
+            });
+          }
 
           await prisma.subscription.updateMany({
             where: { stripeId: subscriptionId },
@@ -90,6 +102,14 @@ export async function POST(req: NextRequest) {
             where: { stripeId: subscriptionId },
             data: { status: "past_due" },
           });
+
+          const sub = await prisma.subscription.findFirst({ where: { stripeId: subscriptionId } });
+          if (sub) {
+            await prisma.user.update({
+              where: { id: sub.userId },
+              data: { plan: "FREE" },
+            });
+          }
         }
         break;
       }
