@@ -19,7 +19,6 @@ import SettingsPage from "@/components/pages/SettingsPage";
 import AdRadarPage from "@/components/pages/AdRadarPage";
 import AdsShopPage from "@/components/pages/AdsShopPage";
 import InstallBanner from "@/components/InstallBanner";
-import { getSimulatedCampaigns, getOverallStats, tickSimulation, SimulatedCampaign } from "@/lib/simulated-campaigns";
 
 const STEP_NAMES = [
   "Produto",
@@ -93,9 +92,6 @@ export default function DashboardPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
-  const [simCampaigns, setSimCampaigns] = useState<SimulatedCampaign[]>([]);
-  const [simStats, setSimStats] = useState<ReturnType<typeof getOverallStats> | null>(null);
-  const [selectedSimCampaign, setSelectedSimCampaign] = useState<SimulatedCampaign | null>(null);
 
   const handleStepChange = useCallback((step: number) => {
     setCurrentStep(step);
@@ -126,18 +122,6 @@ export default function DashboardPage() {
         .catch(() => {});
     }
   }, [currentPage]);
-
-  useEffect(() => {
-    function updateSim() {
-      tickSimulation();
-      const c = getSimulatedCampaigns();
-      setSimCampaigns(c);
-      setSimStats(getOverallStats(c));
-    }
-    updateSim();
-    const interval = setInterval(updateSim, 2000);
-    return () => clearInterval(interval);
-  }, []);
 
   async function handleDeleteCampaign(id: string, metaCampaignId?: string | null) {
     setDeletingId(id);
@@ -208,13 +192,10 @@ export default function DashboardPage() {
           {currentPage === "dashboard" && (
             !showWizard ? (
               <>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: 12 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                    <h2 style={{ fontSize: 26, fontWeight: 700, color: "#F3F5FF", margin: 0 }}>Painel de Campanhas</h2>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(34,176,125,0.1)", border: "1px solid rgba(34,176,125,0.25)", borderRadius: 99, padding: "5px 12px" }}>
-                      <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#22B07D", animation: "pulse 1.5s ease-in-out infinite" }} />
-                      <span style={{ fontSize: 11, fontWeight: 700, color: "#22B07D", textTransform: "uppercase" as const, letterSpacing: 1 }}>Ao vivo</span>
-                    </div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32, flexWrap: "wrap", gap: 12 }}>
+                  <div>
+                    <h2 style={{ fontSize: 28, fontWeight: 700, color: "#F3F5FF", margin: 0 }}>Campanhas</h2>
+                    <p style={{ color: "#8C93B8", fontSize: 15, marginTop: 6 }}>Gerencie suas campanhas de anuncios</p>
                   </div>
                   <button
                     onClick={() => setShowWizard(true)}
@@ -224,105 +205,55 @@ export default function DashboardPage() {
                   </button>
                 </div>
 
-                {simStats && (
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14, marginBottom: 32 }}>
-                    {[
-                      { label: "ROAS", value: `${simStats.avgRoas.toFixed(1)}x`, color: "#22B07D" },
-                      { label: "Custo por lead", value: `R$ ${simStats.avgCpc.toFixed(2)}`, color: "#8B5CF6" },
-                      { label: "Gasto total", value: `R$ ${simStats.totalSpent.toLocaleString("pt-BR")}`, color: "#F97316" },
-                      { label: "Receita", value: `R$ ${simStats.totalRevenue.toLocaleString("pt-BR")}`, color: "#22B07D" },
-                      { label: "Cliques", value: `${(simStats.totalClicks / 1000).toFixed(1)}K`, color: "#60A5FA" },
-                      { label: "CTR", value: `${simStats.avgCtr.toFixed(1)}%`, color: "#A78BFA" },
-                    ].map((kpi, i) => (
-                      <div key={i} style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 14, padding: "18px 16px", textAlign: "center" as const }}>
-                        <p style={{ fontSize: 12, color: "#8C93B8", margin: 0, textTransform: "uppercase" as const, letterSpacing: 0.5 }}>{kpi.label}</p>
-                        <p style={{ fontSize: 26, fontWeight: 800, color: kpi.color, margin: "8px 0 0", fontFamily: "'Space Grotesk', sans-serif" }}>{kpi.value}</p>
-                      </div>
-                    ))}
+                {loading ? (
+                  <p style={{ color: "#8C93B8", fontSize: 14 }}>Carregando campanhas...</p>
+                ) : campaigns.length === 0 ? (
+                  <div style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 16, padding: "56px 40px", textAlign: "center" }}>
+                    <p style={{ fontSize: 44, marginBottom: 16 }}>&#128203;</p>
+                    <p style={{ fontWeight: 700, fontSize: 20, color: "#F3F5FF", marginBottom: 10 }}>Nenhuma campanha ainda</p>
+                    <p style={{ color: "#8C93B8", fontSize: 15, marginBottom: 28 }}>Crie sua primeira campanha em poucos passos com ajuda da IA.</p>
+                    <button
+                      onClick={() => setShowWizard(true)}
+                      style={{ padding: "14px 28px", background: "linear-gradient(90deg,#8B5CF6,#22B07D)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer" }}
+                    >
+                      Criar primeira campanha
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {campaigns.map((c) => {
+                      const st = STATUS_COLORS[c.status] || STATUS_COLORS.DRAFT;
+                      return (
+                        <div key={c.id} style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 12, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+                          <div style={{ minWidth: 0 }}>
+                            <p style={{ fontWeight: 600, color: "#F3F5FF", fontSize: 16, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.productName}</p>
+                            <p style={{ color: "#8C93B8", fontSize: 14, margin: "4px 0 0 0" }}>{c.countryCode} · {new Date(c.createdAt).toLocaleDateString("pt-BR")}</p>
+                          </div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                            <span style={{ padding: "5px 14px", borderRadius: 99, fontSize: 13, fontWeight: 600, color: st.color, background: st.bg, whiteSpace: "nowrap" }}>
+                              {STATUS_LABELS[c.status] || c.status}
+                            </span>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setSelectedCampaign(c); }}
+                              title="Ver detalhes"
+                              style={{ padding: "6px 12px", background: "rgba(96,165,250,0.08)", border: "1px solid rgba(96,165,250,0.2)", borderRadius: 8, color: "#60A5FA", fontSize: 13, fontWeight: 600, cursor: "pointer" }}
+                            >
+                              Ver
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); if (confirm(`Excluir "${c.productName}"?${c.metaCampaignId ? " A campanha sera removida do Meta tambem." : ""}`)) handleDeleteCampaign(c.id, c.metaCampaignId); }}
+                              disabled={deletingId === c.id}
+                              title="Excluir campanha"
+                              style={{ padding: "6px 10px", background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.2)", borderRadius: 8, color: "#F87171", fontSize: 14, cursor: deletingId === c.id ? "wait" : "pointer" }}
+                            >
+                              &#128465;&#65039;
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {simCampaigns.map((c) => {
-                    const st = STATUS_COLORS[c.status] || STATUS_COLORS.DRAFT;
-                    const isLive = c.status === "ACTIVE";
-                    return (
-                      <div
-                        key={c.id}
-                        onClick={() => setSelectedSimCampaign(c)}
-                        style={{
-                          background: "#121830",
-                          border: isLive ? "1px solid rgba(34,176,125,0.2)" : "1px solid #232C52",
-                          borderRadius: 12,
-                          padding: "16px 20px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          cursor: "pointer",
-                          transition: "border-color 0.15s",
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.borderColor = isLive ? "#22B07D" : "#3B4570")}
-                        onMouseLeave={(e) => (e.currentTarget.style.borderColor = isLive ? "rgba(34,176,125,0.2)" : "#232C52")}
-                      >
-                        <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
-                          <div style={{ width: 38, height: 38, borderRadius: 10, background: st.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, position: "relative" as const }}>
-                            <span style={{ fontSize: 18, fontWeight: 700, color: st.color }}>{c.name.charAt(0)}</span>
-                            {isLive && <div style={{ position: "absolute", top: -2, right: -2, width: 8, height: 8, borderRadius: "50%", background: "#22B07D", border: "2px solid #121830" }} />}
-                          </div>
-                          <div style={{ minWidth: 0 }}>
-                            <p style={{ fontWeight: 600, color: "#F3F5FF", fontSize: 15, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</p>
-                            <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 3 }}>
-                              <span style={{ fontSize: 11, color: "#6B739E" }}>{c.impressions.toLocaleString("pt-BR")} imp.</span>
-                              <span style={{ fontSize: 11, color: "#6B739E" }}>{c.clicks.toLocaleString("pt-BR")} cliques</span>
-                              <span style={{ fontSize: 11, color: "#F97316" }}>R$ {c.spent.toLocaleString("pt-BR")}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: c.roas >= 3 ? "#22B07D" : c.roas >= 2 ? "#F59E0B" : "#F87171", fontFamily: "monospace" }}>{c.roas.toFixed(1)}x</span>
-                          <span style={{ padding: "5px 14px", borderRadius: 99, fontSize: 12, fontWeight: 600, color: st.color, background: st.bg, whiteSpace: "nowrap" }}>
-                            {STATUS_LABELS[c.status] || c.status}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-
-                  {campaigns.length > 0 && campaigns.map((c) => {
-                    const st = STATUS_COLORS[c.status] || STATUS_COLORS.DRAFT;
-                    return (
-                      <div
-                        key={c.id}
-                        onClick={() => setSelectedCampaign(c)}
-                        style={{
-                          background: "#121830",
-                          border: "1px solid #232C52",
-                          borderRadius: 12,
-                          padding: "16px 20px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          cursor: "pointer",
-                          transition: "border-color 0.15s",
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.borderColor = "#3B4570")}
-                        onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#232C52")}
-                      >
-                        <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
-                          <div style={{ width: 38, height: 38, borderRadius: 10, background: st.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            <span style={{ fontSize: 18, fontWeight: 700, color: st.color }}>{c.productName.charAt(0)}</span>
-                          </div>
-                          <div style={{ minWidth: 0 }}>
-                            <p style={{ fontWeight: 600, color: "#F3F5FF", fontSize: 15, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.productName}</p>
-                          </div>
-                        </div>
-                        <span style={{ padding: "5px 14px", borderRadius: 99, fontSize: 12, fontWeight: 600, color: st.color, background: st.bg, whiteSpace: "nowrap", flexShrink: 0 }}>
-                          {STATUS_LABELS[c.status] || c.status}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
               </>
             ) : (
               <>
@@ -330,7 +261,7 @@ export default function DashboardPage() {
                   onClick={() => { setShowWizard(false); setCurrentStep(1); }}
                   style={{ background: "transparent", border: "none", color: "#8C93B8", fontSize: 14, fontWeight: 500, cursor: "pointer", marginBottom: 16, padding: 0 }}
                 >
-                  ← Voltar para lista
+                  &#8592; Voltar para lista
                 </button>
                 <AdsFlowWizard onStepChange={handleStepChange} onClose={() => { setShowWizard(false); setCurrentStep(1); }} />
               </>
@@ -360,52 +291,6 @@ export default function DashboardPage() {
             setSelectedCampaign({ ...selectedCampaign, ...updated } as Campaign);
           }}
         />
-      )}
-      {selectedSimCampaign && (
-        <div
-          style={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)" }}
-          onClick={() => setSelectedSimCampaign(null)}
-        >
-          <div
-            style={{ background: "#0C1022", border: "1px solid #232C52", borderRadius: 18, width: "90%", maxWidth: 640, maxHeight: "85vh", overflow: "auto", padding: 0 }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div style={{ padding: "20px 24px", borderBottom: "1px solid #1A2040", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div>
-                <h3 style={{ fontSize: 18, fontWeight: 700, color: "#F3F5FF", margin: 0 }}>{selectedSimCampaign.name}</h3>
-                <p style={{ fontSize: 13, color: "#8C93B8", margin: "4px 0 0 0" }}>{selectedSimCampaign.niche} · {selectedSimCampaign.country}</p>
-              </div>
-              <button onClick={() => setSelectedSimCampaign(null)} style={{ background: "transparent", border: "none", color: "#8C93B8", fontSize: 22, cursor: "pointer" }}>X</button>
-            </div>
-            <div style={{ padding: "20px 24px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
-                {[
-                  { label: "Gasto", value: `R$ ${selectedSimCampaign.spent.toLocaleString("pt-BR")}`, color: "#F97316" },
-                  { label: "Receita", value: `R$ ${selectedSimCampaign.revenue.toLocaleString("pt-BR")}`, color: "#22B07D" },
-                  { label: "Lucro", value: `R$ ${(selectedSimCampaign.revenue - selectedSimCampaign.spent).toLocaleString("pt-BR")}`, color: selectedSimCampaign.revenue > selectedSimCampaign.spent ? "#22B07D" : "#F87171" },
-                  { label: "Impressoes", value: selectedSimCampaign.impressions.toLocaleString("pt-BR"), color: "#60A5FA" },
-                  { label: "Cliques", value: selectedSimCampaign.clicks.toLocaleString("pt-BR"), color: "#A78BFA" },
-                  { label: "CTR", value: `${selectedSimCampaign.ctr.toFixed(2)}%`, color: "#60A5FA" },
-                  { label: "CPC", value: `R$ ${selectedSimCampaign.cpc.toFixed(2)}`, color: "#F97316" },
-                  { label: "CPM", value: `R$ ${selectedSimCampaign.cpm.toFixed(2)}`, color: "#8B5CF6" },
-                  { label: "ROAS", value: `${selectedSimCampaign.roas.toFixed(2)}x`, color: selectedSimCampaign.roas >= 3 ? "#22B07D" : "#F59E0B" },
-                  { label: "Conversoes", value: selectedSimCampaign.conversions.toLocaleString("pt-BR"), color: "#22B07D" },
-                  { label: "Budget/dia", value: `R$ ${selectedSimCampaign.budgetDaily}`, color: "#8C93B8" },
-                  { label: "Funil", value: selectedSimCampaign.funnelStage === "topo" ? "Topo" : selectedSimCampaign.funnelStage === "meio" ? "Meio" : "Fundo", color: "#A78BFA" },
-                ].map((m, i) => (
-                  <div key={i} style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 10, padding: "12px 14px" }}>
-                    <p style={{ fontSize: 11, color: "#8C93B8", margin: 0 }}>{m.label}</p>
-                    <p style={{ fontSize: 17, fontWeight: 700, color: m.color, margin: "4px 0 0", fontFamily: "monospace" }}>{m.value}</p>
-                  </div>
-                ))}
-              </div>
-              <div style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 10, padding: 14 }}>
-                <p style={{ fontSize: 11, color: "#8C93B8", margin: "0 0 6px" }}>Link da presell</p>
-                <p style={{ fontSize: 13, color: "#60A5FA", fontFamily: "monospace", wordBreak: "break-all", margin: 0 }}>{selectedSimCampaign.link}</p>
-              </div>
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );

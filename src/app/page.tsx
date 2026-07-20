@@ -1,5 +1,7 @@
 "use client";
 
+import LiveCampaignPanel from "@/components/LiveCampaignPanel";
+
 const s = {
   /* ───────── tokens ───────── */
   bg: "#080B14",
@@ -318,7 +320,7 @@ export default function Home() {
             </p>
           </div>
 
-          {/* right – dashboard mock */}
+          {/* right – live dashboard demo */}
           <div style={{ flex: "1 1 420px", minWidth: 300 }}>
             <div
               style={{
@@ -340,107 +342,13 @@ export default function Home() {
                 <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#F0A500" }} />
                 <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#8B5CF6" }} />
                 <span style={{ fontSize: 12, color: "#5B628A", marginLeft: 12 }}>Painel de Campanhas</span>
+                <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 5, background: "rgba(34,176,125,0.1)", border: "1px solid rgba(34,176,125,0.25)", borderRadius: 99, padding: "3px 8px" }}>
+                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#22B07D", animation: "pulse 1.5s ease-in-out infinite" }} />
+                  <span style={{ fontSize: 9, fontWeight: 700, color: "#22B07D", textTransform: "uppercase" as const, letterSpacing: 0.5 }}>AO VIVO</span>
+                </div>
               </div>
 
-              <div style={{ padding: "24px 20px" }}>
-                {/* kpi row */}
-                <div style={{ display: "flex", gap: 16, marginBottom: 24, flexWrap: "wrap" }}>
-                  {/* ROAS */}
-                  <div
-                    style={{
-                      flex: 1,
-                      minWidth: 120,
-                      background: "rgba(139,92,246,.08)",
-                      border: "1px solid rgba(139,92,246,.2)",
-                      borderRadius: 12,
-                      padding: 16,
-                    }}
-                  >
-                    <p style={{ fontSize: 12, color: "#8C93B8", marginBottom: 4 }}>ROAS</p>
-                    <p
-                      style={{
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: 28,
-                        fontWeight: 700,
-                        color: "#8B5CF6",
-                      }}
-                    >
-                      4.2x
-                    </p>
-                  </div>
-                  {/* CPL */}
-                  <div
-                    style={{
-                      flex: 1,
-                      minWidth: 120,
-                      background: "rgba(139,92,246,.08)",
-                      border: "1px solid rgba(139,92,246,.2)",
-                      borderRadius: 12,
-                      padding: 16,
-                    }}
-                  >
-                    <p style={{ fontSize: 12, color: "#8C93B8", marginBottom: 4 }}>Custo por lead</p>
-                    <p
-                      style={{
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: 28,
-                        fontWeight: 700,
-                        color: "#C4B5FD",
-                      }}
-                    >
-                      R$6.80
-                    </p>
-                  </div>
-                </div>
-
-                {/* bar chart */}
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 100, marginBottom: 24 }}>
-                  {[60, 45, 80, 55, 95, 70, 85].map((h, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        flex: 1,
-                        height: `${h}%`,
-                        borderRadius: 6,
-                        background: `linear-gradient(180deg,${i === 4 ? "#F97316" : "#8B5CF6"},${i === 4 ? "rgba(247,37,133,.3)" : "rgba(139,92,246,.2)"})`,
-                        transition: "height .4s",
-                      }}
-                    />
-                  ))}
-                </div>
-
-                {/* campaign rows */}
-                {[
-                  { name: "Black Friday - Conversão", status: "Ativa", color: "#22B07D" },
-                  { name: "Lançamento Curso IA", status: "Ativa", color: "#22B07D" },
-                  { name: "Retargeting - Site", status: "Pausada", color: "#F0A500" },
-                ].map((c, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      padding: "10px 0",
-                      borderTop: i > 0 ? "1px solid #232C52" : "none",
-                    }}
-                  >
-                    <span style={{ fontSize: 13, color: "#F3F5FF" }}>{c.name}</span>
-                    <span
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: c.color,
-                        background: `${c.color}18`,
-                        padding: "4px 10px",
-                        borderRadius: 999,
-                      }}
-                    >
-                      {c.status}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              <LiveCampaignPanel />
             </div>
           </div>
         </div>
