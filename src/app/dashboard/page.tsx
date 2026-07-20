@@ -158,49 +158,12 @@ export default function DashboardPage() {
 
   const isPaid = userPlan === "BASICO" || userPlan === "PRO";
   const isAdmin = userRole === "ADMIN";
-  const showPaywall = userPlan !== null && !isPaid && !isAdmin;
+  const isFree = userPlan !== null && !isPaid && !isAdmin;
+  const freePages: SidebarPage[] = ["plans", "settings", "support"];
+  const isPageBlocked = isFree && !freePages.includes(currentPage);
 
-  if (showPaywall) {
-    return (
-      <div style={{ minHeight: "100vh", background: "#080B14", fontFamily: "'Inter', sans-serif" }}>
-        <header style={{ borderBottom: "1px solid #1A2040", padding: "14px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#0C1022" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <svg width="36" height="36" viewBox="0 0 96 96" fill="none">
-              <rect width="96" height="96" rx="20" fill="#171A21" stroke="#262B36" />
-              <path d="M24 32 L40 48 L52 38 L72 60" stroke="#8B5CF6" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M60 60 H72 V48" stroke="#8B5CF6" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx="24" cy="32" r="4" fill="#A78BFA" />
-              <circle cx="52" cy="38" r="4" fill="#A78BFA" />
-            </svg>
-            <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 20 }}>
-              <span style={{ color: "#F3F5FF" }}>Ads</span>
-              <span style={{ background: "linear-gradient(90deg,#8B5CF6,#22B07D)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Flow</span>
-            </span>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ color: "#8C93B8", fontSize: 14 }}>{session.user?.email}</span>
-            <button
-              onClick={() => signOut({ callbackUrl: "/login" })}
-              style={{ padding: "10px 20px", background: "transparent", border: "1px solid #232C52", borderRadius: 10, color: "#8C93B8", fontSize: 14, fontWeight: 500, cursor: "pointer" }}
-            >
-              Sair
-            </button>
-          </div>
-        </header>
-
-        <main style={{ padding: "40px 32px", maxWidth: 900, margin: "0 auto" }}>
-          <div style={{ background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.2)", borderRadius: 14, padding: "28px 32px", marginBottom: 32, textAlign: "center" }}>
-            <p style={{ fontSize: 40, marginBottom: 12 }}>&#128274;</p>
-            <h2 style={{ fontSize: 24, fontWeight: 700, color: "#F3F5FF", margin: "0 0 8px" }}>Acesso bloqueado</h2>
-            <p style={{ color: "#8C93B8", fontSize: 15, marginBottom: 0, lineHeight: 1.6 }}>
-              Escolha um plano para acessar o sistema.<br />
-              Basico (R$30/mes) ou Pro (R$50/mes).
-            </p>
-          </div>
-          <PlansPage />
-        </main>
-      </div>
-    );
+  if (userPlan !== null && !isPaid && !isAdmin && currentPage === "plans") {
+    // allow plans page to show inline below
   }
 
   return (
@@ -248,7 +211,21 @@ export default function DashboardPage() {
         </header>
 
         <main style={{ padding: "clamp(16px, 4vw, 32px)", flex: 1, overflow: "auto" }}>
-          {currentPage === "dashboard" && (
+          {isPageBlocked ? (
+            <div style={{ textAlign: "center", padding: "80px 32px" }}>
+              <p style={{ fontSize: 52, marginBottom: 16 }}>&#128274;</p>
+              <h2 style={{ fontSize: 24, fontWeight: 700, color: "#F3F5FF", margin: "0 0 10px" }}>Funcionalidade bloqueada</h2>
+              <p style={{ color: "#8C93B8", fontSize: 15, marginBottom: 28, lineHeight: 1.6 }}>
+                Assine um plano para desbloquear todas as funcionalidades.
+              </p>
+              <button
+                onClick={() => handleNavigate("plans")}
+                style={{ padding: "14px 32px", background: "linear-gradient(90deg,#8B5CF6,#22B07D)", color: "#080B14", border: "none", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer" }}
+              >
+                Ver planos
+              </button>
+            </div>
+          ) : currentPage === "dashboard" ? (
             !showWizard ? (
               <>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32, flexWrap: "wrap", gap: 12 }}>
@@ -325,20 +302,22 @@ export default function DashboardPage() {
                 <AdsFlowWizard onStepChange={handleStepChange} onClose={() => { setShowWizard(false); setCurrentStep(1); }} />
               </>
             )
+          ) : (
+            <>
+              {currentPage === "campaigns" && <CampaignsPage />}
+              {currentPage === "metrics" && <MetricsPage />}
+              {currentPage === "creatives" && <CreativesPage />}
+              {currentPage === "radar" && <AdRadarPage />}
+              {currentPage === "ads-shop" && <AdsShopPage />}
+              {currentPage === "install" && <InstallAppPage />}
+              {currentPage === "settings" && <SettingsPage />}
+              {currentPage === "plans" && <PlansPage />}
+              {currentPage === "ia" && <IaPage />}
+              {currentPage === "meta-api" && <MetaApiPage />}
+              {currentPage === "support" && <SupportPage />}
+              {currentPage === "admin" && isAdmin && <AdminPanel />}
+            </>
           )}
-
-          {currentPage === "campaigns" && <CampaignsPage />}
-          {currentPage === "metrics" && <MetricsPage />}
-          {currentPage === "creatives" && <CreativesPage />}
-          {currentPage === "radar" && <AdRadarPage />}
-          {currentPage === "ads-shop" && <AdsShopPage />}
-          {currentPage === "install" && <InstallAppPage />}
-          {currentPage === "settings" && <SettingsPage />}
-          {currentPage === "plans" && <PlansPage />}
-          {currentPage === "ia" && <IaPage />}
-          {currentPage === "meta-api" && <MetaApiPage />}
-          {currentPage === "support" && <SupportPage />}
-          {currentPage === "admin" && isAdmin && <AdminPanel />}
         </main>
       </div>
       <InstallBanner />
