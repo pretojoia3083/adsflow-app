@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { aiGenerateJSON, getOpenAI } from "@/lib/ai";
+import { aiGenerateJSON } from "@/lib/ai";
+import { prisma } from "@/lib/prisma";
 
 interface PresellResult {
   slug: string;
@@ -93,23 +94,11 @@ export async function POST(req: NextRequest) {
 
   const slug = baseSlug + "-" + Date.now().toString(36);
 
-  const openai = getOpenAI();
-
-  if (!openai) {
-    return NextResponse.json({
-      slug,
-      title: productName,
-      headline: generateHeadline(productName, colors.mood),
-      subheadline: generateSubheadline(productName),
-      ctaText: "Saiba Mais",
-      bgColor: colors.bg,
-      accentColor: colors.accent,
-      textColor: colors.text,
-      niche,
-      mood: colors.mood,
-      affiliateLink: affiliateLink || "",
-    });
-  }
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { openaiApiKey: true },
+  });
+  const userKey = user?.openaiApiKey || null;
 
   const aiResult = await aiGenerateJSON<{ headline: string; subheadline: string; ctaText: string }>(
     `Gere textos para uma pagina de presell (pre-venda) de afiliado.
@@ -124,8 +113,11 @@ Retorne um JSON com:
 - subheadline: subtitulo que complementa e gera curiosidade (max 120 caracteres)
 - ctaText: texto do botao de call to action em portugues (max 25 caracteres)`,
 
-    `Voce e um copywriter especializado em presell e paginas de captura para afiliados. O objetivo e maximizar a taxa de clique no botao CTA. Use gatilhos de curiosidade, prova social e urgencia. Idioma: portugues do Brasil.`
+    `Voce e um copywriter especializado em presell e paginas de captura para afiliados. O objetivo e maximizar a taxa de clique no botao CTA. Use gatilhos de curiosidade, prova social e urgencia. Idioma: portugues do Brasil.`,
+    userKey,
   );
+
+  const hasAi = !!aiResult;
 
   return NextResponse.json({
     slug,
@@ -139,5 +131,6 @@ Retorne um JSON com:
     niche,
     mood: colors.mood,
     affiliateLink: affiliateLink || "",
+    generatedByAi: hasAi,
   });
 }

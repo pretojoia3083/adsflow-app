@@ -16,6 +16,7 @@ model User {
   avatarUrl         String?
   agencyLogo        String?
   plan              String         @default("FREE")
+  openaiApiKey      String?
   stripeCustomerId  String?        @unique
   emailVerified     DateTime?
   createdAt         DateTime       @default(now())

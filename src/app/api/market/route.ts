@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { aiGenerateJSON, getOpenAI } from "@/lib/ai";
+import { aiGenerateJSON } from "@/lib/ai";
+import { prisma } from "@/lib/prisma";
 
 interface MarketResult {
   score: number;
@@ -38,16 +39,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { openaiApiKey: true },
+  });
+  const userKey = user?.openaiApiKey || null;
+
   const { productName, audience, country, language } = await req.json();
 
   if (!productName || !country) {
     return NextResponse.json({ error: "productName and country are required" }, { status: 400 });
-  }
-
-  const openai = getOpenAI();
-
-  if (!openai) {
-    return NextResponse.json(mockMarket({ productName, country }));
   }
 
   const result = await aiGenerateJSON<MarketResult>(
@@ -65,7 +66,8 @@ Retorne um JSON com exatamente esses campos:
 - audienceSize: estimativa do tamanho do publico no formato "X - Y"
 - recommendations: array com 3-5 recomendacoes especificas para esta campanha`,
 
-    `Voce e um consultor de marketing digital especializado em Meta Ads para o Brasil e mercados internacionais. Seja preciso nas estimativas baseado no tipo de produto e pais informado. CPM deve refletir a realidade do pais. Publico-alvo deve ser realista.`
+    `Voce e um consultor de marketing digital especializado em Meta Ads para o Brasil e mercados internacionais. Seja preciso nas estimativas baseado no tipo de produto e pais informado. CPM deve refletir a realidade do pais. Publico-alvo deve ser realista.`,
+    userKey
   );
 
   if (result && result.score) {

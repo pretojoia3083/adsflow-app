@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { aiGenerateJSON } from "@/lib/ai";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { openaiApiKey: true },
+  });
+  const userKey = user?.openaiApiKey || null;
 
   const body = await request.json();
   const { pageInfo, productName, productDescription } = body;
@@ -42,7 +49,7 @@ Retorne um JSON com:
 }`;
 
   try {
-    const result = await aiGenerateJSON(userPrompt, systemPrompt);
+    const result = await aiGenerateJSON(userPrompt, systemPrompt, userKey);
     return NextResponse.json(result);
   } catch (err: any) {
     return NextResponse.json({

@@ -1,16 +1,27 @@
 import OpenAI from "openai";
 
-let client: OpenAI | null = null;
+let defaultClient: OpenAI | null = null;
 
-export function getOpenAI(): OpenAI | null {
+function getDefaultClient(): OpenAI | null {
   if (!process.env.OPENAI_API_KEY) return null;
-  if (client) return client;
-  client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  return client;
+  if (defaultClient) return defaultClient;
+  defaultClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  return defaultClient;
 }
 
-export async function aiGenerate(prompt: string, systemPrompt?: string): Promise<string> {
-  const openai = getOpenAI();
+function getUserClient(userKey: string): OpenAI {
+  return new OpenAI({ apiKey: userKey });
+}
+
+export function getOpenAI(userKey?: string | null): OpenAI | null {
+  if (userKey && userKey.startsWith("sk-")) {
+    return getUserClient(userKey);
+  }
+  return getDefaultClient();
+}
+
+export async function aiGenerate(prompt: string, systemPrompt?: string, userKey?: string | null): Promise<string> {
+  const openai = getOpenAI(userKey);
   if (!openai) return "";
 
   try {
@@ -29,8 +40,8 @@ export async function aiGenerate(prompt: string, systemPrompt?: string): Promise
   }
 }
 
-export async function aiGenerateJSON<T>(prompt: string, systemPrompt: string): Promise<T | null> {
-  const openai = getOpenAI();
+export async function aiGenerateJSON<T>(prompt: string, systemPrompt: string, userKey?: string | null): Promise<T | null> {
+  const openai = getOpenAI(userKey);
   if (!openai) return null;
 
   try {

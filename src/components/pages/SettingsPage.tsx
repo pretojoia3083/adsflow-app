@@ -9,7 +9,11 @@ export default function SettingsPage() {
   const [email] = useState(session?.user?.email || "");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [agencyLogo, setAgencyLogo] = useState("");
+  const [openaiApiKey, setOpenaiApiKey] = useState("");
+  const [hasOpenaiKey, setHasOpenaiKey] = useState(false);
+  const [showApiKey, setShowApiKey] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [apiKeySaved, setApiKeySaved] = useState(false);
   const [uploading, setUploading] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -23,6 +27,7 @@ export default function SettingsPage() {
           if (data.user.avatarUrl) setAvatarUrl(data.user.avatarUrl);
           if (data.user.agencyLogo) setAgencyLogo(data.user.agencyLogo);
           if (data.user.name) setName(data.user.name);
+          if (data.user.hasOpenaiKey) setHasOpenaiKey(true);
         }
       } catch (err) {
         void err;
@@ -59,7 +64,7 @@ export default function SettingsPage() {
       const res = await fetch("/api/user/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, image: avatarUrl, agencyLogo }),
+        body: JSON.stringify({ name, image: avatarUrl, agencyLogo, openaiApiKey }),
       });
       if (res.ok) {
         await update({ name });
@@ -70,6 +75,24 @@ export default function SettingsPage() {
       void err;
     }
     setUploading(false);
+  }
+
+  async function handleSaveApiKey() {
+    try {
+      const res = await fetch("/api/user/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ openaiApiKey }),
+      });
+      if (res.ok) {
+        setApiKeySaved(true);
+        setHasOpenaiKey(true);
+        setOpenaiApiKey("");
+        setTimeout(() => setApiKeySaved(false), 2000);
+      }
+    } catch (err) {
+      void err;
+    }
   }
 
   const avatarBg = avatarUrl ? avatarUrl : "";
@@ -159,6 +182,51 @@ export default function SettingsPage() {
               </button>
             </div>
           </div>
+        </div>
+
+        <div style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 14, padding: 28 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+            <h3 style={{ color: "#F3F5FF", fontSize: 18, fontWeight: 600, margin: 0 }}>API Key da IA (OpenAI)</h3>
+            <span style={{ fontSize: 11, fontWeight: 600, color: "#22B07D", background: "rgba(34,176,125,0.12)", padding: "3px 8px", borderRadius: 99 }}>Plano Basico</span>
+          </div>
+          <p style={{ color: "#8C93B8", fontSize: 13, marginTop: 8, marginBottom: 16, lineHeight: 1.5 }}>
+            Para usar IA no plano Basico (R$30/mes), conecte sua propria API key da OpenAI. 
+            A chave e usada apenas para gerar copy, presells e analises. Nao e compartilhada.
+          </p>
+          <div style={{ marginBottom: 12 }}>
+            <span style={{ color: "#8C93B8", fontSize: 13, fontWeight: 500, display: "block", marginBottom: 6 }}>OpenAI API Key</span>
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                type={showApiKey ? "text" : "password"}
+                value={openaiApiKey}
+                onChange={(e) => setOpenaiApiKey(e.target.value)}
+                placeholder={hasOpenaiKey ? "sk-...chave salva (digite uma nova para trocar)" : "sk-proj-..."}
+                style={{ flex: 1, padding: "12px 16px", background: "#0C1022", border: "1px solid #232C52", borderRadius: 10, color: "#F3F5FF", fontSize: 14, fontFamily: "monospace", outline: "none", boxSizing: "border-box" as const }}
+              />
+              <button
+                onClick={() => setShowApiKey(!showApiKey)}
+                style={{ padding: "12px 14px", background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.3)", borderRadius: 10, color: "#A78BFA", fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}
+              >
+                {showApiKey ? "Ocultar" : "Mostrar"}
+              </button>
+            </div>
+          </div>
+          {hasOpenaiKey && !openaiApiKey && (
+            <p style={{ fontSize: 12, color: "#22B07D", marginTop: 8 }}>
+              Chave salva e ativa. IA habilitada para gerar presells e copy.
+            </p>
+          )}
+          {openaiApiKey && !openaiApiKey.startsWith("sk-") && (
+            <p style={{ fontSize: 12, color: "#F87171", marginTop: 8 }}>
+              Formato invalido. Deve comecar com sk-
+            </p>
+          )}
+          <button
+            onClick={handleSaveApiKey}
+            style={{ marginTop: 14, padding: "10px 20px", background: apiKeySaved ? "#22B07D" : "rgba(34,176,125,0.15)", border: "1px solid rgba(34,176,125,0.3)", borderRadius: 10, color: apiKeySaved ? "#080B14" : "#22B07D", fontSize: 14, fontWeight: 600, cursor: "pointer" }}
+          >
+            {apiKeySaved ? "Salvo!" : "Salvar API Key"}
+          </button>
         </div>
 
         <div style={{ background: "#121830", border: "1px solid #232C52", borderRadius: 14, padding: 28 }}>

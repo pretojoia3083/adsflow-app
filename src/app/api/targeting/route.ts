@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { aiGenerateJSON, getOpenAI } from "@/lib/ai";
+import { aiGenerateJSON } from "@/lib/ai";
+import { prisma } from "@/lib/prisma";
 
 interface TargetingResult {
   keywords: string;
@@ -36,16 +37,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { openaiApiKey: true },
+  });
+  const userKey = user?.openaiApiKey || null;
+
   const { productName, audience, country, funnelStage } = await req.json();
 
   if (!productName) {
     return NextResponse.json({ error: "productName is required" }, { status: 400 });
-  }
-
-  const openai = getOpenAI();
-
-  if (!openai) {
-    return NextResponse.json(mockTargeting({ productName, funnelStage }));
   }
 
   const stageLabel = funnelStage === "topo" ? "topo de funil (consciencia/reconhecimento)" : funnelStage === "fundo" ? "fundo de funil (conversao/venda)" : "meio de funil (consideracao)";
@@ -63,7 +64,8 @@ Retorne um JSON com exatamente esses campos:
 - placements: array com os posicionamentos ideais para este estagio (Feed do Facebook, Feed do Instagram, Stories do Instagram, Reels do Instagram, Audience Network, Messenger)
 - funnelStage: "${funnelStage || "meio"}"`,
 
-    `Voce e um especialista em trafego pago e Meta Ads. Gere segmentacao precisa e relevante para o publico e produto informados. Use interesses que existam realmente no Meta Ads Manager. Palavras-chave devem ter alto potencial de busca no pais indicado.`
+    `Voce e um especialista em trafego pago e Meta Ads. Gere segmentacao precisa e relevante para o publico e produto informados. Use interesses que existam realmente no Meta Ads Manager. Palavras-chave devem ter alto potencial de busca no pais indicado.`,
+    userKey
   );
 
   if (result && result.keywords) {

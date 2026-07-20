@@ -9,12 +9,13 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { image, name, agencyLogo } = await req.json();
+    const { image, name, agencyLogo, openaiApiKey } = await req.json();
 
-    const updateData: Record<string, string> = {};
-    if (name) updateData.name = name;
-    if (image) updateData.avatarUrl = image;
-    if (agencyLogo) updateData.agencyLogo = agencyLogo;
+    const updateData: Record<string, string | null> = {};
+    if (name !== undefined) updateData.name = name;
+    if (image !== undefined) updateData.avatarUrl = image;
+    if (agencyLogo !== undefined) updateData.agencyLogo = agencyLogo;
+    if (openaiApiKey !== undefined) updateData.openaiApiKey = openaiApiKey || null;
 
     const updated = await prisma.user.update({
       where: { id: session.user.id },
@@ -29,6 +30,7 @@ export async function POST(req: NextRequest) {
         email: updated.email,
         avatarUrl: updated.avatarUrl,
         agencyLogo: updated.agencyLogo,
+        hasOpenaiKey: !!updated.openaiApiKey,
       },
     });
   } catch (e) {
@@ -45,8 +47,17 @@ export async function GET() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { id: true, name: true, email: true, avatarUrl: true, agencyLogo: true },
+    select: { id: true, name: true, email: true, avatarUrl: true, agencyLogo: true, openaiApiKey: true },
   });
 
-  return NextResponse.json({ user });
+  return NextResponse.json({
+    user: user ? {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      avatarUrl: user.avatarUrl,
+      agencyLogo: user.agencyLogo,
+      hasOpenaiKey: !!user.openaiApiKey,
+    } : null,
+  });
 }

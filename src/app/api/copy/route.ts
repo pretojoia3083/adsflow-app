@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { aiGenerateJSON, getOpenAI } from "@/lib/ai";
+import { aiGenerateJSON } from "@/lib/ai";
+import { prisma } from "@/lib/prisma";
 
 interface CopyResult {
   headline: string;
@@ -32,17 +33,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { openaiApiKey: true },
+  });
+  const userKey = user?.openaiApiKey || null;
+
   const body = await req.json();
   const { productName, audience, country, funnelStage, tone } = body;
 
   if (!productName) {
     return NextResponse.json({ error: "productName is required" }, { status: 400 });
-  }
-
-  const openai = getOpenAI();
-
-  if (!openai) {
-    return NextResponse.json(mockCopy(body));
   }
 
   const stageLabel = funnelStage === "topo" ? "topo de funil (consciencia)" : funnelStage === "fundo" ? "fundo de funil (conversao)" : "meio de funil (consideracao)";
@@ -60,7 +61,8 @@ Retorne um JSON com exatamente esses campos:
 - description: descricao curta do anuncio (max 90 caracteres)
 - cta: call to action em portugues (ex: Saiba Mais, Comprar Agora, Quero Testar, Assinar Agora)`,
 
-    `Voce e um especialista em copywriting para Meta Ads. Gere textos persuasivos, com gatilhos mentais, em portugues do Brasil. Nao use aspas no headline. O texto principal deve gerar curiosidade e urgencia.`
+    `Voce e um especialista em copywriting para Meta Ads. Gere textos persuasivos, com gatilhos mentais, em portugues do Brasil. Nao use aspas no headline. O texto principal deve gerar curiosidade e urgencia.`,
+    userKey
   );
 
   if (result && result.headline) {
