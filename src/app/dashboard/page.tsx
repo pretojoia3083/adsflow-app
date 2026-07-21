@@ -96,6 +96,7 @@ export default function DashboardPage() {
   const [userPlan, setUserPlan] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string>("USER");
   const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const handleStepChange = useCallback((step: number) => {
     setCurrentStep(step);
@@ -170,10 +171,18 @@ export default function DashboardPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#080B14", fontFamily: "'Inter', sans-serif", display: "flex" }}>
-      <Sidebar currentPage={currentPage} onNavigate={handleNavigate} userName={session.user?.name || session.user?.email || ""} avatarUrl={avatarUrl} isAdmin={isAdmin} />
+      <Sidebar currentPage={currentPage} onNavigate={handleNavigate} userName={session.user?.name || session.user?.email || ""} avatarUrl={avatarUrl} isAdmin={isAdmin} onMobileOpen={mobileSidebarOpen} onMobileClose={() => setMobileSidebarOpen(false)} />
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        <header style={{ borderBottom: "1px solid #1A2040", padding: "14px clamp(16px, 4vw, 32px)", display: "flex", alignItems: "center", gap: 24, background: "#0C1022" }}>
+        <header style={{ borderBottom: "1px solid #1A2040", padding: "14px clamp(12px, 3vw, 32px)", display: "flex", alignItems: "center", gap: 12, background: "#0C1022" }}>
+          <button
+            onClick={() => setMobileSidebarOpen(true)}
+            style={{ display: "none", background: "transparent", border: "none", color: "#F3F5FF", fontSize: 22, cursor: "pointer", padding: "4px 8px", borderRadius: 8 }}
+            className="mobile-menu-btn"
+          >
+            &#9776;
+          </button>
+
           {showWizard && (
             <div style={{ flex: 1, minWidth: 0 }}>
               <Stepper labels={STEP_NAMES} currentStep={currentStep} />
@@ -182,14 +191,14 @@ export default function DashboardPage() {
 
           {!showWizard && <div style={{ flex: 1 }} />}
 
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0, flexWrap: "wrap" }}>
             {isPaid && (
               <span style={{ padding: "4px 10px", borderRadius: 8, fontSize: 12, fontWeight: 700, color: userPlan === "PRO" ? "#8B5CF6" : "#22B07D", background: userPlan === "PRO" ? "rgba(139,92,246,0.12)" : "rgba(34,176,125,0.12)" }}>
                 {userPlan === "PRO" ? "Pro" : "Basico"}
               </span>
             )}
             {isPaid && subscriptionEnd && (
-              <span style={{ fontSize: 12, color: "#6B739E" }}>
+              <span className="hide-mobile" style={{ fontSize: 12, color: "#6B739E" }}>
                 Expira: {new Date(subscriptionEnd).toLocaleDateString("pt-BR")}
               </span>
             )}
@@ -206,7 +215,7 @@ export default function DashboardPage() {
                   <span style={{ color: "#080B14", fontSize: 14, fontWeight: 700 }}>{(session.user?.name || session.user?.email || "U").charAt(0).toUpperCase()}</span>
                 )}
               </div>
-              <span style={{ color: "#8C93B8", fontSize: 14 }}>{session.user?.name || session.user?.email}</span>
+            <span className="hide-mobile" style={{ color: "#8C93B8", fontSize: 14 }}>{session.user?.name || session.user?.email}</span>
             </div>
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}

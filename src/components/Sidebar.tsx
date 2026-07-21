@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export type SidebarPage = "dashboard" | "campaigns" | "metrics" | "creatives" | "radar" | "ads-shop" | "install" | "settings" | "plans" | "ia" | "meta-api" | "support" | "admin";
 
@@ -10,6 +10,8 @@ interface SidebarProps {
   userName?: string;
   avatarUrl?: string | null;
   isAdmin?: boolean;
+  onMobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
 const MENU_SECTIONS = [
@@ -47,26 +49,28 @@ const MENU_SECTIONS = [
   },
 ];
 
-export default function Sidebar({ currentPage, onNavigate, userName, avatarUrl, isAdmin }: SidebarProps) {
+export default function Sidebar({ currentPage, onNavigate, userName, avatarUrl, isAdmin, onMobileOpen, onMobileClose }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   const sections = isAdmin
     ? [...MENU_SECTIONS, { title: "Administracao", items: [{ id: "admin" as SidebarPage, label: "Painel ADM", icon: "🛡️" }] }]
     : MENU_SECTIONS;
 
-  return (
-    <aside
-      style={{
-        width: collapsed ? 72 : 240,
-        minWidth: collapsed ? 72 : 240,
-        background: "#0C1022",
-        borderRight: "1px solid #1A2040",
-        display: "flex",
-        flexDirection: "column",
-        transition: "width 0.25s ease, min-width 0.25s ease",
-        overflow: "hidden",
-      }}
-    >
+  function handleNavigate(page: SidebarPage) {
+    onNavigate(page);
+    if (isMobile && onMobileClose) onMobileClose();
+  }
+
+  const sidebarContent = (
+    <>
       <div style={{ padding: collapsed ? "20px 8px" : "20px 20px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid #1A2040", minHeight: 72 }}>
         <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", flexShrink: 0 }}>
           <svg width="40" height="40" viewBox="0 0 96 96" fill="none">
@@ -99,7 +103,7 @@ export default function Sidebar({ currentPage, onNavigate, userName, avatarUrl, 
               return (
                 <button
                   key={item.id}
-                  onClick={() => onNavigate(item.id)}
+                  onClick={() => handleNavigate(item.id)}
                   title={collapsed ? item.label : undefined}
                   style={{
                     display: "flex",
@@ -140,48 +144,33 @@ export default function Sidebar({ currentPage, onNavigate, userName, avatarUrl, 
         ))}
       </nav>
 
-      <div style={{ padding: "12px 8px", borderTop: "1px solid #1A2040" }}>
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          style={{
-            width: "100%",
-            padding: collapsed ? "10px 0" : "10px 16px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: collapsed ? "center" : "flex-start",
-            gap: 8,
-            background: "transparent",
-            border: "1px solid #1A2040",
-            borderRadius: 8,
-            color: "#6B739E",
-            fontSize: 15,
-            cursor: "pointer",
-          }}
-        >
-          <span style={{ fontSize: 16, transform: collapsed ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>◀</span>
-          {!collapsed && <span>Recolher</span>}
-        </button>
-      </div>
-
-      {collapsed && userName && (
-        <div style={{ padding: "12px 0", borderTop: "1px solid #1A2040", display: "flex", justifyContent: "center" }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
-            background: avatarUrl ? "none" : "linear-gradient(135deg, #8B5CF6, #A78BFA)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            overflow: "hidden", border: "2px solid #232C52",
-          }}>
-            {avatarUrl ? (
-              <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            ) : (
-              <span style={{ color: "#080B14", fontSize: 12, fontWeight: 700 }}>{userName.charAt(0).toUpperCase()}</span>
-            )}
-          </div>
+      {!isMobile && (
+        <div style={{ padding: "12px 8px", borderTop: "1px solid #1A2040" }}>
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            style={{
+              width: "100%",
+              padding: collapsed ? "10px 0" : "10px 16px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: collapsed ? "center" : "flex-start",
+              gap: 8,
+              background: "transparent",
+              border: "1px solid #1A2040",
+              borderRadius: 8,
+              color: "#6B739E",
+              fontSize: 15,
+              cursor: "pointer",
+            }}
+          >
+            <span style={{ fontSize: 16, transform: collapsed ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>&#9664;</span>
+            {!collapsed && <span>Recolher</span>}
+          </button>
         </div>
       )}
 
       {!collapsed && userName && (
-        <div style={{ padding: "16px 20px", borderTop: "1px solid #1A2040", display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => onNavigate("settings")}>
+        <div style={{ padding: "16px 20px", borderTop: "1px solid #1A2040", display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => handleNavigate("settings")}>
           <div style={{
             width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
             background: avatarUrl ? "none" : "linear-gradient(135deg, #8B5CF6, #A78BFA)",
@@ -197,6 +186,49 @@ export default function Sidebar({ currentPage, onNavigate, userName, avatarUrl, 
           <div style={{ fontSize: 14, color: "#A0A8CE", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{userName}</div>
         </div>
       )}
+    </>
+  );
+
+  if (isMobile) {
+    if (!onMobileOpen) return null;
+    return (
+      <>
+        <div
+          onClick={onMobileClose}
+          style={{
+            position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+            background: "rgba(0,0,0,0.6)", zIndex: 998,
+            transition: "opacity 0.2s",
+          }}
+        />
+        <aside
+          style={{
+            position: "fixed", top: 0, left: 0, bottom: 0, width: 260,
+            background: "#0C1022", borderRight: "1px solid #1A2040",
+            display: "flex", flexDirection: "column", zIndex: 999,
+            transition: "transform 0.25s ease",
+          }}
+        >
+          {sidebarContent}
+        </aside>
+      </>
+    );
+  }
+
+  return (
+    <aside
+      style={{
+        width: collapsed ? 72 : 240,
+        minWidth: collapsed ? 72 : 240,
+        background: "#0C1022",
+        borderRight: "1px solid #1A2040",
+        display: "flex",
+        flexDirection: "column",
+        transition: "width 0.25s ease, min-width 0.25s ease",
+        overflow: "hidden",
+      }}
+    >
+      {sidebarContent}
     </aside>
   );
 }
