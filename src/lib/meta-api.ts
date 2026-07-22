@@ -302,7 +302,6 @@ export async function createMetaCampaign(
   if (objective === "OUTCOME_ENGAGEMENT" && pageId) {
     adSetBody.promoted_object = {
       page_id: pageId,
-      engagement_type: "POST_ENGAGEMENT",
     };
   }
 
