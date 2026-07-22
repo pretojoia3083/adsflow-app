@@ -184,6 +184,10 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
   const [publishError, setPublishError] = useState("");
   const [publishSuccess, setPublishSuccess] = useState(false);
   const [adsManagerUrl, setAdsManagerUrl] = useState("");
+  const [publishPlatform, setPublishPlatform] = useState<"meta" | "google">("meta");
+  const [googleConnected, setGoogleConnected] = useState(false);
+  const [googlePublishError, setGooglePublishError] = useState("");
+  const [googlePublishSuccess, setGooglePublishSuccess] = useState(false);
 
   const progressSteps = [
     { title: "Salvando campanha no banco de dados", desc: "Registrando todas as configuracoes da sua campanha..." },
@@ -192,6 +196,10 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
     { title: "Preparando copy do anuncio", desc: "Validando headline, texto principal e CTA..." },
     { title: "Finalizando criacao", desc: "Tudo quase pronto!" },
   ];
+
+  useEffect(() => {
+    fetch("/api/google/config").then((r) => r.json()).then((d) => setGoogleConnected(d.connected)).catch(() => {});
+  }, []);
 
   async function fetchMarket() {
     setLoading(true);
@@ -364,6 +372,44 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
       }
     } catch {
       setPublishError("Erro ao conectar com a API do Meta. Verifique sua conexao e token.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handlePublishGoogle() {
+    if (!campaignConfig.pageId) {
+      setGooglePublishError("Selecione uma Facebook Page na etapa Config antes de publicar.");
+      return;
+    }
+    setLoading(true);
+    setGooglePublishError("");
+    setGooglePublishSuccess(false);
+    try {
+      const res = await fetch("/api/google/create-campaign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          campaignId: launchResult?.id !== "local" ? launchResult?.id : undefined,
+          productName: product.productName,
+          dailyBudget: campaignConfig.budgetDaily || 20,
+          country: product.country || "BR",
+          keywords: targeting.keywords.split(",").map((k) => k.trim()).filter(Boolean),
+          adCopy: { headline: adCopy.headline, primaryText: adCopy.primaryText, description: adCopy.description, cta: adCopy.cta },
+          finalUrl: presellUrl || presell.affiliateLink || "",
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setGooglePublishSuccess(true);
+        if (campaignConfig.pageId && launchResult?.id && launchResult.id !== "local") {
+          setLaunchResult({ ...launchResult, googleCampaignId: data.googleCampaignId, productName: launchResult.productName });
+        }
+      } else {
+        setGooglePublishError(data.error || "Erro ao publicar no Google Ads.");
+      }
+    } catch {
+      setGooglePublishError("Erro ao conectar com a API do Google Ads.");
     } finally {
       setLoading(false);
     }
@@ -1089,10 +1135,22 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
                     {launchResult.id && launchResult.id !== "local" ? "Campanha criada no banco de dados" : "Campanha salva localmente"}
                   </div>
                   <div style={{ fontSize: 14, color: C.muted, lineHeight: 1.6 }}>
-                    {launchResult.id && launchResult.id !== "local"
-                      ? "Clique em 'Publicar no Meta' para publicar automaticamente no Facebook/Instagram, ou fechar e publicar depois."
-                      : "Acesse o Meta Ads Manager (business.facebook.com), crie uma campanha com o objetivo de reconhecimento, cole a copy e configure a segmentacao."}
+                    Escolha a plataforma para publicar, ou feche e publique depois.
                   </div>
+                </div>
+
+                {/* Platform Selector */}
+                <div style={{ display: "flex", gap: 12, marginTop: 16, marginBottom: 16 }}>
+                  <button onClick={() => setPublishPlatform("meta")} style={{ flex: 1, padding: "14px 16px", background: publishPlatform === "meta" ? "rgba(59,130,246,0.15)" : C.card, border: `2px solid ${publishPlatform === "meta" ? "#3B82F6" : C.border}`, borderRadius: 12, cursor: "pointer", textAlign: "center" as const }}>
+                    <div style={{ fontSize: 22, marginBottom: 4 }}>📱</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: publishPlatform === "meta" ? "#60A5FA" : C.text }}>Meta Ads</div>
+                    <div style={{ fontSize: 11, color: C.muted }}>Facebook / Instagram</div>
+                  </button>
+                  <button onClick={() => setPublishPlatform("google")} style={{ flex: 1, padding: "14px 16px", background: publishPlatform === "google" ? "rgba(34,176,125,0.15)" : C.card, border: `2px solid ${publishPlatform === "google" ? C.green1 : C.border}`, borderRadius: 12, cursor: "pointer", textAlign: "center" as const }}>
+                    <div style={{ fontSize: 22, marginBottom: 4 }}>🔍</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: publishPlatform === "google" ? C.green1 : C.text }}>Google Ads</div>
+                    <div style={{ fontSize: 11, color: C.muted }}>Search Network</div>
+                  </button>
                 </div>
 
                 {publishError && (
@@ -1117,6 +1175,50 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
                         </a>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {googlePublishError && (
+                  <div style={{ background: "rgba(248,113,113,0.08)", borderRadius: 12, padding: 16, border: `1px solid rgba(248,113,113,0.25)`, marginTop: 12 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: "#F87171", marginBottom: 4 }}>Erro ao publicar no Google</div>
+                    <div style={{ fontSize: 13, color: "#F87171", opacity: 0.85, lineHeight: 1.5 }}>{googlePublishError}</div>
+                  </div>
+                )}
+
+                {googlePublishSuccess && (
+                  <div style={{ background: "rgba(34,176,125,0.12)", borderRadius: 12, padding: 16, border: `1px solid rgba(34,176,125,0.3)`, marginTop: 12 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: "#22B07D" }}>
+                      Campanha publicada no Google Ads com sucesso!
+                    </div>
+                    <div style={{ fontSize: 13, color: "#8C93B8", marginTop: 6, lineHeight: 1.5 }}>
+                      Campanha criada e pausada. Acesse o Google Ads para ativar e monitorar.
+                    </div>
+                  </div>
+                )}
+
+                {/* Google Ads Data Panel for manual copy */}
+                {publishPlatform === "google" && (
+                  <div style={{ background: C.card, borderRadius: 12, padding: 18, border: `1px solid ${C.border}`, marginTop: 16 }}>
+                    <div style={{ fontSize: 12, color: C.dim, marginBottom: 8, fontWeight: 600 }}>DADOS PARA GOOGLE ADS (copie e cole)</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {[
+                        { label: "Budget Diario", value: `R$ ${campaignConfig.budgetDaily || 20}/dia` },
+                        { label: "Pais", value: countryObj?.name || product.country },
+                        { label: "Headline 1", value: adCopy.headline || "—" },
+                        { label: "Texto Principal", value: adCopy.primaryText?.slice(0, 90) || "—" },
+                        { label: "CTA", value: adCopy.cta || "Saiba Mais" },
+                        { label: "URL Destino", value: presellUrl || presell.affiliateLink || "—" },
+                        { label: "Palavras-chave", value: targeting.keywords || "—" },
+                      ].map((item, i) => (
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: `1px solid ${C.border}`, gap: 12 }}>
+                          <span style={{ fontSize: 12, color: C.dim, flexShrink: 0 }}>{item.label}</span>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: C.text, textAlign: "right" as const, wordBreak: "break-all" }}>{item.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <a href="https://ads.google.com/aw/campaigns/new" target="_blank" rel="noopener noreferrer" style={{ display: "block", textAlign: "center" as const, marginTop: 14, padding: "12px 20px", background: `linear-gradient(90deg, ${C.green1}, ${C.green2})`, color: C.bg, borderRadius: 10, fontSize: 14, fontWeight: 700, textDecoration: "none" }}>
+                      🔗 Abrir Google Ads Manager
+                    </a>
                   </div>
                 )}
               </div>
@@ -1153,7 +1255,7 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
             &#8592; Voltar
           </button>
           <button
-            onClick={step === STEP_NAMES.length - 1 ? handleLaunch : step === 8 ? handlePublish : next}
+            onClick={step === STEP_NAMES.length - 1 ? handleLaunch : step === 8 ? (publishPlatform === "google" && launchResult?.id && launchResult.id !== "local" ? handlePublishGoogle : handlePublish) : next}
             disabled={loading || (step === 1 && !product.productName)}
             style={{
               padding: "14px 36px",
@@ -1178,7 +1280,9 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
             ) : step === 7 ? (
               "Criar Campanha"
             ) : step === 8 ? (
-              launchResult?.id && launchResult.id !== "local" ? "Publicar no Meta" : "Fechar"
+              launchResult?.id && launchResult.id !== "local"
+                ? (publishPlatform === "google" ? "Publicar no Google" : "Publicar no Meta")
+                : "Fechar"
             ) : (
               "Proximo"
             )}

@@ -8,6 +8,7 @@ import Stepper from "@/components/Stepper";
 import Sidebar, { SidebarPage } from "@/components/Sidebar";
 import PlansPage from "@/components/pages/PlansPage";
 import MetaApiPage from "@/components/pages/MetaApiPage";
+import GoogleAdsConfigPage from "@/components/pages/GoogleAdsConfigPage";
 import SupportPage from "@/components/pages/SupportPage";
 import IaPage from "@/components/pages/IaPage";
 import CampaignsPage from "@/components/pages/CampaignsPage";
@@ -162,7 +163,7 @@ export default function DashboardPage() {
   const isPaid = userPlan === "BASICO" || userPlan === "PRO";
   const isAdmin = userRole === "ADMIN";
   const isFree = userPlan !== null && !isPaid && !isAdmin;
-  const freePages: SidebarPage[] = ["plans", "settings", "support"];
+  const freePages: SidebarPage[] = ["plans", "settings", "support", "google-ads"];
   const isPageBlocked = isFree && !freePages.includes(currentPage);
 
   if (userPlan !== null && !isPaid && !isAdmin && currentPage === "plans") {
@@ -330,6 +331,7 @@ export default function DashboardPage() {
               {currentPage === "plans" && <PlansPage />}
               {currentPage === "ia" && <IaPage />}
               {currentPage === "meta-api" && <MetaApiPage />}
+              {currentPage === "google-ads" && <GoogleAdsConfigPage />}
               {currentPage === "support" && <SupportPage />}
               {currentPage === "admin" && isAdmin && <AdminPanel />}
             </>

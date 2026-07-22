@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-export type SidebarPage = "dashboard" | "campaigns" | "metrics" | "creatives" | "radar" | "ads-shop" | "install" | "settings" | "plans" | "ia" | "meta-api" | "support" | "admin";
+export type SidebarPage = "dashboard" | "campaigns" | "metrics" | "creatives" | "radar" | "ads-shop" | "install" | "settings" | "plans" | "ia" | "meta-api" | "google-ads" | "support" | "admin";
 
 interface SidebarProps {
   currentPage: SidebarPage;
@@ -38,6 +38,7 @@ const MENU_SECTIONS = [
     items: [
       { id: "ia" as SidebarPage, label: "IA", icon: "🤖" },
       { id: "meta-api" as SidebarPage, label: "Meta Ads API", icon: "🔗" },
+      { id: "google-ads" as SidebarPage, label: "Google Ads API", icon: "🔍" },
     ],
   },
   {

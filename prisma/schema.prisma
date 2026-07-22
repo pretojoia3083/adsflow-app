@@ -55,7 +55,21 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model GoogleConfig {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  accessToken    String
+  refreshToken   String
+  customerId     String
+  mccId          String?
+  developerToken String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Campaign {
@@ -87,6 +101,7 @@ model Campaign {
   tone            String?
   status          String   @default("DRAFT")
   metaCampaignId  String?
+  googleCampaignId String?
   targetCities    String?  @default("[]")
   targetRegions   String?  @default("[]")
   startTime       String?
