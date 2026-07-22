@@ -150,7 +150,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { productName, description, platform } = await req.json();
+  const { productName, description, platform, country: selectedCountry } = await req.json();
 
   if (!productName) {
     return NextResponse.json({ error: "productName is required" }, { status: 400 });
@@ -164,6 +164,25 @@ export async function POST(req: NextRequest) {
   const rand = (min: number, max: number) => min + ((seed * 9301 + 49297) % 233280) / 233280 * (max - min);
 
   const platformBoost = (code: string) => pInfo.topCountries.includes(code) ? 1.6 : 1.0;
+
+  const REGION_MAP: Record<string, string[]> = {
+    "BR": ["BR", "PT", "AO", "MZ"],
+    "US": ["US", "CA", "GB"],
+    "PT": ["PT", "BR", "AO"],
+    "IT": ["IT", "ES", "FR", "DE"],
+    "ES": ["ES", "PT", "FR", "IT"],
+    "GB": ["GB", "US", "CA", "AU"],
+    "FR": ["FR", "BE", "CA", "CH"],
+    "DE": ["DE", "AT", "CH", "NL"],
+    "MX": ["MX", "CO", "AR", "CL"],
+    "JP": ["JP", "KR", "SG"],
+    "AU": ["AU", "NZ", "SG"],
+    "IN": ["IN", "SG", "AE"],
+  };
+
+  const regionCodes = selectedCountry && REGION_MAP[selectedCountry]
+    ? REGION_MAP[selectedCountry]
+    : undefined;
 
   const countries: CountryIntel[] = Object.entries(COUNTRY_DATA)
     .map(([code, data]) => {
@@ -181,15 +200,18 @@ export async function POST(req: NextRequest) {
       const activeAds = Math.floor(rand(20, 500) * data.multiplier * nicheMult);
       const successProb = Math.min(95, Math.max(15, Math.floor(50 + nicheMult * 20 - (competitionScore > 3000 ? 15 : 0) + rand(-5, 10))));
 
+      const isTarget = code === selectedCountry;
+      const isRegion = regionCodes?.includes(code) && !isTarget;
+
       return {
-        name: code === "BR" ? "Brasil" : code === "US" ? "Estados Unidos" : code === "PT" ? "Portugal" : code === "AO" ? "Angola" : code === "MZ" ? "Mocambique" : code === "MX" ? "Mexico" : code === "CO" ? "Colombia" : code === "AR" ? "Argentina" : code === "ES" ? "Espanha" : code === "GB" ? "Reino Unido" : code === "FR" ? "Franca" : code === "DE" ? "Alemanha" : code === "IT" ? "Italia" : code === "CA" ? "Canada" : code === "AU" ? "Australia" : code === "JP" ? "Japao" : code === "IN" ? "India" : code === "ZA" ? "Africa do Sul" : code === "NG" ? "Nigeria" : code === "TR" ? "Turquia" : code === "PL" ? "Polonia" : code === "NL" ? "Holanda" : code === "SE" ? "Suecia" : code === "SG" ? "Singapura" : code === "AE" ? "Emirados" : code,
+        name: code === "BR" ? "Brasil" : code === "US" ? "Estados Unidos" : code === "PT" ? "Portugal" : code === "AO" ? "Angola" : code === "MZ" ? "Mocambique" : code === "MX" ? "Mexico" : code === "CO" ? "Colombia" : code === "AR" ? "Argentina" : code === "CL" ? "Chile" : code === "PE" ? "Peru" : code === "ES" ? "Espanha" : code === "GB" ? "Reino Unido" : code === "FR" ? "Franca" : code === "DE" ? "Alemanha" : code === "IT" ? "Italia" : code === "CA" ? "Canada" : code === "AU" ? "Australia" : code === "JP" ? "Japao" : code === "IN" ? "India" : code === "ZA" ? "Africa do Sul" : code === "NG" ? "Nigeria" : code === "GH" ? "Gana" : code === "KE" ? "Quenia" : code === "TR" ? "Turquia" : code === "PL" ? "Polonia" : code === "NL" ? "Holanda" : code === "SE" ? "Suecia" : code === "SG" ? "Singapura" : code === "AE" ? "Emirados" : code,
         code,
-        searchVolume,
+        searchVolume: isTarget ? searchVolume * 3 : isRegion ? Math.floor(searchVolume * 1.5) : searchVolume,
         competitionLevel,
         cpmEstimate: cpm,
-        avgSpendPerDay: avgSpend,
-        activeAds,
-        successProbability: successProb,
+        avgSpendPerDay: isTarget ? Math.floor(avgSpend * 1.8) : isRegion ? Math.floor(avgSpend * 1.2) : avgSpend,
+        activeAds: isTarget ? Math.floor(activeAds * 2) : activeAds,
+        successProbability: isTarget ? Math.min(95, successProb + 10) : successProb,
         flag: data.flag,
       };
     })
@@ -215,6 +237,8 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     productName,
     platform: pInfo.name,
+    selectedCountry: selectedCountry || null,
+    selectedCountryName: selectedCountry ? countries.find((c) => c.code === selectedCountry)?.name || selectedCountry : null,
     platformFocus: pInfo.focus,
     platformCommission: pInfo.avgCommission,
     totalSearchVolume: countries.reduce((a, c) => a + c.searchVolume, 0),

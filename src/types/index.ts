@@ -19,6 +19,7 @@ export interface CampaignData {
   budgetDaily?: number;
   deviceSplit: Record<string, number>;
   adCopy: AdCopy;
+  creativeUrl?: string;
   tone?: string;
 }
 

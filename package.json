@@ -11,6 +11,7 @@
   "dependencies": {
     "@prisma/client": "6.2.0",
     "bcryptjs": "^2.4.3",
+    "html-to-image": "^1.11.13",
     "next": "15.3.6",
     "next-auth": "5.0.0-beta.25",
     "openai": "^6.47.0",

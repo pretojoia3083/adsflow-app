@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import MarketIntelligence from "./MarketIntelligence";
+import CreativeStep from "./CreativeStep";
+import CampaignAudit from "./CampaignAudit";
 import {
   COUNTRIES,
   CTA_OPTIONS,
@@ -18,7 +20,7 @@ const STEP_NAMES = [
   "Analise",
   "Segmentacao",
   "Copy",
-  "Presell",
+  "Criativo & Presell",
   "Config",
   "Revisao",
   "Publicar",
@@ -34,6 +36,7 @@ const C = {
   text: "#F3F5FF",
   muted: "#8C93B8",
   dim: "#5B628A",
+  orange: "#F97316",
 };
 
 function inputStyle(): React.CSSProperties {
@@ -162,9 +165,22 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
   const [facebookPages, setFacebookPages] = useState<{ id: string; name: string }[]>([]);
   const [pagesLoaded, setPagesLoaded] = useState(false);
 
+  const [creativeMode, setCreativeMode] = useState<"ai" | "template" | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [creativeLoading, setCreativeLoading] = useState(false);
+
   const [launchResult, setLaunchResult] = useState<{ id: string; productName: string; cpmEstimate?: string } | null>(null);
   const [currentProgress, setCurrentProgress] = useState(0);
-  const [intelligence, setIntelligence] = useState<Record<string, unknown> | null>(null);
+  const [intelligence, setIntelligence] = useState<{
+    recommendedBudget?: { min: number; suggested: number; aggressive: number };
+    selectedCountry?: string;
+    selectedCountryName?: string;
+    topCountries?: { code: string; name: string; flag: string; searchVolume: number; competitionLevel: string; cpmEstimate: number; successProbability: number }[];
+    competitors?: { advertiser: string; headline: string; cta: string; estimatedSpend: string; platform: string }[];
+    insights?: string[];
+    bestTimeToLaunch?: string;
+    estimatedRoi?: string;
+  } | null>(null);
   const [publishError, setPublishError] = useState("");
   const [publishSuccess, setPublishSuccess] = useState(false);
   const [adsManagerUrl, setAdsManagerUrl] = useState("");
@@ -276,6 +292,7 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
         budgetDaily: campaignConfig.budgetDaily,
         deviceSplit: { mobile: 70, desktop: 30 },
         adCopy,
+        creativeUrl: selectedImage || undefined,
       };
 
       const res = await fetch("/api/campaigns", {
@@ -404,10 +421,13 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
       const res = await fetch("/api/intelligence", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productName: product.productName, description: product.description, platform: product.platform }),
+        body: JSON.stringify({ productName: product.productName, description: product.description, platform: product.platform, country: product.country }),
       });
       const data = await res.json();
       setIntelligence(data);
+      if (data.recommendedBudget) {
+        setCampaignConfig((prev) => ({ ...prev, budgetDaily: data.recommendedBudget.suggested }));
+      }
     } catch {
       //
     }
@@ -417,8 +437,7 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
     if (step === 1) { fetchMarket(); fetchIntelligence(); }
     if (step === 2) fetchTargeting();
     if (step === 3) fetchCopy();
-    if (step === 4) fetchPresell();
-    if (step === 5) fetchFacebookPages();
+    if (step === 4) { fetchPresell(); fetchFacebookPages(); }
     setStep((s) => Math.min(s + 1, STEP_NAMES.length));
   }
 
@@ -739,153 +758,20 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
           </div>
         )}
 
-        {/* STEP 5: Presell */}
+        {/* STEP 5: Criativo & Presell (Unificado) */}
         {step === 5 && (
-          <div>
-            <h2 style={sectionTitle()}></h2>
-            {loading ? (
-              <div style={{ textAlign: "center" as const, padding: "56px 0" }}>
-                <div style={{ width: 44, height: 44, border: `3px solid ${C.border}`, borderTopColor: C.green1, borderRadius: "50%", margin: "0 auto", animation: "spin 1s linear infinite" }} />
-                <p style={{ color: C.muted, fontSize: 16, marginTop: 18 }}>Gerando presell automatica...</p>
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-              </div>
-            ) : (
-              <>
-                <p style={sectionSub()}>Presell gerada automaticamente baseada no produto. Cores e textos ja configurados.</p>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-
-                  <div style={{ background: C.bg, borderRadius: 12, padding: 18, border: `1px solid ${C.border}` }}>
-                    <div style={{ fontSize: 13, color: C.dim, marginBottom: 6 }}>Link da presell (gerado automaticamente)</div>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: C.green2, fontFamily: "monospace", wordBreak: "break-all" }}>
-                      {presellUrl}
-                    </div>
-                    <div style={{ fontSize: 13, color: C.muted, marginTop: 8 }}>
-                      A presell fica hospedada no proprio sistema. Nao precisa comprar dominio nem WordPress.
-                    </div>
-                  </div>
-
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
-                    <div>
-                      <label style={labelStyle()}>Slug (identificador da pagina)</label>
-                      <input
-                        style={inputStyle()}
-                        placeholder="meu-produto"
-                        value={presell.slug}
-                        onChange={(e) => setPresell({ ...presell, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-") })}
-                      />
-                    </div>
-                    <div>
-                      <label style={labelStyle()}>Titulo</label>
-                      <input style={inputStyle()} value={presell.title} onChange={(e) => setPresell({ ...presell, title: e.target.value })} />
-                    </div>
-                  </div>
-                  <div>
-                    <label style={labelStyle()}>Headline da Pagina</label>
-                    <input style={inputStyle()} value={presell.headline} onChange={(e) => setPresell({ ...presell, headline: e.target.value })} />
-                  </div>
-                  <div>
-                    <label style={labelStyle()}>Subheadline</label>
-                    <input style={inputStyle()} value={presell.subheadline} onChange={(e) => setPresell({ ...presell, subheadline: e.target.value })} />
-                  </div>
-                  <div>
-                    <label style={labelStyle()}>Link de Afiliado *</label>
-                    <input
-                      style={inputStyle()}
-                      placeholder="https://exemplo.com/afiliado/seu-id"
-                      value={presell.affiliateLink}
-                      onChange={(e) => setPresell({ ...presell, affiliateLink: e.target.value })}
-                    />
-                    <div style={{ fontSize: 13, color: C.muted, marginTop: 6 }}>
-                      Link completo da oferta de afiliado. O CTA da presell apontara para este link.
-                    </div>
-                  </div>
-                  <div>
-                    <label style={labelStyle()}>Video da Presell (URL)</label>
-                    <input
-                      style={inputStyle()}
-                      placeholder="https://youtube.com/watch?v=... ou https://exemplo.com/video.mp4"
-                      value={presell.videoUrl}
-                      onChange={(e) => setPresell({ ...presell, videoUrl: e.target.value })}
-                    />
-                    <div style={{ fontSize: 13, color: C.muted, marginTop: 6 }}>
-                      URL do video (YouTube, Vimeo ou link direto MP4). Aparece na presell acima do botao CTA.
-                    </div>
-                  </div>
-
-                  {/* PREVIEW DA PRESELL */}
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: C.muted, marginBottom: 12 }}>Preview da Presell</div>
-                    <div style={{ borderRadius: 14, overflow: "hidden", border: `1px solid ${C.border}` }}>
-                      <div style={{ background: "#1A2333", padding: "8px 16px", display: "flex", alignItems: "center", gap: 6 }}>
-                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#EF4444" }} />
-                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F59E0B" }} />
-                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#8B5CF6" }} />
-                        <span style={{ marginLeft: 12, fontSize: 12, color: "#5B628A" }}>{presellUrl}</span>
-                      </div>
-                      <div style={{ background: presell.bgColor, color: presell.textColor, padding: "clamp(32px, 5vw, 56px) clamp(24px, 4vw, 40px)", textAlign: "center" as const }}>
-                        <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: 2, color: presell.accentColor, textTransform: "uppercase" as const, marginBottom: 16 }}>
-                          {presell.title || product.productName}
-                        </div>
-                        <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 700, color: presell.textColor, marginBottom: 16, lineHeight: 1.2 }}>
-                          {presell.headline || "Headline da presell"}
-                        </h1>
-                        <p style={{ fontSize: 16, color: `${presell.textColor}cc`, marginBottom: 32, maxWidth: 480, margin: "0 auto 32px", lineHeight: 1.6 }}>
-                          {presell.subheadline || "Subheadline da presell"}
-                        </p>
-                        {presell.videoUrl && (
-                          <div style={{ marginBottom: 32, maxWidth: 560, margin: "0 auto 32px" }}>
-                            {presell.videoUrl.includes("youtube.com") || presell.videoUrl.includes("youtu.be") ? (
-                              <div style={{ position: "relative" as const, paddingBottom: "56.25%", height: 0, overflow: "hidden", borderRadius: 12 }}>
-                                <iframe
-                                  src={`https://www.youtube.com/embed/${presell.videoUrl.includes("youtu.be") ? presell.videoUrl.split("youtu.be/")[1]?.split("?")[0] : presell.videoUrl.split("v=")[1]?.split("&")[0]}`}
-                                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", borderRadius: 12 }}
-                                  allowFullScreen
-                                />
-                              </div>
-                            ) : presell.videoUrl.includes("vimeo.com") ? (
-                              <div style={{ position: "relative" as const, paddingBottom: "56.25%", height: 0, overflow: "hidden", borderRadius: 12 }}>
-                                <iframe
-                                  src={`https://player.vimeo.com/video/${presell.videoUrl.split("vimeo.com/")[1]?.split("?")[0]}`}
-                                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none", borderRadius: 12 }}
-                                  allowFullScreen
-                                />
-                              </div>
-                            ) : (
-                              <video
-                                controls
-                                style={{ width: "100%", borderRadius: 12, maxHeight: 320, background: "#000" }}
-                                src={presell.videoUrl}
-                              />
-                            )}
-                          </div>
-                        )}
-                        <a
-                          href={presell.affiliateLink || "#"}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{
-                            display: "inline-block",
-                            padding: "16px 40px",
-                            background: presell.accentColor,
-                            color: presell.bgColor,
-                            borderRadius: 12,
-                            fontSize: 17,
-                            fontWeight: 700,
-                            textDecoration: "none",
-                            transition: "opacity 0.2s",
-                          }}
-                        >
-                          {presell.ctaText || "Saiba Mais"}
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              </>
-            )}
-          </div>
+          <CreativeStep
+            product={product}
+            adCopy={adCopy}
+            presell={presell}
+            onPresellChange={setPresell}
+            selectedImage={selectedImage}
+            onImageSelect={setSelectedImage}
+            creativeMode={creativeMode}
+            onModeChange={setCreativeMode}
+            loading={creativeLoading}
+            onLoadingChange={setCreativeLoading}
+          />
         )}
 
         {/* STEP 6: Config */}
@@ -930,6 +816,47 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
                   onChange={(e) => setCampaignConfig({ ...campaignConfig, budgetDaily: Number(e.target.value) })}
                 />
               </div>
+
+              {intelligence?.recommendedBudget && (
+                <div style={{ background: "rgba(139,92,246,0.08)", border: `1px solid ${C.border}`, borderRadius: 12, padding: 14 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: C.text }}>Recomendado pela IA</p>
+                    {intelligence.selectedCountryName && (
+                      <span style={{ fontSize: 11, color: C.muted, background: C.bg, padding: "3px 8px", borderRadius: 6 }}>
+                        {COUNTRIES.find((c) => c.code === intelligence.selectedCountry)?.flag} {intelligence.selectedCountryName}
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {[
+                      { label: "Conservador", value: intelligence.recommendedBudget.min, color: C.green1 },
+                      { label: "Sugerido", value: intelligence.recommendedBudget.suggested, color: "#8B5CF6" },
+                      { label: "Agressivo", value: intelligence.recommendedBudget.aggressive, color: C.orange },
+                    ].map((rec) => (
+                      <button
+                        key={rec.label}
+                        onClick={() => setCampaignConfig((prev) => ({ ...prev, budgetDaily: rec.value }))}
+                        style={{
+                          flex: 1,
+                          padding: "10px 6px",
+                          borderRadius: 8,
+                          border: `1px solid ${campaignConfig.budgetDaily === rec.value ? rec.color : C.border}`,
+                          background: campaignConfig.budgetDaily === rec.value ? "rgba(139,92,246,0.12)" : "transparent",
+                          color: C.text,
+                          fontSize: 12,
+                          fontWeight: 500,
+                          cursor: "pointer",
+                          textAlign: "center" as const,
+                        }}
+                      >
+                        <div style={{ color: rec.color, fontSize: 16, fontWeight: 700 }}>R${rec.value}</div>
+                        <div style={{ color: C.muted, fontSize: 11, marginTop: 2 }}>{rec.label}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label style={labelStyle()}>Nivel de Orcamento</label>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
@@ -1018,14 +945,32 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
         {/* STEP 7: Revisao */}
         {step === 7 && (
           <div>
-            <h2 style={sectionTitle()}></h2>
-            <p style={sectionSub()}>Confira os dados antes de criar a campanha.</p>
-            <div style={{ background: C.bg, borderRadius: 14, padding: 24 }}>
+            <h2 style={sectionTitle()}>Revisao da Campanha</h2>
+            <p style={sectionSub()}>Analise completa antes de publicar.</p>
+
+            <CampaignAudit data={{
+              productName: product.productName,
+              description: product.description,
+              audience: product.audience,
+              funnelStage: targeting.funnelStage,
+              budgetPref: campaignConfig.budgetPref,
+              country: product.country,
+              keywords: targeting.keywords.split(",").map((k) => k.trim()).filter(Boolean),
+              interests: targeting.interests.split(",").map((i) => i.trim()).filter(Boolean),
+              placements: targeting.placements,
+              budgetDaily: campaignConfig.budgetDaily,
+              adCopy,
+              presell: { ...presell, slug: presellSlug },
+              selectedImage,
+              creativeMode,
+              intelligence: intelligence as { recommendedBudget?: { min: number; suggested: number; aggressive: number }; topCountries?: { code: string; name: string; competitionLevel: string; cpmEstimate: number }[] } | null,
+            }} />
+
+            <div style={{ background: C.bg, borderRadius: 14, padding: 24, marginTop: 20 }}>
               {[
                 { label: "Produto", value: product.productName || "—" },
                 { label: "Pais", value: countryObj?.name ?? product.country },
                 { label: "Publico", value: product.audience || "—" },
-                { label: "Score", value: market?.score != null ? String(market.score) : "—" },
                 { label: "Funil", value: FUNNEL_STAGES.find((f) => f.value === targeting.funnelStage)?.label || targeting.funnelStage },
                 { label: "Headline", value: adCopy.headline || "—" },
                 { label: "CTA", value: adCopy.cta || "—" },

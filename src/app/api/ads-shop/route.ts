@@ -35,15 +35,19 @@ export async function GET(req: NextRequest) {
     }
 
     if (category !== "all" && action !== "trending" && action !== "top-commission") {
-      products = getProductsByCategory(category);
-      if (q) {
-        const qLower = q.toLowerCase();
-        products = products.filter(
-          (p) =>
-            p.name.toLowerCase().includes(qLower) ||
-            p.description.toLowerCase().includes(qLower) ||
-            p.tags.some((t) => t.toLowerCase().includes(qLower))
-        );
+      if (action === "search") {
+        products = products.filter((p) => p.category === category);
+      } else {
+        products = getProductsByCategory(category);
+        if (q) {
+          const qLower = q.toLowerCase();
+          products = products.filter(
+            (p) =>
+              p.name.toLowerCase().includes(qLower) ||
+              p.description.toLowerCase().includes(qLower) ||
+              p.tags.some((t) => t.toLowerCase().includes(qLower))
+          );
+        }
       }
     }
 
