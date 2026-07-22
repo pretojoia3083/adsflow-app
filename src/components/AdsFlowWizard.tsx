@@ -344,7 +344,7 @@ export default function AdsFlowWizard({ onStepChange, onClose }: { onStepChange?
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          campaignId: launchResult.id,
+          campaignId: launchResult?.id !== "local" ? launchResult?.id : undefined,
           pageId: campaignConfig.pageId,
           startTime: campaignConfig.startTime || undefined,
         }),

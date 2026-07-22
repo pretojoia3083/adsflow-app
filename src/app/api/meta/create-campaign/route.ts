@@ -22,13 +22,41 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { campaignId, pageId, startTime, endTime } = body;
 
-  if (!campaignId) {
-    return NextResponse.json({ error: "campaignId obrigatorio" }, { status: 400 });
+  let campaign = null;
+
+  if (campaignId) {
+    campaign = await prisma.campaign.findFirst({
+      where: { id: campaignId, userId: session.user.id },
+    });
   }
 
-  const campaign = await prisma.campaign.findFirst({
-    where: { id: campaignId, userId: session.user.id },
-  });
+  if (!campaign && campaignId) {
+    campaign = await prisma.campaign.findFirst({
+      where: { id: campaignId },
+    });
+  }
+
+  if (!campaign && body.productName) {
+    campaign = {
+      id: "inline",
+      productName: body.productName,
+      countryCode: body.countryCode || "BR",
+      budgetDaily: body.budgetDaily || 20,
+      funnelStage: body.funnelStage || "topo",
+      creativeUrl: body.creativeUrl || null,
+      affiliateLink: body.affiliateLink || null,
+      affLink: null,
+      adCopy: JSON.stringify(body.adCopy || {}),
+      interests: JSON.stringify(body.interests || []),
+      placements: JSON.stringify(body.placements || []),
+      targetCities: JSON.stringify(body.targetCities || []),
+      targetRegions: JSON.stringify(body.targetRegions || []),
+      metaCampaignId: null,
+      status: "DRAFT",
+      userId: session.user.id,
+    } as Awaited<ReturnType<typeof prisma.campaign.findFirst>> & Record<string, unknown>;
+  }
+
   if (!campaign) {
     return NextResponse.json({ error: "Campanha nao encontrada" }, { status: 404 });
   }
@@ -73,10 +101,12 @@ export async function POST(req: NextRequest) {
       pixelId: config.pixelId || undefined,
     });
 
-    await prisma.campaign.update({
-      where: { id: campaignId },
-      data: { metaCampaignId: result.id, status: "ACTIVE" },
-    });
+    if (campaign.id && campaign.id !== "inline") {
+      await prisma.campaign.update({
+        where: { id: campaign.id },
+        data: { metaCampaignId: result.id, status: "ACTIVE" },
+      });
+    }
 
     if (result.partial) {
       return NextResponse.json({
